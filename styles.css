@@ -1,8 +1,174 @@
-/*
+.persian-calendar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    font-family: IRANSans(Fanum);
+}
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+.calendar-header {
+    align-items: center;
+    display: flex;
+    margin: 0.5rem;
+    padding: 0px 14px;
+    width: 100%;
 
-If your plugin does not need CSS, delete this file.
+}
 
-*/
+.calendar-change-month-arrow {
+    cursor: pointer;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+}
+
+.calendar-month-year {
+    flex-grow: 1;
+    text-align: right;
+    font-size: 1.25rem;
+    font-weight: bold;
+    padding: 0 20px;
+    cursor: pointer;
+}
+
+.calendar-today-button {
+    cursor: pointer;
+    color: var(--interactive-accent);
+    font-weight: bold;
+    margin: 0 7px 0 7px;
+}
+
+.calendar-content {
+    display: grid;
+    grid-template-rows: auto repeat(6, auto); /* 1 row for header, 6 for the weeks */
+    gap: 5px;
+    direction: rtl;
+    padding: 0 12px;
+}
+
+.calendar-weekdays-header {
+    grid-column: 2 / span 7; /* Weekday headers start at the second column and span 7 columns */
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* 7 days of the week */
+    text-align: center;
+    font-weight: bold;
+    padding: 5px;
+}
+
+.calendar-weekday, .calendar-weekday-header {
+    padding: 5px;
+    text-align: center;
+    height: 2rem;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+}
+
+.calendar-week-numbers {
+    display: grid;
+    grid-template-rows: repeat(6, auto); /* 6 weeks */
+    text-align: center;
+    grid-column: 1; /* Week numbers stay in the first column */
+    grid-row: 2 / span 6; /* Align with the rows of days */
+    border-left: 1px solid var(--background-modifier-border);
+}
+
+.calendar-days-grid {
+    display: grid;
+    align-items: start;
+    grid-row: 2 / span 6; /* Align with the rows of days */
+}
+
+.calendar-week-number{
+    padding: 5px;
+    background-color: var(--background-secondary);
+    color: var(--text-normal);
+    text-align: center;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    height: 2rem;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    font-size: 0.8rem;
+    flex-direction: column;
+    position: relative;
+}
+
+.calendar-day{
+    padding: 4px;
+    background-color: var(--background-secondary);
+    color: var(--text-normal);
+    text-align: center;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    height: 2rem;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    font-size: 0.8rem;
+    flex-direction: column;
+    position: relative;
+}
+
+.calendar-day.dim {
+    opacity: 0.25;
+}
+
+.calendar-day:hover {
+    background-color: var(--background-secondary-alt);
+}
+
+.calendar-day.today {
+    color: var(--interactive-accent);
+    border-radius: 50%;
+    font-weight: bold;
+}
+
+.calendar-day.has-note::before {
+    content: "\2022";
+    color: var(--interactive-accent);
+    font-size: 18px;
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+}
+
+
+.calendar-week-header {
+    font-weight: bold;
+    text-align: center;
+    height: 2rem;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+}
+
+.calendar-month{
+    color: var(--interactive-accent);
+    padding-left: 5px;
+}
+
+
+.note-indicator {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    line-height: 6px;
+    min-height: 6px;
+    position: absolute;
+    bottom: 3px;
+}
+
+
+.calendar-week-number .has-note {
+    content: "\2022";
+    color: var(--interactive-accent);
+    font-size: 18px;
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+}

@@ -1,11 +1,15 @@
 {
-	"id": "sample-plugin",
-	"name": "Sample Plugin",
+	"id": "obsidian-persian-calendar",
+	"name": "Obsidian Persian Calendar",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "Demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
+	"description": "Obsidian Persian Calendar for daily note management",
+	"author": "Hossein Maleknejad",
 	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
+	"fundingUrl": {
+		"سایت کارفکر": "https://karfekr.ir",
+		"انحمن کارفکر": "https://forum.karfekr.ir",
+		"کانال تلگرام": "https://t.me/karfekr"
+	},
 	"isDesktopOnly": false
 }

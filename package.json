@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-sample-plugin",
+	"name": "obsidian-persian-calendar",
 	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"description": "Obsidian Persian Calendar",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
@@ -12,6 +12,8 @@
 	"author": "",
 	"license": "MIT",
 	"devDependencies": {
+		"@types/jalaali-js": "^1.1.3",
+		"@types/moment-jalaali": "^0.7.9",
 		"@types/node": "^16.11.6",
 		"@typescript-eslint/eslint-plugin": "5.29.0",
 		"@typescript-eslint/parser": "5.29.0",
@@ -20,5 +22,10 @@
 		"obsidian": "latest",
 		"tslib": "2.4.0",
 		"typescript": "4.7.4"
+	},
+	"dependencies": {
+		"jalaali-js": "^1.2.6",
+		"moment-jalaali": "^0.10.0",
+		"momentjs": "^2.0.0"
 	}
 }
