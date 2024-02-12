@@ -34,9 +34,7 @@ export default class PersianCalendarView extends View {
         return 'calendar'; 
     }
     
-    async onClose(): Promise<void> {
-        console.log("Persian Calendar is closing");
-    }
+
     private currentJalaaliYear: number;
     private currentJalaaliMonth: number;
     
