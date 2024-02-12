@@ -1,7 +1,7 @@
 {
 	"name": "obsidian-persian-calendar",
 	"version": "1.0.0",
-	"description": "Obsidian Persian Calendar",
+	"description": "Persian (Shamsi) Calendar",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",

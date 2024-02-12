@@ -13,7 +13,7 @@ export default class PersianCalendarPlugin extends Plugin {
         this.addSettingTab(new PersianCalendarSettingTab(this.app, this));
         this.addCommand({
             id: 'open-persian-calendar',
-            name: 'Open Persian Calendar',
+            name: 'Open Obsidian Persian Calendar View',
             callback: () => this.activateView(),
         });
     }
@@ -50,19 +50,27 @@ class PersianCalendarSettingTab extends PluginSettingTab {
         containerEl.empty();
 
         // Daily Note Settings
-        containerEl.createEl('h3', { text: 'Notes Path' });
+        containerEl.createEl('h3', { text: 'Notes path' });
+        containerEl.createEl('p', { text: 'You can define periodic notes path here. Dont put "/" at start of path.' });
         this.addPathSetting(containerEl, 'Daily Note Path', 'dailyNotesFolderPath');
         this.addPathSetting(containerEl, 'Weekly Note Path', 'weeklyNotesFolderPath');
         this.addPathSetting(containerEl, 'Monthly Note Path', 'monthlyNotesFolderPath');
         this.addPathSetting(containerEl, 'Yearly Note Path', 'yearlyNotesFolderPath');
-
+        const paragraph = containerEl.createEl('p');
+        paragraph.appendText('In case you see a bug or have idea for this plugin report it on ');
+        paragraph.createEl('a', { text: 'Karfekr Forum', href: 'https://forum.Karfekr.ir' });
+        paragraph.appendText('.');
+        paragraph.createEl('br');
+        paragraph.appendText('Developed by Hossein Maleknejad, for supporting, follow  ');
+        paragraph.createEl('a', { text: 'Karfekr', href: 'https://Karfekr.ir' });
+        paragraph.appendText('.');
     }
 
     addPathSetting(containerEl: HTMLElement, name: string, settingKey: keyof PluginSettings) {
         new Setting(containerEl)
             .setName(name)
             .addText(text => text
-                .setPlaceholder('Path/to/notes')
+                .setPlaceholder('Path/for/notes')
                 .setValue(this.plugin.settings[settingKey])
                 .onChange(async (value) => {
                     this.plugin.settings[settingKey] = value;
