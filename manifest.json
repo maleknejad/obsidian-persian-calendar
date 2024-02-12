@@ -1,7 +1,7 @@
 {
 	"id": "obsidian-persian-calendar",
 	"name": "Obsidian Persian Calendar",
-	"version": "1.0.0",
+	"version": "0.0.9",
 	"minAppVersion": "0.15.0",
 	"description": "Obsidian Persian Calendar for daily note management",
 	"author": "Hossein Maleknejad",
