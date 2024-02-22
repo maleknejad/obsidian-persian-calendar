@@ -355,36 +355,35 @@ export default class PersianCalendarView extends View {
     }
 
     private getWeekNumbersForMonth(jalaaliDate: {jy: number, jm: number}): number[] {
-        // Ensure moment-jalaali uses the Jalaali calendar
         moment.loadPersian({usePersianDigits: false, dialect: 'persian-modern'});
-    
-        // Start of the month for which we want to find the week numbers, in Jalaali
-        const startOfMonth = moment(`${jalaaliDate.jy}/${jalaaliDate.jm}/1`, 'jYYYY/jM/jD');
-        
-        // Find out the Jalaali week number for the first day of the month
+        const startOfMonth = moment(`${jalaaliDate.jy}/${jalaaliDate.jm}/1`, 'jYYYY/jM/jD');        
         const startWeekNumber = startOfMonth.jWeek();
-    
-        // Prepare an array to hold the week numbers for 6 weeks
         const weekNumbers = [];
     
         for (let i = 0; i < 6; i++) {
-            // Calculate the week number for each week to be displayed
             let weekNumberForIthWeek = startWeekNumber + i;
             
-            // Adjust week number for cases when it exceeds the number of weeks in a year
             if(weekNumberForIthWeek > 52) {
-                weekNumberForIthWeek -= 52; // Assuming a maximum of 52 weeks per Jalaali year
+                weekNumberForIthWeek -= 52; 
             }
     
-            // Push the calculated week number into the array
             weekNumbers.push(weekNumberForIthWeek);
         }
     
         return weekNumbers;
     }
     
+    private calculateCurrentWeekNumber(jalaaliDate: {jy: number, jm: number, jd: number}): number {
+    moment.loadPersian({usePersianDigits: false, dialect: 'persian-modern'});
 
-    private async openOrCreateDailyNote(dayNumber: number) {
+    const currentDate = moment(`${jalaaliDate.jy}/${jalaaliDate.jm}/${jalaaliDate.jd}`, 'jYYYY/jM/jD');
+
+    const currentWeekNumber = currentDate.jWeek();
+
+    return currentWeekNumber;
+}
+
+    public async openOrCreateDailyNote(dayNumber: number) {
         const year = this.currentJalaaliYear;
         const month = this.currentJalaaliMonth;
         const dateString = `${year}-${month.toString().padStart(2, '0')}-${dayNumber.toString().padStart(2, '0')}`;
@@ -422,7 +421,7 @@ export default class PersianCalendarView extends View {
     }
     
     
-    private async openOrCreateWeeklyNote(weekNumber: number, jy: number) {
+    public async openOrCreateWeeklyNote(weekNumber: number, jy: number) {
         const weekString = `${jy}-W${weekNumber}`;
         const notesLocation = this.settings.weeklyNotesFolderPath.trim().replace(/^\/*|\/*$/g, "");
         const filePath = `${notesLocation === '' ? '' : notesLocation + '/'}${weekString}.md`;
@@ -459,7 +458,7 @@ export default class PersianCalendarView extends View {
     }
     
 
-    private async openOrCreateMonthlyNote(month: number, jy: number) {
+    public async openOrCreateMonthlyNote(month: number, jy: number) {
         const monthString = `${jy}-${month.toString().padStart(2, '0')}`;
         const notesLocation = this.settings.monthlyNotesFolderPath.trim().replace(/^\/*|\/*$/g, "");
         const filePath = `${notesLocation === '' ? '' : notesLocation + '/'}${monthString}.md`;
@@ -487,8 +486,7 @@ export default class PersianCalendarView extends View {
         }
     }
     
-    // Refactored openOrCreateYearlyNote
-    private async openOrCreateYearlyNote(jy: number) {
+    public async openOrCreateYearlyNote(jy: number) {
         const yearString = `${jy}`;
         const notesLocation = this.settings.yearlyNotesFolderPath.trim().replace(/^\/*|\/*$/g, "");
         const filePath = `${notesLocation === '' ? '' : notesLocation + '/'}${yearString}.md`;
