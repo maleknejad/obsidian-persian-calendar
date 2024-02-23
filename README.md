@@ -18,7 +18,7 @@ This Obsidian plugin gives you a simple and useful view for working with periodi
 
 این پلاگین تقویم فارسی را به [ابسیدین](https://obsidian.md/) اضافه می‌کند و شما می‌توانید بااستفاده از این پلاگین روزنوشت‌، هفته‌نوشت، ماه‌نوشت و سال‌نوشت تولید کنید و آن‌ها را مدیریت کنید.  
 
-<video controls src="Instructions/Obsidian.mp4" title="افزونه تقویم فارسی ابسیدین"></video>
+![نمای اصلی افزونه تقویم فارسی ابسیدین](Instructions/Obsidian.webp)
 
 ## قابلیت‌ها
 
@@ -32,7 +32,7 @@ This Obsidian plugin gives you a simple and useful view for working with periodi
 تا زمان تایید شدن این افزونه توسط ابسیدین و اضافه شدن به مخزن افزونه‌ها، می‌توانید از طریق افزونه [BRAT](https://tfthacker.com/brat-quick-guide) نصب کنید.
 کافیست لینک گیت‌هاب را با استفاده از راهنمای تصویری زیر نصب کنید.
 
-<video controls src="Instructions/installing with brat.mp4" title="نصب از طریق BRAT"></video>
+![راهنمای نصب از طریق افزونه BRAT](Instructions/installingwithbrat.webp)
 
 در صورتی که مایل هستید بدون پلاگین BRAT  این کار را انجام دهید می‌توانید فایل‌های زیر را دانلود کنید و در پوشه‌ای با نام این پلاگین در بخش افزونه‌های مخزن ابسیدین خود اضافه کنید:
 > `style.css` `main.js` `maifest.json`
@@ -47,13 +47,13 @@ This Obsidian plugin gives you a simple and useful view for working with periodi
 با استفاده از افزونه [Templater](https://github.com/SilentVoid13/Templater) می‌توانید قالب‌های مشخصی را برای یاداشت‌های روزانه، هفتگی، ماهانه و سالانه خود مشخص کنید:
 کافیست افزونه [Templater](https://github.com/SilentVoid13/Templater) را نصب کنید و مطابق تصویر زیر برای هر نوع از فایل‌ها یک قالب به افزونه معرفی کنید. در نظر داشته باشید مسیرهایی که به افزونه معرفی می‌کنید با مسیرهای مشخص شده در تنظیمات افزونه یکسان باشد. حتما باید گزینه Trigger Templater on new file creation روشن باشد.
 
-![راهنمای استفاده از [Templater](https://github.com/SilentVoid13/Templater) به همراه افزونه](Instructions/templater.gif)
+![راهنمای استفاده به همراه Templater](Instructions/templater.webp)
 
 ## دستورات تعریف شده در افزونه
 
 برای سهولت در دسترسی به فایل‌های روزهای مختلف دستورات زیر در افزونه قرار دارد که می‌توانید برای آن‌ها شورتکات تعریف کنید. 
 
-<video controls src="Instructions/commands.mp4" title="دستورات داخل نرم افزار"></video>
+![دستورات تعریف شده داخل ابسیدین](Instructions/commands.webp)
 
 ## مسیر مشارکت در توسعه پلاگین
 
