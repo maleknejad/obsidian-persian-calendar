@@ -87,7 +87,7 @@ export default class PersianCalendarPlugin extends Plugin {
 
         this.addCommand({
             id: 'open-current-months-note',
-            name: 'Monthly - باز کردن ماه‌نوشت این هفته',
+            name: 'Monthly - بازکردن ماه‌نوشت این ماه',
             callback: async () => {
                 const today = new Date();
                 const todayJalaali = toJalaali(today);
