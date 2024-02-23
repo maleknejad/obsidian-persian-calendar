@@ -2,7 +2,8 @@
 # Obsidian Persian Calendar
 
 This Obsidian plugin gives you a simple and useful view for working with periodic notes on Solar calendar.
-[[تصویر افزونه]]
+
+![Obsidian Persian Calendar](<Instructions/Obsidian Persian Calendar.png>)
 
 ## Usage
 
@@ -17,7 +18,7 @@ This Obsidian plugin gives you a simple and useful view for working with periodi
 
 این پلاگین تقویم فارسی را به [ابسیدین](https://obsidian.md/) اضافه می‌کند و شما می‌توانید بااستفاده از این پلاگین روزنوشت‌، هفته‌نوشت، ماه‌نوشت و سال‌نوشت تولید کنید و آن‌ها را مدیریت کنید.  
 
-![فعالیت اصلی](Instructions/Obsidian.gif)
+<video controls src="Instructions/Obsidian.mp4" title="افزونه تقویم فارسی ابسیدین"></video>
 
 ## قابلیت‌ها
 
@@ -31,7 +32,7 @@ This Obsidian plugin gives you a simple and useful view for working with periodi
 تا زمان تایید شدن این افزونه توسط ابسیدین و اضافه شدن به مخزن افزونه‌ها، می‌توانید از طریق افزونه [BRAT](https://tfthacker.com/brat-quick-guide) نصب کنید.
 کافیست لینک گیت‌هاب را با استفاده از راهنمای تصویری زیر نصب کنید.
 
-![نصب از طریق افزونه BRAT](<Instructions/installing with brat.gif>)
+<video controls src="Instructions/installing with brat.mp4" title="نصب از طریق BRAT"></video>
 
 در صورتی که مایل هستید بدون پلاگین BRAT  این کار را انجام دهید می‌توانید فایل‌های زیر را دانلود کنید و در پوشه‌ای با نام این پلاگین در بخش افزونه‌های مخزن ابسیدین خود اضافه کنید:
 > `style.css` `main.js` `maifest.json`
@@ -52,9 +53,8 @@ This Obsidian plugin gives you a simple and useful view for working with periodi
 
 برای سهولت در دسترسی به فایل‌های روزهای مختلف دستورات زیر در افزونه قرار دارد که می‌توانید برای آن‌ها شورتکات تعریف کنید. 
 
-![دستورات داخل برنامه](Instructions/commands.gif)
-
+<video controls src="Instructions/commands.mp4" title="دستورات داخل نرم افزار"></video>
 
 ## مسیر مشارکت در توسعه پلاگین
 
-این پلاگین به صورت رایگان و برای مقاصد غیرتحاری توسعه یافته است و با مشارکت شما کامل‌ می‌شود. در تب Issues همین مخزن می‌توانید ایده‌ها و باگ‌ها را گزارش کنید. هم‌چنین در تلاشم در سایت و فروم [کارفکر](https://karfekr.ir) مطالب مرتبط با ابسیدین را به اشتراک بگذارم. اگر مایل هستید که توسعه دهنده این پلاگین را حمایت کنید [کارفکر](https://karfekr.ir) را دنبال کنید. 
+این پلاگین به صورت رایگان و برای مقاصد غیرتحاری توسعه یافته است و با مشارکت شما کامل‌ می‌شود. در تب Issues همین مخزن می‌توانید ایده‌ها و باگ‌ها را گزارش کنید. هم‌چنین در تلاشم در سایت و فروم [کارفکر](https://karfekr.ir) مطالب مرتبط با ابسیدین را به اشتراک بگذارم. اگر مایل هستید که توسعه دهنده این پلاگین را حمایت کنید [کارفکر](https://karfekr.ir) را دنبال کنید.
