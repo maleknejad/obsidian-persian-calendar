@@ -1,9 +1,9 @@
 {
-	"id": "obsidian-persian-calendar",
-	"name": "Obsidian Persian Calendar",
+	"id": "persian-calendar",
+	"name": "Persian Calendar",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "Obsidian Persian Calendar for managing periodic notes based on persian solar calendar. تقویم شمسی ابسیدین برای مدیریت فایل‌های دوره‌ای",
+	"description": "Persian Calendar plugin for managing periodic notes based on persian solar calendar.",
 	"author": "Hossein Maleknejad",
 	"authorUrl": "https://karfekr.ir",
 	"fundingUrl": {
