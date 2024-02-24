@@ -149,15 +149,15 @@ export default class PersianCalendarView extends View {
         // Define weekdays for the header
         const weekdays = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
 
-        // Create the weekdays header as part of the grid
         weekdays.forEach((weekday, index) => {
             if (gridEl === null) {
                 console.error('gridEl is null');
-                return; // Or handle the error as appropriate
+                return; 
             }
             const headerCell = gridEl.createEl('div', { cls: 'calendar-weekday-header' });
             headerCell.textContent = weekday;
-            headerCell.style.gridColumnStart = (index + 2).toString();
+            headerCell.classList.add("dynamic-grid-placement"); // Add the class
+            headerCell.style.setProperty('--dynamic-grid-start', (index + 2).toString());
         });
         // Retrieve days with notes
         const daysWithNotes = await this.getDaysWithNotes();
@@ -208,9 +208,8 @@ export default class PersianCalendarView extends View {
                 dayEl.addClass('dim');
             }
             
-   
-            // Assign the day element to the correct grid column
-            dayEl.style.gridColumnStart = ((i % 7) + 2).toString();
+            dayEl.classList.add("dynamic-day-grid-placement"); 
+            dayEl.style.setProperty('--day-grid-start', ((i % 7) + 2).toString());
         }
     }
     
