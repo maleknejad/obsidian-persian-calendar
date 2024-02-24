@@ -1,9 +1,9 @@
 {
 	"id": "persian-calendar",
 	"name": "Persian Calendar",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"minAppVersion": "0.15.0",
-	"description": "Persian Calendar plugin for managing periodic notes based on persian solar calendar.",
+	"description": "Persian Calendar plugin for managing periodic notes based on persian solar (h calendar.",
 	"author": "Hossein Maleknejad",
 	"authorUrl": "https://karfekr.ir",
 	"fundingUrl": {
