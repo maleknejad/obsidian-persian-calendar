@@ -1,4 +1,3 @@
-
 interface PluginSettings {
     dailyNotesFolderPath: string;
     weeklyNotesFolderPath: string;
