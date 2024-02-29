@@ -150,9 +150,9 @@ export default class PersianCalendarView extends View {
         const weekdays = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
 
         weekdays.forEach((weekday, index) => {
-            if (gridEl === null) {
-                console.error('gridEl is null');
-                return; 
+            if (!gridEl) {
+                new Notice('Calendar grid element not found. Please ensure the calendar is properly loaded.');
+                return; // Exit the iteration if gridEl is not found
             }
             const headerCell = gridEl.createEl('div', { cls: 'calendar-weekday-header' });
             headerCell.textContent = weekday;
@@ -411,10 +411,10 @@ export default class PersianCalendarView extends View {
             }
         } catch (error) {
             if (error instanceof Error) {
-                console.error(`Error creating/opening daily note: ${error.message}`);
+                new Notice ('Error creating/opening daily note');
             } else {
                 // Handle the case where the error is not an Error instance
-                console.error("An unknown error occurred", error);
+                new Notice ('Error creating/opening daily note');
             }
         }
     }
@@ -448,10 +448,9 @@ export default class PersianCalendarView extends View {
             }
         } catch (error) {
             if (error instanceof Error) {
-                console.error(`Error creating/opening weekly note: ${error.message}`);
+                new Notice('Error creating/opening weekly note');
             } else {
-                // Handle the case where the error is not an Error instance
-                console.error("An unknown error occurred", error);
+                new Notice('Error creating/opening weekly note');
             }
         }
     }
@@ -477,10 +476,10 @@ export default class PersianCalendarView extends View {
             }
         } catch (error) {
             if (error instanceof Error) {
-                console.error(`Error creating/opening daily note: ${error.message}`);
+                new Notice('Error creating/opening daily note');
             } else {
                 // Handle the case where the error is not an Error instance
-                console.error("An unknown error occurred", error);
+                new Notice('an error accured!');
             }
         }
     }
@@ -506,10 +505,10 @@ export default class PersianCalendarView extends View {
             }
         } catch (error) {
             if (error instanceof Error) {
-                console.error(`Error creating/opening yearly note: ${error.message}`);
+                new Notice('Error creating/opening yearly note');
             } else {
                 // Handle the case where the error is not an Error instance
-                console.error("An unknown error occurred", error);
+                new Notice('An unknown error occurred');
             }
         }
     }
