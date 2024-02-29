@@ -1,7 +1,7 @@
 {
 	"id": "persian-calendar",
 	"name": "Persian Calendar",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"minAppVersion": "0.15.0",
 	"description": "Persian Calendar for managing periodic notes based on persian solar (shamsi) calendar.",
 	"author": "Hossein Maleknejad",
