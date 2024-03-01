@@ -6,7 +6,5 @@
 	"description": "Persian Calendar for managing periodic notes based on persian solar (shamsi) calendar.",
 	"author": "Hossein Maleknejad",
 	"authorUrl": "https://karfekr.ir",
-	"fundingUrl": {
-	},
 	"isDesktopOnly": false
 }
