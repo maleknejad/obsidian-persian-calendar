@@ -6,6 +6,8 @@ import moment from 'moment-jalaali';
 
 
 export default class PersianCalendarView extends View {
+    dailyCheckInterval: number | undefined;
+    lastCheckedDate: moment.Moment = moment().startOf('day');
     
     constructor(leaf: WorkspaceLeaf, app: App, settings: PluginSettings) {
         super(leaf);
@@ -17,6 +19,7 @@ export default class PersianCalendarView extends View {
         const todayJalaali = toJalaali(new Date());
         this.currentJalaaliYear = todayJalaali.jy;
         this.currentJalaaliMonth = todayJalaali.jm;
+        this.startDailyCheckInterval();
     }
     getViewType(): string {
         return "persian-calendar";
@@ -28,13 +31,21 @@ export default class PersianCalendarView extends View {
 
     async onOpen(): Promise<void> {
         await this.render();
+        this.startDailyCheckInterval();
+    }
+
+    async onClose(): Promise<void> {
+        this.stopDailyCheckInterval(); 
     }
 
     getIcon() {
         return 'calendar'; 
     }
     
-
+    focus() {
+        const inputEl = this.containerEl.querySelector('input');
+        inputEl?.focus();
+    }
     private currentJalaaliYear: number;
     private currentJalaaliMonth: number;
     
@@ -210,6 +221,23 @@ export default class PersianCalendarView extends View {
             
             dayEl.classList.add("dynamic-day-grid-placement"); 
             dayEl.style.setProperty('--day-grid-start', ((i % 7) + 2).toString());
+        }
+    }
+
+    private startDailyCheckInterval(): void {
+        this.dailyCheckInterval = setInterval(() => {
+            const today = moment().startOf('day');
+            if (!this.lastCheckedDate.isSame(today, 'day')) {
+                this.lastCheckedDate = today;
+                this.render(); // Rerender or refresh the part of your view that needs updating
+            }
+        }, 60 * 1000) as unknown as number;// Check every minute
+    }
+
+    private stopDailyCheckInterval(): void {
+        if (this.dailyCheckInterval !== undefined) {
+            clearInterval(this.dailyCheckInterval);
+            this.dailyCheckInterval = undefined;
         }
     }
     

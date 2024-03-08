@@ -1,4 +1,4 @@
-import { Plugin, PluginSettingTab, Setting, App } from 'obsidian';
+import { Notice, Plugin, PluginSettingTab, Setting, App } from 'obsidian';
 import PersianCalendarView from './view';
 import { PluginSettings, DEFAULT_SETTINGS } from './settings';
 import { toJalaali } from 'jalaali-js';
@@ -59,6 +59,13 @@ export default class PersianCalendarPlugin extends Plugin {
             }
         });
         
+        this.addCommand({
+            id: 'open-persian-calendar-view',
+            name: 'Open Persian Calendar View - باز کردن تقویم فارسی',
+            callback: async () => {
+                await this.activateView();
+            },
+        });
 
         this.addCommand({
             id: 'open-this-weeks-note',
@@ -161,6 +168,24 @@ export default class PersianCalendarPlugin extends Plugin {
         // Return the current week number
         return currentWeekNumber;
     }
+    private async activateView() {
+        let leaf = this.app.workspace.getLeavesOfType('persian-calendar').first();
+        
+        if (!leaf) {
+            leaf = this.app.workspace.getRightLeaf(false);
+            await leaf.setViewState({
+                type: 'persian-calendar',
+            });
+        }
+
+        if (!leaf || !(leaf.view instanceof PersianCalendarView)) {
+            new Notice('Unable to open Persian Calendar view. Please make sure the plugin is correctly installed.');
+            return;
+        }
+
+        this.app.workspace.revealLeaf(leaf);
+        leaf.view.focus();
+    }
 }
 
 class PersianCalendarSettingTab extends PluginSettingTab {
@@ -178,7 +203,7 @@ class PersianCalendarSettingTab extends PluginSettingTab {
         // Daily Note Settings
         containerEl.createEl('h3', { text: 'Notes path' });
         containerEl.createEl('p', { text: 'You can define periodic notes path here. Dont put "/" at start of path.' });
-        containerEl.createEl('p', { text: 'مسیر نوشته‌ها را میتوانید از طریق تنظیمات زیر تعیین کنید و اول مسیر "/" نگذارید' });
+        containerEl.createEl('p', { text: 'مسیر ساختن نوشته‌ها را میتوانید از طریق تنظیمات زیر تعیین کنید و اول مسیر "/" نگذارید' });
         this.addPathSetting(containerEl, 'Daily Note Path - مسیر روزنوشت‌ها', 'dailyNotesFolderPath');
         this.addPathSetting(containerEl, 'Weekly Note Path - مسیر هفته‌نوشت‌ها', 'weeklyNotesFolderPath');
         this.addPathSetting(containerEl, 'Monthly Note Path - مسیر ماه‌نوشت‌ها', 'monthlyNotesFolderPath');

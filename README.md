@@ -12,7 +12,7 @@ This Obsidian plugin gives you a simple and useful view for working with periodi
 - Can add monthly notes by clicking on month.
 - Can add yearly notes by clicking on year.
 - Modify path for creating notes.
-- Works Fine with Templater Plugin.
+- Works Fine with [Templater](https://github.com/SilentVoid13/Templater) Plugin for note templates. 
 
 # پلاگین تقویم فارسی ابسیدین
 
@@ -29,13 +29,7 @@ This Obsidian plugin gives you a simple and useful view for working with periodi
 
 ## راهنمای نصب
 
-تا زمان تایید شدن این افزونه توسط ابسیدین و اضافه شدن به مخزن افزونه‌ها، می‌توانید از طریق افزونه [BRAT](https://tfthacker.com/brat-quick-guide) نصب کنید.
-کافیست لینک گیت‌هاب را با استفاده از راهنمای تصویری زیر نصب کنید.
-
-![راهنمای نصب از طریق افزونه BRAT](Instructions/installingwithbrat.webp)
-
-در صورتی که مایل هستید بدون پلاگین BRAT  این کار را انجام دهید می‌توانید فایل‌های زیر را دانلود کنید و در پوشه‌ای با نام این پلاگین در بخش افزونه‌های مخزن ابسیدین خود اضافه کنید:
-> `style.css` `main.js` `maifest.json`
+این افزونه در مخزن افزونه‌های ابسیدین نمایه شده است. برای نصب افزونه کافیست از طریق تنظیمات در بخش Community plugins نام Persian Calendar را جستجو کنید و افزونه را نصب کنید.
 
 ## راهنمای استفاده
 
