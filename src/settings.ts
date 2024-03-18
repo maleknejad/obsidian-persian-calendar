@@ -3,6 +3,8 @@ interface PluginSettings {
     weeklyNotesFolderPath: string;
     monthlyNotesFolderPath: string;
     yearlyNotesFolderPath: string;
+    enableQuarterlyNotes: boolean;
+    quarterlyNotesFolderPath: string;
 }
 
 
@@ -11,6 +13,8 @@ const DEFAULT_SETTINGS: PluginSettings = {
     weeklyNotesFolderPath: '/',
     monthlyNotesFolderPath: '/',
     yearlyNotesFolderPath: '/',
+    enableQuarterlyNotes: true,
+    quarterlyNotesFolderPath: '/',
 };
 
 type JalaaliDate = {

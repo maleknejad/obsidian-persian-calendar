@@ -1,9 +1,9 @@
 {
 	"id": "persian-calendar",
 	"name": "Persian Calendar",
-	"version": "1.0.3",
+	"version": "1.1.0",
 	"minAppVersion": "0.15.0",
-	"description": "Persian Calendar for managing periodic notes based on persian solar (shamsi) calendar.",
+	"description": "Persian Calendar gives you a simple and useful view for working with periodic (yearly, quarterly, monthly, weekly and daily) notes based on solar (shamsi) calendar.",
 	"author": "Hossein Maleknejad",
 	"authorUrl": "https://karfekr.ir",
 	"isDesktopOnly": false

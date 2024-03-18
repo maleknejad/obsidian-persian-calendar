@@ -180,3 +180,25 @@
 .dynamic-day-grid-placement {
     grid-column-start: var(--day-grid-start);
 }
+
+
+.calendar-quarters-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    align-items: center;
+    justify-items: center;
+    grid-column: 1 / span 2;
+    grid-row: auto;
+}
+
+.calendar-quarter {
+    cursor: pointer;
+    padding: 5px 10px;
+    opacity: 0.25;
+    font-size: 0.9rem;
+}
+
+.calendar-quarter.current-quarter {
+    color: var(--interactive-accent-text);
+    opacity: 1;
+}

@@ -56,26 +56,22 @@ export default class PersianCalendarView extends View {
         containerEl.empty();
         
         await this.renderHeader(containerEl);
-
-        // Create the main content container
         const contentEl = containerEl.createEl('div', { cls: 'calendar-content' });
-
-        // Render the week numbers directly inside the content container
-        await this.renderWeekNumbers(contentEl, this.getCurrentJalaaliDate()); // Pass contentEl and the current Jalaali date
-    
-        // Render the days grid directly inside the content container
-        await this.renderDaysGrid(contentEl, this.getCurrentJalaaliDate()); // Pass contentEl and the current Jalaali date
+        await this.renderWeekNumbers(contentEl, this.getCurrentJalaaliDate()); 
+            await this.renderDaysGrid(contentEl, this.getCurrentJalaaliDate());
+        if (this.settings.enableQuarterlyNotes) {
+            await this.renderQuarterlyNotesRow(contentEl);
+        }
     }
     
     private async renderHeader(containerEl: HTMLElement): Promise<void> {
-        // Create the header container
+         
         const headerEl = containerEl.createEl('div', { cls: 'calendar-header' });
     
         const nextMonthArrow = headerEl.createEl('span', { cls: 'calendar-change-month-arrow' });
         nextMonthArrow.textContent = '<';
         nextMonthArrow.addEventListener('click', () => this.changeMonth(1));
        
-        // Create the "Today" button in the center
         const todayButton = headerEl.createEl('span', { cls: 'calendar-today-button' });
         todayButton.textContent = 'امروز';
         todayButton.addEventListener('click', () => this.goToToday());
@@ -83,35 +79,25 @@ export default class PersianCalendarView extends View {
         const prevMonthArrow = headerEl.createEl('span', { cls: 'calendar-change-month-arrow' });
         prevMonthArrow.textContent = '>';
         prevMonthArrow.addEventListener('click', () => this.changeMonth(-1));
-
-    
-        // Create the month and year display in the center
         const monthYearEl = headerEl.createEl('div', { cls: 'calendar-month-year' });
-
-        // Create separate elements for month and year
         const monthEl = monthYearEl.createEl('span', { cls: 'calendar-month' });
-        const yearEl = monthYearEl.createEl('span', { cls: 'calendar-year' });
-    
-        // Set the text content for month and year
+        const yearEl = monthYearEl.createEl('span', { cls: 'calendar-year' });    
         const monthName = this.getMonthName(this.currentJalaaliMonth);
         monthEl.textContent = monthName;
         yearEl.textContent = this.toFarsiDigits(this.currentJalaaliYear);
-    
-        // Add click listener for opening monthly note to the month element
+
         monthEl.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent the event from bubbling to the parent element
+            e.stopPropagation();
             this.openOrCreateMonthlyNote(this.currentJalaaliMonth, this.currentJalaaliYear);
         });
     
-        // Add click listener for opening yearly note to the year element
+         
         yearEl.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent the event from bubbling to the parent element
+            e.stopPropagation(); 
             this.openOrCreateYearlyNote(this.currentJalaaliYear);
         });
     
     }
-
-
     
     private async renderWeekNumbers(contentEl: HTMLElement, jalaaliDate: { jy: number, jm: number }) {
         let weekNumbersEl = contentEl.querySelector('.calendar-week-numbers');
@@ -124,17 +110,17 @@ export default class PersianCalendarView extends View {
         weekHeader.textContent = "ه";
     
         const weekNumbers = this.getWeekNumbersForMonth(jalaaliDate);
-        const weeksWithNotes = await this.getWeeksWithNotes(jalaaliDate.jy); // Assumes this method is implemented
+        const weeksWithNotes = await this.getWeeksWithNotes(jalaaliDate.jy);  
     
         for (let i = 0; i < 6; i++) {
             const weekEl = weekNumbersEl.createEl('div', { cls: 'calendar-week-number' });
     
             if (i < weekNumbers.length) {
                 weekEl.textContent = this.toFarsiDigits(weekNumbers[i]);
-                // Add visual indicator if the week has a note
+                 
                 if (weeksWithNotes.includes(weekNumbers[i])) {
                     const dotEl = weekEl.createDiv({ cls: 'note-indicator' });
-                    dotEl.setText('•'); // You can style this dot with CSS
+                    dotEl.setText('•');  
                 }
     
                 weekEl.addEventListener('click', async () => {
@@ -150,54 +136,41 @@ export default class PersianCalendarView extends View {
     
     
     private async renderDaysGrid(contentEl: HTMLElement, jalaaliDate: { jy: number, jm: number }) {
-        // Clear any existing grid and create a new one
+         
         let gridEl = contentEl.querySelector('.calendar-days-grid');
         if (gridEl) {
             gridEl.remove();
         }
         gridEl = contentEl.createEl('div', { cls: 'calendar-days-grid' });
     
-        // Define weekdays for the header
+         
         const weekdays = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
 
         weekdays.forEach((weekday, index) => {
             if (!gridEl) {
                 new Notice('Calendar grid element not found. Please ensure the calendar is properly loaded.');
-                return; // Exit the iteration if gridEl is not found
+                return;  
             }
             const headerCell = gridEl.createEl('div', { cls: 'calendar-weekday-header' });
             headerCell.textContent = weekday;
-            headerCell.classList.add("dynamic-grid-placement"); // Add the class
+            headerCell.classList.add("dynamic-grid-placement");  
             headerCell.style.setProperty('--dynamic-grid-start', (index + 2).toString());
         });
-        // Retrieve days with notes
+         
         const daysWithNotes = await this.getDaysWithNotes();
-    
-        // Use Jalaali date to get the first day of the month and the number of days in the month
         const daysInMonth = jalaaliMonthLength(jalaaliDate.jy, jalaaliDate.jm);
-    
-        // Calculate the index for the first day of the month (0 for Saturday, 1 for Sunday, ...)
         const firstDayOfWeekIndex = this.calculateFirstDayOfWeekIndex(jalaaliDate.jy, jalaaliDate.jm);
-    
-        // Define the total number of cells (6 weeks, 7 days a week)
-        const totalCells = 42; // Fixed number of cells for a 6-row calendar
-    
-        // Calculate days from the previous and next months
+        const totalCells = 42;  
         const daysFromPrevMonth = this.calculateDaysFromPreviousMonth(firstDayOfWeekIndex);
         const daysFromNextMonth = this.calculateDaysFromNextMonth(firstDayOfWeekIndex, daysInMonth);
-    
-        // Loop through total cells and create day elements
         for (let i = 0; i < totalCells; i++) {
             const dayEl = gridEl.createEl('div', { cls: 'calendar-day' });
-            const dayIndex = i - firstDayOfWeekIndex; // Calculate index relative to the first day of the month
-    
-            // Assign day numbers or leave blank for cells outside the current month
+            const dayIndex = i - firstDayOfWeekIndex;       
             if (dayIndex < 0) {
-                // Days from the previous month
                 dayEl.textContent = this.toFarsiDigits(daysFromPrevMonth[daysFromPrevMonth.length + dayIndex]);
                 dayEl.addClass('dim');
             } else if (dayIndex < daysInMonth) {
-                // Days of the current month
+                 
                 const dayNumber = dayIndex + 1;
                 dayEl.textContent = this.toFarsiDigits(dayNumber);
                 if (this.isToday({ jy: jalaaliDate.jy, jm: jalaaliDate.jm, jd: dayNumber })) {
@@ -214,24 +187,39 @@ export default class PersianCalendarView extends View {
                 }
                 
             } else {
-                // Days from the next month
+                 
                 dayEl.textContent = this.toFarsiDigits(daysFromNextMonth[dayIndex - daysInMonth]);
                 dayEl.addClass('dim');
             }
-            
             dayEl.classList.add("dynamic-day-grid-placement"); 
             dayEl.style.setProperty('--day-grid-start', ((i % 7) + 2).toString());
         }
     }
+
+    private async renderQuarterlyNotesRow(containerEl: HTMLElement) {    
+        const quartersRow = containerEl.createDiv({ cls: 'calendar-quarters-row' });
+        const { quarter: currentQuarter, jy } = this.getCurrentQuarter();
+        const seasons = ['بهار', 'تابستان', 'پاییز', 'زمستان'];
+        seasons.forEach((season, index) => {  
+            const quarterDiv = quartersRow.createDiv({
+                cls: `calendar-quarter${index + 1 === currentQuarter ? ' current-quarter' : ''}`
+            });
+            quarterDiv.textContent = season;  
+            quarterDiv.addEventListener('click', () => {
+                const quarterNumber = index + 1;
+                this.openOrCreateQuarterlyNote(quarterNumber, jy);
+            });
+        });
+    } 
 
     private startDailyCheckInterval(): void {
         this.dailyCheckInterval = setInterval(() => {
             const today = moment().startOf('day');
             if (!this.lastCheckedDate.isSame(today, 'day')) {
                 this.lastCheckedDate = today;
-                this.render(); // Rerender or refresh the part of your view that needs updating
+                this.render();  
             }
-        }, 60 * 1000) as unknown as number;// Check every minute
+        }, 60 * 1000) as unknown as number; 
     }
 
     private stopDailyCheckInterval(): void {
@@ -243,15 +231,15 @@ export default class PersianCalendarView extends View {
     
 
     private isToday(jalaaliDate: { jy: number, jm: number, jd: number }): boolean {
-        // Using moment-jalaali to check if the given date is today
+         
         const today = moment().locale('fa');
         return today.isSame(moment(`${jalaaliDate.jy}/${jalaaliDate.jm}/${jalaaliDate.jd}`, 'jYYYY/jM/jD'), 'day');
     }
 
     private async getDaysWithNotes(): Promise<number[]> {
-        // Normalize the notes location path for consistent comparison
-        const notesLocation = this.settings.dailyNotesFolderPath.trim().replace(/^\/*|\/*$/g, ""); // Remove leading and trailing slashes
-        const filePrefix = notesLocation ? `${notesLocation}/` : ""; // Add a slash to the end if not root
+         
+        const notesLocation = this.settings.dailyNotesFolderPath.trim().replace(/^\/*|\/*$/g, "");  
+        const filePrefix = notesLocation ? `${notesLocation}/` : "";  
     
         const files = this.app.vault.getFiles();
         const noteDays: number[] = files
@@ -270,19 +258,19 @@ export default class PersianCalendarView extends View {
 
     
     private async getWeeksWithNotes(jy: number): Promise<number[]> {
-        // Normalize the weekly notes location path for consistent comparison
+         
         const notesLocation = this.settings.weeklyNotesFolderPath.trim().replace(/^\/*|\/*$/g, "");
-        const filePrefix = notesLocation ? `${notesLocation}/` : ""; // Add a slash to the end if not the root
+        const filePrefix = notesLocation ? `${notesLocation}/` : "";  
     
         const files = this.app.vault.getFiles();
         const weekNumbers: number[] = files
             .filter(file => {
-                // Build the start of the expected file name for weekly notes of the given year
+                 
                 const expectedStart = `${filePrefix}${jy}-W`;
                 return file.path.startsWith(expectedStart) && file.extension === 'md';
             })
             .map(file => {
-                // Extract the week number from the file name
+                 
                 const match = file.name.match(/W(\d+)/);
                 return match ? parseInt(match[1], 10) : null;
             })
@@ -297,22 +285,21 @@ export default class PersianCalendarView extends View {
     }
     
     private calculateFirstDayOfWeekIndex(jy: number, jm: number): number {
-        // Convert the first day of the Jalaali month to Gregorian
+         
         const { gy, gm, gd } = toGregorian(jy, jm, 1);
-        // Create a Date object for the first day of the month in Gregorian
-        const firstDayDate = new Date(gy, gm - 1, gd); // Note: JavaScript Date months are 0-indexed
-        // Get the day of the week: 0 for Sunday, 1 for Monday, ..., 6 for Saturday
+         
+        const firstDayDate = new Date(gy, gm - 1, gd);  
+         
         const dayOfWeek = firstDayDate.getDay();
     
-        // Adjust for a week starting on Saturday:
-        // If getDay() returns 6 (Saturday), we want 0. For other days (Sun-Fri), we just add 1.
+         
+         
         const adjustedDayOfWeek = dayOfWeek === 6 ? 0 : dayOfWeek + 1;
     
         return adjustedDayOfWeek;
     }
     
     private changeMonth(offset: number): void {
-        // Adjust the current month and year based on the offset (-1 for previous, +1 for next)
         let newMonth = this.currentJalaaliMonth + offset;
         let newYear = this.currentJalaaliYear;
         if (newMonth > 12) {
@@ -322,14 +309,9 @@ export default class PersianCalendarView extends View {
             newMonth = 12;
             newYear--;
         }
-    
         this.currentJalaaliMonth = newMonth;
         this.currentJalaaliYear = newYear;
-    
-        
-        // After updating the month and year, re-render the calendar with the new month
-        this.render();
-       
+        this.render(); 
     }
   
 
@@ -371,13 +353,13 @@ export default class PersianCalendarView extends View {
     
 
     private getCurrentJalaaliDate(): JalaaliDate {
-        // Use the currently selected year and month, defaulting to today's date if not set
+         
         const now = new Date();
         const todayJalaali = toJalaali(now.getFullYear(), now.getMonth() + 1, now.getDate());
         return { 
             jy: this.currentJalaaliYear || todayJalaali.jy,
             jm: this.currentJalaaliMonth || todayJalaali.jm,
-            jd: 1  // Always use the first day of the month for this purpose
+            jd: 1   
         };
     }
 
@@ -427,13 +409,13 @@ export default class PersianCalendarView extends View {
             }
     
             if (dailyNoteFile && dailyNoteFile instanceof TFile) {
-                // Attempt to find an open leaf with this file
+                 
                 const openLeaf = this.app.workspace.getLeavesOfType('markdown').find(leaf => leaf.view instanceof MarkdownView && leaf.view.file === dailyNoteFile);
                 if (openLeaf) {
-                    // File is already open, focus on it
+                     
                     this.app.workspace.setActiveLeaf(openLeaf);
                 } else {
-                    // File is not open, open it in a new pane
+                     
                     await this.app.workspace.openLinkText(dailyNoteFile.path, '', false);
                 }
             }
@@ -441,7 +423,7 @@ export default class PersianCalendarView extends View {
             if (error instanceof Error) {
                 new Notice ('Error creating/opening daily note');
             } else {
-                // Handle the case where the error is not an Error instance
+                 
                 new Notice ('Error creating/opening daily note');
             }
         }
@@ -464,13 +446,13 @@ export default class PersianCalendarView extends View {
             }
     
             if (weeklyNoteFile && weeklyNoteFile instanceof TFile) {
-                // Attempt to find an open leaf with this file
+                 
                 const openLeaf = this.app.workspace.getLeavesOfType('markdown').find(leaf => leaf.view instanceof MarkdownView && leaf.view.file === weeklyNoteFile);
                 if (openLeaf) {
-                    // File is already open, focus on it
+                     
                     this.app.workspace.setActiveLeaf(openLeaf);
                 } else {
-                    // File is not open, open it in a new pane
+                     
                     await this.app.workspace.openLinkText(weeklyNoteFile.path, '', false);
                 }
             }
@@ -495,7 +477,7 @@ export default class PersianCalendarView extends View {
             if (!monthlyNoteFile) {
                 await this.app.vault.create(filePath, '');
                 new Notice(`Created monthly note: ${filePath}`);
-                // Re-fetch the file after creation to ensure it's not null
+                 
                 monthlyNoteFile = await this.app.vault.getAbstractFileByPath(filePath);
             }
     
@@ -506,12 +488,45 @@ export default class PersianCalendarView extends View {
             if (error instanceof Error) {
                 new Notice('Error creating/opening daily note');
             } else {
-                // Handle the case where the error is not an Error instance
+                 
                 new Notice('an error accured!');
             }
         }
     }
     
+    public async openOrCreateQuarterlyNote(quarter: number, jy: number) {
+         
+        const quarterString = `${jy}-Q${quarter}`;
+         
+        const notesLocation = this.settings.quarterlyNotesFolderPath.trim().replace(/^\/*|\/*$/g, "");
+        const filePath = `${notesLocation === '' ? '' : notesLocation + '/'}${quarterString}.md`;
+        
+        try {
+            let quarterlyNoteFile = await this.app.vault.getAbstractFileByPath(filePath);
+            
+             
+            if (!quarterlyNoteFile) {
+                await this.app.vault.create(filePath, '');
+                new Notice(`Created quarterly note: ${filePath}`);
+                 
+                quarterlyNoteFile = await this.app.vault.getAbstractFileByPath(filePath);
+            }
+            
+             
+            if (quarterlyNoteFile && quarterlyNoteFile instanceof TFile) {
+                this.openNoteInWorkspace(quarterlyNoteFile);
+            }
+        } catch (error) {
+             
+            if (error instanceof Error) {
+                new Notice(`Error creating/opening quarterly note: ${error.message}`);
+            } else {
+                new Notice('An unknown error occurred while handling the quarterly note');
+            }
+        }
+    }
+    
+
     public async openOrCreateYearlyNote(jy: number) {
         const yearString = `${jy}`;
         const notesLocation = this.settings.yearlyNotesFolderPath.trim().replace(/^\/*|\/*$/g, "");
@@ -523,7 +538,7 @@ export default class PersianCalendarView extends View {
             if (!yearlyNoteFile) {
                 await this.app.vault.create(filePath, '');
                 new Notice(`Created yearly note: ${filePath}`);
-                // Re-fetch the file after creation to ensure it's not null
+                 
                 yearlyNoteFile = await this.app.vault.getAbstractFileByPath(filePath);
             }
     
@@ -535,31 +550,31 @@ export default class PersianCalendarView extends View {
             if (error instanceof Error) {
                 new Notice('Error creating/opening yearly note');
             } else {
-                // Handle the case where the error is not an Error instance
+                 
                 new Notice('An unknown error occurred');
             }
         }
     }
     
-    // Utility method to open or focus a note in the workspace
+     
     private async openNoteInWorkspace(noteFile: TFile): Promise<void> {
-    // Check if the note is already open in any leaf
+     
     const isOpen = this.app.workspace.getLeavesOfType('markdown').some(leaf => leaf.view instanceof MarkdownView && leaf.view.file === noteFile);
 
     if (isOpen) {
-        // If open, find the leaf and activate it
+         
         const leaf = this.app.workspace.getLeavesOfType('markdown').find(leaf => leaf.view instanceof MarkdownView && leaf.view.file === noteFile);
         if (leaf) {
             this.app.workspace.setActiveLeaf(leaf);
         }
     } else {
-        // If not open, open the note in a new pane
+         
         await this.app.workspace.openLinkText(noteFile.path, '', false);
     }
 }
 
     private scrollToDay(dayNumber: number) {
-        // Function to scroll to the specified day in the calendar
+         
         const dayEl = this.containerEl.querySelector(`.calendar-day[data-day="${dayNumber}"]`);
         if (dayEl) {
             dayEl.scrollIntoView();
@@ -567,22 +582,36 @@ export default class PersianCalendarView extends View {
     }
 
     private async goToToday() {
-        // Function to navigate to the current day and open the daily note
+         
         const { jy, jm, jd } = getTodayJalaali();
         this.currentJalaaliYear = jy;
         this.currentJalaaliMonth = jm;
         this.render();
         this.scrollToDay(jd);
     
-        // Open or create the daily note for today
+         
         this.openOrCreateDailyNote(jd);
     }
+
+    public getCurrentQuarter(): { quarter: number, jy: number } {
+        const month = this.currentJalaaliMonth; 
+        const year = this.currentJalaaliYear; 
+        let quarter = 1;
+    
+        if (month >= 1 && month <= 3) quarter = 1; 
+        else if (month >= 4 && month <= 6) quarter = 2; 
+        else if (month >= 7 && month <= 9) quarter = 3; 
+        else if (month >= 10 && month <= 12) quarter = 4; 
+    
+        return { quarter, jy: year };
+    }
+    
     private getMonthName(monthIndex: number): string {
         const monthNames = [
             'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
             'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'
         ];
-        return monthNames[monthIndex - 1]; // Adjusted if your monthIndex starts from 1
+        return monthNames[monthIndex - 1];  
     }
 }
 
