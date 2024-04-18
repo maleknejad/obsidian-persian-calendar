@@ -1,4 +1,4 @@
-import { Notice, Plugin, PluginSettingTab, Setting, App } from 'obsidian';
+import { Notice, Plugin, PluginSettingTab, Setting, App, TFile } from 'obsidian';
 import PersianCalendarView from './view';
 import { PluginSettings, DEFAULT_SETTINGS } from './settings';
 import { toJalaali } from 'jalaali-js';
@@ -25,6 +25,20 @@ export default class PersianCalendarPlugin extends Plugin {
             }
         });
         
+
+        this.registerEvent(this.app.vault.on('create', (file) => {
+            if (file instanceof TFile && file.path.endsWith('.md')) {
+                this.handleFileUpdate(file, true);
+            }
+        }));
+
+        this.registerEvent(this.app.vault.on('delete', (file) => {
+            if (file instanceof TFile && file.path.endsWith('.md')) {
+                this.handleFileUpdate(file, false);
+            }
+        }));
+
+
         this.addSettingTab(new PersianCalendarSettingTab(this.app, this));
         this.addCommand({
             id: 'open-todays-daily-note',
@@ -91,17 +105,11 @@ export default class PersianCalendarPlugin extends Plugin {
             id: 'open-current-quarterly-note',
             name: 'ْQuarterly - باز کردن فصل نوشت این فصل',
             callback: async () => {
-                 
                 const leaf = this.app.workspace.getLeavesOfType('persian-calendar')[0];
-                
                 if (leaf && leaf.view instanceof PersianCalendarView) {
-                     
                     const { quarter, jy } = leaf.view.getCurrentQuarter();
-
-                     
                     await leaf.view.openOrCreateQuarterlyNote(quarter, jy);
                 } else {
-                     
                     new Notice('Persian Calendar view is not open. Please open the Persian Calendar first.');
                 }
             },
@@ -145,7 +153,7 @@ export default class PersianCalendarPlugin extends Plugin {
                 }
             },
         });
-        
+
 
         const openNoteForDate = (year: number, month: number, dayNumber: number) => {
             const leaf = this.app.workspace.getLeavesOfType('persian-calendar')[0];
@@ -159,21 +167,27 @@ export default class PersianCalendarPlugin extends Plugin {
             }
         };
 
-        
-        
     }
 
     async loadSettings() {
         this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
     }
 
-
+    
 
 
     async saveSettings() {
         await this.saveData(this.settings);
     }
     
+    private async handleFileUpdate(file: TFile, isCreation: boolean): Promise<void> {
+        const view = this.app.workspace.getLeavesOfType('persian-calendar')[0]?.view;
+        if (view instanceof PersianCalendarView) {
+            view.refreshCalendarDots(file, isCreation);
+        }
+    }
+
+
     private calculateCurrentWeekNumber(jalaaliDate: {jy: number, jm: number, jd: number}): number {
         moment.loadPersian({usePersianDigits: false, dialect: 'persian-modern'});    
         const currentDate = moment(`${jalaaliDate.jy}/${jalaaliDate.jm}/${jalaaliDate.jd}`, 'jYYYY/jM/jD');
@@ -198,6 +212,16 @@ export default class PersianCalendarPlugin extends Plugin {
         this.app.workspace.revealLeaf(leaf);
         leaf.view.focus();
     }
+
+    refreshViews() {
+        if (this.app.workspace.getLeavesOfType('persian-calendar').length > 0) {
+            this.app.workspace.getLeavesOfType('persian-calendar').forEach(leaf => {
+                if (leaf.view instanceof PersianCalendarView) {
+                    leaf.view.render(); 
+                }
+            });
+        }
+    }
 }
 
 class PersianCalendarSettingTab extends PluginSettingTab {
@@ -221,11 +245,21 @@ class PersianCalendarSettingTab extends PluginSettingTab {
     
          
         this.addPathSetting(containerEl, 'مسیر روزنوشت‌ها', 'dailyNotesFolderPath');
+        new Setting(containerEl)
+        .setName('فرمت نام‌گذاری و شناسایی روزنوشت‌ها')
+        .setDesc('مشخص کنید روزنوشت‌ها با چه فرمتی نام‌گذاری شوند. این نام در Title روزنوشت‌ها قرار می‌گیرد.')
+        .addDropdown(dropdown => dropdown
+            .addOption('persian', 'خورشیدی')
+            .addOption('georgian', 'میلادی')
+            .setValue(this.plugin.settings.dateFormat || 'georgian')
+            .onChange(async (value) => {
+                this.plugin.settings.dateFormat = value;
+                await this.plugin.saveSettings();
+                this.plugin.refreshViews();  // Optionally refresh views if necessary
+            }));
         this.addPathSetting(containerEl, 'مسیر هفته‌نوشت‌ها', 'weeklyNotesFolderPath');
         this.addPathSetting(containerEl, 'مسیر ماه‌نوشت‌ها', 'monthlyNotesFolderPath');
         this.addPathSetting(containerEl, 'مسیر فصل‌نوشت‌ها', 'quarterlyNotesFolderPath');
-        this.addPathSetting(containerEl, 'مسیر سال‌نوشت‌ها', 'yearlyNotesFolderPath');
-         
         new Setting(containerEl)
             .setName('فعال‌سازی نمایش فصل‌نوشت‌ها در تقویم')
             .setDesc('نمایش یا پنهان کردن ردیف فصل‌نوشت‌ها در نمای تقویم')
@@ -234,9 +268,15 @@ class PersianCalendarSettingTab extends PluginSettingTab {
                 .onChange(async (value) => {
                     this.plugin.settings.enableQuarterlyNotes = value;
                     await this.plugin.saveSettings();
+                    this.plugin.refreshViews();
                 }));
-    
+        this.addPathSetting(containerEl, 'مسیر سال‌نوشت‌ها', 'yearlyNotesFolderPath');
          
+        
+    
+        
+            
+
         containerEl.createEl('p', { text: 'مسیرها را قبل از تنظیم کردن در ابسیدین ایجاد کنید. مسیرها باید بدون "/" در ابتدای آن باشد.' });
         containerEl.createEl('p', { text: 'برای اعمال تغییرات، لازم است تقویم را از تنظیمات ابسیدین مجددا فعال کنید.' });
         const templaterparagraph = containerEl.createEl('p');
@@ -265,6 +305,7 @@ class PersianCalendarSettingTab extends PluginSettingTab {
                 .setPlaceholder('Path/for/notes')
                 .setValue(this.plugin.settings[settingKey] as string)
                 .onChange(async (value) => {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     (this.plugin.settings as any)[settingKey] = value;
                     await this.plugin.saveSettings();
                 }));

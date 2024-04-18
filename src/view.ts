@@ -8,6 +8,7 @@ import moment from 'moment-jalaali';
 export default class PersianCalendarView extends View {
     dailyCheckInterval: number | undefined;
     lastCheckedDate: moment.Moment = moment().startOf('day');
+    noteDays: number[] = [];
     
     constructor(leaf: WorkspaceLeaf, app: App, settings: PluginSettings) {
         super(leaf);
@@ -20,6 +21,8 @@ export default class PersianCalendarView extends View {
         this.currentJalaaliYear = todayJalaali.jy;
         this.currentJalaaliMonth = todayJalaali.jm;
         this.startDailyCheckInterval();
+        this.noteDays = [];
+        
     }
     getViewType(): string {
         return "persian-calendar";
@@ -51,7 +54,7 @@ export default class PersianCalendarView extends View {
     
     private settings: PluginSettings;
 
-    private async render() {
+    public async render() {
         const containerEl = this.containerEl;
         containerEl.empty();
         
@@ -142,8 +145,7 @@ export default class PersianCalendarView extends View {
             gridEl.remove();
         }
         gridEl = contentEl.createEl('div', { cls: 'calendar-days-grid' });
-    
-         
+                
         const weekdays = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
 
         weekdays.forEach((weekday, index) => {
@@ -195,6 +197,7 @@ export default class PersianCalendarView extends View {
             dayEl.style.setProperty('--day-grid-start', ((i % 7) + 2).toString());
         }
     }
+    
 
     private async renderQuarterlyNotesRow(containerEl: HTMLElement) {    
         const quartersRow = containerEl.createDiv({ cls: 'calendar-quarters-row' });
@@ -237,25 +240,43 @@ export default class PersianCalendarView extends View {
     }
 
     private async getDaysWithNotes(): Promise<number[]> {
-         
-        const notesLocation = this.settings.dailyNotesFolderPath.trim().replace(/^\/*|\/*$/g, "");  
-        const filePrefix = notesLocation ? `${notesLocation}/` : "";  
+        const notesLocation = this.settings.dailyNotesFolderPath.trim().replace(/^\/*|\/*$/g, "");
+        const filePrefix = notesLocation ? `${notesLocation}/` : "";
     
+        const jy = this.currentJalaaliYear;
+        const jm = this.currentJalaaliMonth.toString().padStart(2, '0');
+    
+        // Assume the directory structure includes the correct year-month prefix for filenames
         const files = this.app.vault.getFiles();
-        const noteDays: number[] = files
-            .filter(file => {
-                const filePath = `${filePrefix}${this.currentJalaaliYear}-${this.currentJalaaliMonth.toString().padStart(2, '0')}`;
-                return file.path.startsWith(filePath) && file.extension === 'md';
-            })
-            .map(file => {
-                const parts = file.name.split('-');
-                return parts.length === 3 ? parseInt(parts[2].replace('.md', ''), 10) : null;
-            })
-            .filter(day => day !== null) as number[];
+        const noteDays: number[] = [];
+    
+        files.forEach(file => {
+            if (!file.path.startsWith(filePrefix) || file.extension !== 'md') {
+                return;
+            }
+    
+            // Extract the date part from the filename based on expected format 'YYYY-MM-DD.md'
+            const match = file.name.match(/^(\d{4})-(\d{2})-(\d{2})\.md$/);
+            if (!match) return;
+    
+            const [ , year, month, day ] = match.map(Number);
+            
+            if (this.settings.dateFormat === 'georgian') {
+                // Convert from Georgian date to Persian to check the month and year
+                const { jy: convJy, jm: convJm, jd: convJd } = toJalaali(new Date(year, month - 1, day));
+                if (convJy === jy && convJm === parseInt(jm)) {
+                    noteDays.push(convJd);
+                }
+            } else {
+                // Direct comparison for Persian formatted filenames
+                if (year === jy && month === parseInt(jm)) {
+                    noteDays.push(day);
+                }
+            }
+        });
     
         return noteDays;
     }
-
     
     private async getWeeksWithNotes(jy: number): Promise<number[]> {
          
@@ -392,42 +413,38 @@ export default class PersianCalendarView extends View {
     return currentWeekNumber;
 }
 
-    public async openOrCreateDailyNote(dayNumber: number) {
-        const year = this.currentJalaaliYear;
-        const month = this.currentJalaaliMonth;
-        const dateString = `${year}-${month.toString().padStart(2, '0')}-${dayNumber.toString().padStart(2, '0')}`;
-        const notesLocation = this.settings.dailyNotesFolderPath.trim().replace(/^\/*|\/*$/g, "");
-        const filePath = `${notesLocation === '' ? '' : notesLocation + '/'}${dateString}.md`;
-    
-        try {
-            let dailyNoteFile = await this.app.vault.getAbstractFileByPath(filePath);
-            if (!dailyNoteFile) {
-                await this.app.vault.create(filePath, '');
-                dailyNoteFile = await this.app.vault.getAbstractFileByPath(filePath);
-                new Notice(`Created daily note: ${filePath}`);
-                this.render();
-            }
-    
-            if (dailyNoteFile && dailyNoteFile instanceof TFile) {
-                 
-                const openLeaf = this.app.workspace.getLeavesOfType('markdown').find(leaf => leaf.view instanceof MarkdownView && leaf.view.file === dailyNoteFile);
-                if (openLeaf) {
-                     
-                    this.app.workspace.setActiveLeaf(openLeaf);
-                } else {
-                     
-                    await this.app.workspace.openLinkText(dailyNoteFile.path, '', false);
-                }
-            }
-        } catch (error) {
-            if (error instanceof Error) {
-                new Notice ('Error creating/opening daily note');
+public async openOrCreateDailyNote(dayNumber: number) {
+    const year = this.currentJalaaliYear;
+    const month = this.currentJalaaliMonth;
+    let dateString = `${year}-${month.toString().padStart(2, '0')}-${dayNumber.toString().padStart(2, '0')}`;
+    if (this.settings.dateFormat === 'georgian') {
+        const gregorianDate = toGregorian(year, month, dayNumber);
+        dateString = `${gregorianDate.gy}-${gregorianDate.gm.toString().padStart(2, '0')}-${gregorianDate.gd.toString().padStart(2, '0')}`;
+    }
+    const notesLocation = this.settings.dailyNotesFolderPath.trim().replace(/^\/*|\/*$/g, "");
+    const filePath = `${notesLocation === '' ? '' : notesLocation + '/'}${dateString}.md`;
+
+    try {
+        let dailyNoteFile = await this.app.vault.getAbstractFileByPath(filePath);
+        if (!dailyNoteFile) {
+            await this.app.vault.create(filePath, '');
+            new Notice(`Created daily note: ${filePath}`);
+            dailyNoteFile = await this.app.vault.getAbstractFileByPath(filePath);
+        }
+
+        if (dailyNoteFile instanceof TFile) {
+            const openLeaf = this.app.workspace.getLeavesOfType('markdown').find(leaf => leaf.view instanceof MarkdownView && leaf.view.file === dailyNoteFile);
+            if (openLeaf) {
+                this.app.workspace.setActiveLeaf(openLeaf, {});
             } else {
-                 
-                new Notice ('Error creating/opening daily note');
+                await this.app.workspace.openLinkText(dailyNoteFile.path, '', false);
             }
         }
+    } catch (error) {
+        console.error("Error creating/opening daily note: ", error);
     }
+}
+
     
     
     public async openOrCreateWeeklyNote(weekNumber: number, jy: number) {
@@ -612,6 +629,14 @@ export default class PersianCalendarView extends View {
             'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'
         ];
         return monthNames[monthIndex - 1];  
+    }
+
+    public async refreshCalendarDots(file: TFile, isCreation: boolean): Promise<void> {
+        if (!this.containerEl) {
+            console.error("Attempting to refresh dots but containerEl is not set.");
+            return;
+        }    
+        await this.render();
     }
 }
 

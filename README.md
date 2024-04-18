@@ -1,7 +1,7 @@
 
 # Obsidian Persian Calendar
 
-This Obsidian plugin gives you a simple and useful view for working with periodic notes on solar calendar.
+Persian Calendar gives you a simple and useful view for working with periodic (yearly, quarterly, monthly, weekly and daily) notes based on solar calendar.
 
 ![افزونه تقویم فارسی ابسیدین](<Instructions/Persian Calendar.png>)
 
@@ -54,4 +54,4 @@ This Obsidian plugin gives you a simple and useful view for working with periodi
 
 ## مسیر مشارکت در توسعه پلاگین
 
-این پلاگین به صورت رایگان و برای مقاصد غیرتحاری توسعه یافته است و با مشارکت شما کامل‌ می‌شود. در تب Issues همین مخزن می‌توانید ایده‌ها و باگ‌ها را گزارش کنید. هم‌چنین در تلاشم در سایت و فروم [کارفکر](https://karfekr.ir) مطالب مرتبط با ابسیدین را به اشتراک بگذارم. اگر مایل هستید که توسعه دهنده این پلاگین را حمایت کنید [کارفکر](https://karfekr.ir) را دنبال کنید.
+این پلاگین به صورت رایگان و برای مقاصد غیرتجاری و مطابق [این لایسنس](LICENSE) توسعه یافته است و با مشارکت شما کامل‌ می‌شود. در تب Issues همین مخزن می‌توانید ایده‌ها و باگ‌ها را گزارش کنید. هم‌چنین در تلاشم در سایت و فروم [کارفکر](https://karfekr.ir) مطالب مرتبط با ابسیدین را به اشتراک بگذارم. اگر مایل هستید که توسعه دهنده این پلاگین را حمایت کنید [کارفکر](https://karfekr.ir) را دنبال کنید.
