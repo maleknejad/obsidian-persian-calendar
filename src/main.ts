@@ -1,12 +1,26 @@
-import { Notice, Plugin, PluginSettingTab, Setting, App, TFile } from 'obsidian';
+/* eslint-disable no-useless-escape */
+import { Notice, Plugin, TFile ,MarkdownView, TAbstractFile ,Editor} from 'obsidian';
 import PersianCalendarView from './view';
 import { PluginSettings, DEFAULT_SETTINGS } from './settings';
-import { toJalaali } from 'jalaali-js';
+import { toJalaali , toGregorian } from 'jalaali-js';
 import moment from 'moment-jalaali';
+import DateSuggester from './suggester';
+import PersianPlaceholders from './placeholder';
+import UpdateModal from './updatemodal';
+import PersianCalendarSettingTab from './settingstab';
 
+//Authored by Hossein Maleknejad, for support and development follow Karfekr. Telegram at https://t.me/karfekr
+//I know this repository has lots of duplicate codes and must be cleaned. I will clean it in next releases. 
+//I am working on it. 1403-02-09
 
 export default class PersianCalendarPlugin extends Plugin {
     settings: PluginSettings = DEFAULT_SETTINGS;
+    dateSuggester: DateSuggester | undefined;
+    placeholder: PersianPlaceholders  | undefined;
+    pluginsettingstab: PersianCalendarSettingTab | undefined;
+
+
+
     
     async onload() {
         await this.loadSettings();
@@ -24,12 +38,23 @@ export default class PersianCalendarPlugin extends Plugin {
                 console.error('Persian Calendar view is not open. Please open the Persian Calendar first.');
             }
         });
+        super.onload();
+        this.registerEditorSuggest(new DateSuggester(this));
+        this.dateSuggester = new DateSuggester(this);
+        this.pluginsettingstab = new PersianCalendarSettingTab(this.app, this);
+        this.placeholder = new PersianPlaceholders(this);
+        this.announceUpdate();
         
 
-        this.registerEvent(this.app.vault.on('create', (file) => {
+        this.registerEvent(this.app.vault.on('create', (file: TAbstractFile) => {
             if (file instanceof TFile && file.path.endsWith('.md')) {
                 this.handleFileUpdate(file, true);
-            }
+                if (this.placeholder) {
+                    this.placeholder.insertPersianDate(file);
+                } else {
+                    console.error("Placeholder is not initialized");
+                }
+            } 
         }));
 
         this.registerEvent(this.app.vault.on('delete', (file) => {
@@ -154,6 +179,34 @@ export default class PersianCalendarPlugin extends Plugin {
             },
         });
 
+        this.addCommand({
+            id: 'convert-date', // For my friend, Amir Napster.
+            name: 'Convert Date Format - تبدیل تاریخ بین شمسی و میلادی',
+            checkCallback: (checking: boolean) => {
+                const editor = this.app.workspace.getActiveViewOfType(MarkdownView)?.editor;
+                if (editor) {
+                    const cursorPos = editor.getCursor();
+                    const lineText = editor.getLine(cursorPos.line);
+                    const hasDate = /(\d{4}[\/\-]\d{1,2}[\/\-]\d{1,2}|\d{8})/.test(lineText);
+                    
+                    if (checking) {
+                        return hasDate;
+                    } else if (hasDate) {
+                        this.convertDate(editor, cursorPos.line, lineText);
+                    }
+                }
+                return false;
+            }
+        });
+        
+
+        this.addCommand({
+            id: 'convert-to-date',
+            name: 'Link Text to Periodic Note - ارجاع متن به یادداشت‌های دوره‌ای',
+            editorCallback: (editor, view) => {
+                this.dateSuggester?.convertTextToDate(editor);
+            }
+        });
 
         const openNoteForDate = (year: number, month: number, dayNumber: number) => {
             const leaf = this.app.workspace.getLeavesOfType('persian-calendar')[0];
@@ -169,11 +222,43 @@ export default class PersianCalendarPlugin extends Plugin {
 
     }
 
+    
+   
+    public convertDate(editor: Editor, lineIndex: number, textLine: string) {
+        // eslint-disable-next-line no-useless-escape
+        const regex = /(\d{4})[\/\-]?(\d{1,2})[\/\-]?(\d{1,2})/g;
+        let match;
+        while ((match = regex.exec(textLine)) !== null) {
+            const [fullMatch, year, month, day] = match;
+            
+            if (parseInt(year) > 1500) {
+                const persianDate = toJalaali(parseInt(year), parseInt(month), parseInt(day));
+                const formatted = `${persianDate.jy}-${persianDate.jm.toString().padStart(2, '0')}-${persianDate.jd.toString().padStart(2, '0')}`;
+                editor.replaceRange(formatted, { line: lineIndex, ch: match.index }, { line: lineIndex, ch: match.index + fullMatch.length });
+            } else {
+                const georgianDate = toGregorian(parseInt(year), parseInt(month), parseInt(day));
+                const formatted = `${georgianDate.gy}-${georgianDate.gm.toString().padStart(2, '0')}-${georgianDate.gd.toString().padStart(2, '0')}`;
+                editor.replaceRange(formatted, { line: lineIndex, ch: match.index }, { line: lineIndex, ch: match.index + fullMatch.length });
+            }
+        }
+    }
+
+
+    private announceUpdate(): void {
+        const currentVersion = this.manifest.version;
+        const knownVersion = this.settings.version;
+        if (currentVersion === knownVersion) return;
+        this.settings.version = currentVersion;
+        void this.saveSettings(); 
+        if (this.settings.announceUpdates === false) return;
+        const updateModal = new UpdateModal(this.app);
+        updateModal.open();
+    }
+    
+
     async loadSettings() {
         this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
     }
-
-    
 
 
     async saveSettings() {
@@ -222,93 +307,4 @@ export default class PersianCalendarPlugin extends Plugin {
             });
         }
     }
-}
-
-class PersianCalendarSettingTab extends PluginSettingTab {
-    plugin: PersianCalendarPlugin;
-
-    constructor(app: App, plugin: PersianCalendarPlugin) {
-        super(app, plugin);
-        this.plugin = plugin;
-        this.addPathSetting = this.addPathSetting.bind(this);
-        
-    }
-
-    display() {
-        const { containerEl } = this;
-        containerEl.empty();
-    
-        containerEl.setAttribute('dir', 'rtl');
-         
-        containerEl.createEl('h3', { text: 'تنظیمات تقویم' });
-        containerEl.createEl('p', { text: 'مسیر ساختن نوشته‌ها را میتوانید از طریق تنظیمات زیر تعیین کنید.' });
-    
-         
-        this.addPathSetting(containerEl, 'مسیر روزنوشت‌ها', 'dailyNotesFolderPath');
-        new Setting(containerEl)
-        .setName('فرمت نام‌گذاری و شناسایی روزنوشت‌ها')
-        .setDesc('مشخص کنید روزنوشت‌ها با چه فرمتی نام‌گذاری شوند. این نام در Title روزنوشت‌ها قرار می‌گیرد.')
-        .addDropdown(dropdown => dropdown
-            .addOption('persian', 'خورشیدی')
-            .addOption('georgian', 'میلادی')
-            .setValue(this.plugin.settings.dateFormat || 'georgian')
-            .onChange(async (value) => {
-                this.plugin.settings.dateFormat = value;
-                await this.plugin.saveSettings();
-                this.plugin.refreshViews();  // Optionally refresh views if necessary
-            }));
-        this.addPathSetting(containerEl, 'مسیر هفته‌نوشت‌ها', 'weeklyNotesFolderPath');
-        this.addPathSetting(containerEl, 'مسیر ماه‌نوشت‌ها', 'monthlyNotesFolderPath');
-        this.addPathSetting(containerEl, 'مسیر فصل‌نوشت‌ها', 'quarterlyNotesFolderPath');
-        new Setting(containerEl)
-            .setName('فعال‌سازی نمایش فصل‌نوشت‌ها در تقویم')
-            .setDesc('نمایش یا پنهان کردن ردیف فصل‌نوشت‌ها در نمای تقویم')
-            .addToggle(toggle => toggle
-                .setValue(this.plugin.settings.enableQuarterlyNotes)
-                .onChange(async (value) => {
-                    this.plugin.settings.enableQuarterlyNotes = value;
-                    await this.plugin.saveSettings();
-                    this.plugin.refreshViews();
-                }));
-        this.addPathSetting(containerEl, 'مسیر سال‌نوشت‌ها', 'yearlyNotesFolderPath');
-         
-        
-    
-        
-            
-
-        containerEl.createEl('p', { text: 'مسیرها را قبل از تنظیم کردن در ابسیدین ایجاد کنید. مسیرها باید بدون "/" در ابتدای آن باشد.' });
-        containerEl.createEl('p', { text: 'برای اعمال تغییرات، لازم است تقویم را از تنظیمات ابسیدین مجددا فعال کنید.' });
-        const templaterparagraph = containerEl.createEl('p');
-        templaterparagraph.appendText('برای تنظیم کردن قالب برای نوشته‌ها می‌توانید از افزونه ');
-        templaterparagraph.createEl('a', { text: 'Templater', href: 'https://github.com/SilentVoid13/Templater' }),
-        templaterparagraph.appendText(' استفاده کنید. راهنمای استفاده از آن در گیت‌هاب نوشته شده است.');
-        const paragraph = containerEl.createEl('p');
-        paragraph.appendText('در صورت مشاهده باگ و یا ارائه پیشنهاد و یا درخواست راهنمایی لطفا در ');
-        paragraph.createEl('a', { text: 'گیت‌هاب', href: 'https://github.com/maleknejad/obsidian-persian-calendar/' }),
-        paragraph.appendText(' به اشتراک بگذارید.'),
-        paragraph.createEl('br'),
-        paragraph.createEl('br'),
-        paragraph.createEl('br'),
-        paragraph.appendText(' ‌توسعه‌یافته توسط حسین ملک نژاد، برای حمایت و پیگیری توسعه پلاگین‌های ابسیدین '),
-        paragraph.createEl('a', { text: 'کارفکر', href: 'https://karfekr.ir' }),
-        paragraph.appendText(' را دنبال کنید.'),
-        paragraph.createEl('br'),
-        paragraph.appendText(' نسخه 1.1.0');
-    }
-    
-
-    addPathSetting(containerEl: HTMLElement, name: string, settingKey: keyof PluginSettings) {
-        new Setting(containerEl)
-            .setName(name)
-            .addText(text => text
-                .setPlaceholder('Path/for/notes')
-                .setValue(this.plugin.settings[settingKey] as string)
-                .onChange(async (value) => {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    (this.plugin.settings as any)[settingKey] = value;
-                    await this.plugin.saveSettings();
-                }));
-    }
-      
 }

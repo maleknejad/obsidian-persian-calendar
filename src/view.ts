@@ -241,12 +241,9 @@ export default class PersianCalendarView extends View {
 
     private async getDaysWithNotes(): Promise<number[]> {
         const notesLocation = this.settings.dailyNotesFolderPath.trim().replace(/^\/*|\/*$/g, "");
-        const filePrefix = notesLocation ? `${notesLocation}/` : "";
-    
+        const filePrefix = notesLocation ? `${notesLocation}/` : "";   
         const jy = this.currentJalaaliYear;
         const jm = this.currentJalaaliMonth.toString().padStart(2, '0');
-    
-        // Assume the directory structure includes the correct year-month prefix for filenames
         const files = this.app.vault.getFiles();
         const noteDays: number[] = [];
     
@@ -255,20 +252,17 @@ export default class PersianCalendarView extends View {
                 return;
             }
     
-            // Extract the date part from the filename based on expected format 'YYYY-MM-DD.md'
             const match = file.name.match(/^(\d{4})-(\d{2})-(\d{2})\.md$/);
             if (!match) return;
     
             const [ , year, month, day ] = match.map(Number);
             
             if (this.settings.dateFormat === 'georgian') {
-                // Convert from Georgian date to Persian to check the month and year
                 const { jy: convJy, jm: convJm, jd: convJd } = toJalaali(new Date(year, month - 1, day));
                 if (convJy === jy && convJm === parseInt(jm)) {
                     noteDays.push(convJd);
                 }
             } else {
-                // Direct comparison for Persian formatted filenames
                 if (year === jy && month === parseInt(jm)) {
                     noteDays.push(day);
                 }
@@ -403,14 +397,14 @@ export default class PersianCalendarView extends View {
         return weekNumbers;
     }
     
-    private calculateCurrentWeekNumber(jalaaliDate: {jy: number, jm: number, jd: number}): number {
-    moment.loadPersian({usePersianDigits: false, dialect: 'persian-modern'});
+    public calculateCurrentWeekNumber(jalaaliDate: {jy: number, jm: number, jd: number}): number {
+        moment.loadPersian({usePersianDigits: false, dialect: 'persian-modern'});
 
-    const currentDate = moment(`${jalaaliDate.jy}/${jalaaliDate.jm}/${jalaaliDate.jd}`, 'jYYYY/jM/jD');
+        const currentDate = moment(`${jalaaliDate.jy}/${jalaaliDate.jm}/${jalaaliDate.jd}`, 'jYYYY/jM/jD');
 
-    const currentWeekNumber = currentDate.jWeek();
+        const currentWeekNumber = currentDate.jWeek();
 
-    return currentWeekNumber;
+        return currentWeekNumber;
 }
 
 public async openOrCreateDailyNote(dayNumber: number) {
@@ -428,7 +422,7 @@ public async openOrCreateDailyNote(dayNumber: number) {
         let dailyNoteFile = await this.app.vault.getAbstractFileByPath(filePath);
         if (!dailyNoteFile) {
             await this.app.vault.create(filePath, '');
-            new Notice(`Created daily note: ${filePath}`);
+            new Notice(`روزنوشت ساخته شد: ${filePath}`);
             dailyNoteFile = await this.app.vault.getAbstractFileByPath(filePath);
         }
 
@@ -457,7 +451,7 @@ public async openOrCreateDailyNote(dayNumber: number) {
     
             if (!weeklyNoteFile) {
                 await this.app.vault.create(filePath, '');
-                new Notice(`Created weekly note: ${filePath}`);
+                new Notice(`هفته‌نوشت ساخته شد: ${filePath}`);
                 weeklyNoteFile = await this.app.vault.getAbstractFileByPath(filePath);
                 this.render();
             }
@@ -493,7 +487,7 @@ public async openOrCreateDailyNote(dayNumber: number) {
     
             if (!monthlyNoteFile) {
                 await this.app.vault.create(filePath, '');
-                new Notice(`Created monthly note: ${filePath}`);
+                new Notice(`ماه‌نوشت ساخته شد: ${filePath}`);
                  
                 monthlyNoteFile = await this.app.vault.getAbstractFileByPath(filePath);
             }
@@ -524,7 +518,7 @@ public async openOrCreateDailyNote(dayNumber: number) {
              
             if (!quarterlyNoteFile) {
                 await this.app.vault.create(filePath, '');
-                new Notice(`Created quarterly note: ${filePath}`);
+                new Notice(`فصل‌نوشت ساخته شد: ${filePath}`);
                  
                 quarterlyNoteFile = await this.app.vault.getAbstractFileByPath(filePath);
             }
@@ -554,7 +548,7 @@ public async openOrCreateDailyNote(dayNumber: number) {
     
             if (!yearlyNoteFile) {
                 await this.app.vault.create(filePath, '');
-                new Notice(`Created yearly note: ${filePath}`);
+                new Notice(`سال‌نوشت ساخته شد: ${filePath}`);
                  
                 yearlyNoteFile = await this.app.vault.getAbstractFileByPath(filePath);
             }

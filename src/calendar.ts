@@ -1,30 +1,10 @@
-import { toJalaali, toGregorian, isValidJalaaliDate, jalaaliMonthLength } from 'jalaali-js';
+import { toJalaali, toGregorian, jalaaliMonthLength } from 'jalaali-js';
 
 export function getTodayJalaali() {
     const today = new Date();
     return toJalaali(today.getFullYear(), today.getMonth() + 1, today.getDate());
 }
 
-export function changeMonth(currentYear: number, currentMonth: number, offset: number): { year: number, month: number } {
-    let newYear = currentYear;
-    let newMonth = currentMonth + offset;
-
-    if (newMonth > 12) {
-        newMonth = 1;
-        newYear++;
-    } else if (newMonth < 1) {
-        newMonth = 12;
-        newYear--;
-    }
-
-    // Ensure the new date is valid, considering leap years etc.
-    if (!isValidJalaaliDate(newYear, newMonth, 1)) {
-        // Adjust newYear or newMonth as needed if the date is not valid
-        // For example, if offsetting into a leap year
-    }
-
-    return { year: newYear, month: newMonth };
-}
 
 export function getMonthDays(year: number, month: number): number[] {
     const lengthOfMonth = jalaaliMonthLength(year, month);

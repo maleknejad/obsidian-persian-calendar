@@ -1,9 +1,9 @@
 {
 	"id": "persian-calendar",
 	"name": "Persian Calendar",
-	"version": "1.1.0",
+	"version": "2.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "Persian Calendar gives you a simple and useful view for working with periodic (yearly, quarterly, monthly, weekly and daily) notes based on solar (shamsi) calendar.",
+	"description": "This tool lets you add and organize notes from daily to yearly on the Persian calendar, use templates with placeholders, and works with all Obsidian daily plugins.",
 	"author": "Hossein Maleknejad",
 	"authorUrl": "https://karfekr.ir",
 	"isDesktopOnly": false

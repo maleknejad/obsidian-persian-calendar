@@ -98,7 +98,7 @@
 
 .calendar-day{
     padding: 4px;
-    background-color: var(--background-secondary);
+    background-color: var(--color-background-day);
     color: var(--text-normal);
     text-align: center;
     cursor: pointer;
@@ -201,12 +201,4 @@
 .calendar-quarter.current-quarter {
     color: var(--interactive-accent-text);
     opacity: 1;
-}
-
-.dynamic-grid-placement {
-    grid-column-start: var(--dynamic-grid-start);
-}
-
-.dynamic-day-grid-placement {
-    grid-column-start: var(--day-grid-start);
 }

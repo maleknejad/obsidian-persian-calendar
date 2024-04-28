@@ -6,6 +6,8 @@ interface PluginSettings {
     enableQuarterlyNotes: boolean;
     quarterlyNotesFolderPath: string;
     dateFormat: string;
+    version: string;
+    announceUpdates: boolean;
 }
 
 
@@ -17,6 +19,8 @@ const DEFAULT_SETTINGS: PluginSettings = {
     enableQuarterlyNotes: true,
     quarterlyNotesFolderPath: '/',
     dateFormat: 'persian',
+    version: `0.0.0`,
+    announceUpdates: true,
 };
 
 type JalaaliDate = {
