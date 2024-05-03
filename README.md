@@ -3,7 +3,7 @@
 
 This tool lets you add and organize notes from daily to yearly on the Persian calendar, use templates with placeholders, and works with all Obsidian daily plugins.
 
-![افزونه تقویم فارسی ابسیدین](%3CInstructions/Persian Calendar.png%3E)
+![تقویم فارسی ابسیدین](<Instructions/Persian Calendar.png>)
 
 ## Usage
 
@@ -94,7 +94,7 @@ This tool lets you add and organize notes from daily to yearly on the Persian ca
 - ارجاع متن سلکت شده به یادداشت مرتبط
 - تبدیل تاریخ بین شمسی و میلادی به صورت خودکار و با فرمت‌های مختلف از جمله`1403/02/01` یا `14030201` یا`1403-02-01` . (سال بیشتر 1500 میلادی و کمتر آن شمسی است.این حرکت اشتباه اما کار راه‌اندازتر است!)
 
-![دستورات تعریف شده در تقویم](Instructions/Commands.png)
+![دستورات تعریف شده در تقویم](Instructions/Commandsv2.png)
 
 ## مسیر مشارکت در توسعه افزونه
 

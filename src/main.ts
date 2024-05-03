@@ -48,14 +48,23 @@ export default class PersianCalendarPlugin extends Plugin {
 
         this.registerEvent(this.app.vault.on('create', (file: TAbstractFile) => {
             if (file instanceof TFile && file.path.endsWith('.md')) {
-                this.handleFileUpdate(file, true);
+                    this.handleFileUpdate(file, true);
+                    const fileCreationTime = file.stat.ctime;
+            const now = Date.now();
+            const timeDiff = now - fileCreationTime;
+
+            if (timeDiff < 10000) { 
                 if (this.placeholder) {
                     this.placeholder.insertPersianDate(file);
                 } else {
                     console.error("Placeholder is not initialized");
                 }
+            } else {
+                console.log("File is not newly created or too old for processing:", file.path);
+            }
             } 
         }));
+
 
         this.registerEvent(this.app.vault.on('delete', (file) => {
             if (file instanceof TFile && file.path.endsWith('.md')) {
