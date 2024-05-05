@@ -51,7 +51,7 @@ export default class PersianCalendarSettingTab extends PluginSettingTab {
         this.addPathSetting(containerEl, 'مسیر سال‌نوشت‌ها', 'yearlyNotesFolderPath');
         const githubadvice = containerEl.createEl('p');
         githubadvice.appendText('پیش از هر اقدامی توصیه می‌کنم راهنمای افزونه در ');
-        githubadvice.createEl('a', { text: 'گیت‌هاب', href: 'https://github.com/maleknejad/obisidan-persian-calendar/' });
+        githubadvice.createEl('a', { text: 'گیت‌هاب', href: 'https://github.com/maleknejad/obsidian-persian-calendar' });
         githubadvice.appendText(' را مطالعه کنید و با ویژگی‌هایی که این افزونه در اختیارتان قرار می‌دهد آشنا شوید.');
         containerEl.createEl('p', { text: 'مسیرها را قبل از تنظیم کردن در ابسیدین ایجاد کنید. مسیرها باید بدون "/" در ابتدای آن باشد.' });
         containerEl.createEl('p', { text: 'برای اعمال تغییرات، لازم است تقویم را از تنظیمات ابسیدین مجددا فعال کنید.' });
