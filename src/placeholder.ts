@@ -52,7 +52,7 @@ export default class PersianPlaceholders {
             if (updatedContent !== fileContent) {
                 await this.plugin.app.vault.modify(file, updatedContent);
             }
-        }, 500); 
+        }, 1250); 
     }
 
     private getJalaaliMoment(): moment.Moment {
