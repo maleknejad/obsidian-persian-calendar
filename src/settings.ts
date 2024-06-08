@@ -9,6 +9,7 @@ interface PluginSettings {
     version: string;
     announceUpdates: boolean;
     showGeorgianDates: boolean;
+    timeoutDuration: number;
 }
 
 
@@ -21,6 +22,7 @@ const DEFAULT_SETTINGS: PluginSettings = {
     quarterlyNotesFolderPath: '/',
     dateFormat: 'persian',
     version: `0.0.0`,
+    timeoutDuration: 1250,
     announceUpdates: true,
     showGeorgianDates: true,
 };

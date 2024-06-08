@@ -38,6 +38,7 @@ export default class PersianCalendarSettingTab extends PluginSettingTab {
         this.addPathSetting(containerEl, 'مسیر هفته‌نوشت‌ها', 'weeklyNotesFolderPath');
         this.addPathSetting(containerEl, 'مسیر ماه‌نوشت‌ها', 'monthlyNotesFolderPath');
         this.addPathSetting(containerEl, 'مسیر فصل‌نوشت‌ها', 'quarterlyNotesFolderPath');
+        this.addPathSetting(containerEl, 'مسیر سال‌نوشت‌ها', 'yearlyNotesFolderPath');
         new Setting(containerEl)
             .setName('فعال‌سازی نمایش فصل‌نوشت‌ها در تقویم')
             .setDesc('نمایش یا پنهان کردن ردیف فصل‌نوشت‌ها در نمای تقویم')
@@ -58,7 +59,19 @@ export default class PersianCalendarSettingTab extends PluginSettingTab {
                 await this.plugin.saveSettings();
                 this.plugin.refreshViews();
             }));
-        this.addPathSetting(containerEl, 'مسیر سال‌نوشت‌ها', 'yearlyNotesFolderPath');
+
+        new Setting(containerEl)
+        .setName('مدت زمان تاخیر در اجرای {{عبارت‌های معنادار}}')
+        .setDesc('{{عبارت‌های معنادار}} پس از ساخته شدن فایل با تاخیر زمانی اجرا می‌گردند. در سیستم‌های با قدرت پایین تر این مقدار را افزایش دهید. (مقدار پیش‌فرض: 1250 میلی‌ثانیه)')
+        .addText(text => text
+            .setPlaceholder('Enter timeout duration')
+            .setValue(this.plugin.settings.timeoutDuration.toString())
+            .onChange(async (value) => {
+                this.plugin.settings.timeoutDuration = parseInt(value);
+                await this.plugin.saveSettings();
+            }));
+        
+        
         const githubadvice = containerEl.createEl('p');
         githubadvice.appendText('پیش از هر اقدامی توصیه می‌کنم راهنمای افزونه در ');
         githubadvice.createEl('a', { text: 'گیت‌هاب', href: 'https://github.com/maleknejad/obsidian-persian-calendar' });

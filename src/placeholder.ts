@@ -15,12 +15,16 @@ export default class PersianPlaceholders {
             console.error("File object is undefined.");
             return;
         }
-
+    
+        // Set the timeout duration in the plugin's settings
+        const timeoutDuration = this.plugin.settings.timeoutDuration || 1250;
+    
         setTimeout(async () => {
             const fileContent = await this.plugin.app.vault.read(file);
             let updatedContent = fileContent;
+    
             type PlaceholderValue = (() => Promise<string | null> | string | null) | string | null;
-
+    
             const placeholders: { [key: string]: PlaceholderValue } = {
                 '{{امروز}}': this.getPersianDate(),
                 '{{این روز}}': this.getFormattedDateFromFileTitle(file.basename, this.plugin.settings.dateFormat),
@@ -37,8 +41,7 @@ export default class PersianPlaceholders {
                 '{{روزهای گذشته}}': this.getDaysPassedFromFileTitle(file.basename, this.plugin.settings.dateFormat),
                 '{{روزهای باقیمانده}}': this.getDaysUntilEndOfYear(file.basename, this.plugin.settings.dateFormat),
             };
-
-           
+    
             for (const [placeholder, value] of Object.entries(placeholders)) {
                 if (fileContent.includes(placeholder)) {
                     const result = typeof value === 'function' ? await value() : value;
@@ -47,12 +50,11 @@ export default class PersianPlaceholders {
                     }
                 }
             }
-
-           
+    
             if (updatedContent !== fileContent) {
                 await this.plugin.app.vault.modify(file, updatedContent);
             }
-        }, 1250); 
+        }, timeoutDuration);
     }
 
     private getJalaaliMoment(): moment.Moment {
