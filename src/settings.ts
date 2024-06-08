@@ -8,6 +8,7 @@ interface PluginSettings {
     dateFormat: string;
     version: string;
     announceUpdates: boolean;
+    showGeorgianDates: boolean;
 }
 
 
@@ -21,6 +22,7 @@ const DEFAULT_SETTINGS: PluginSettings = {
     dateFormat: 'persian',
     version: `0.0.0`,
     announceUpdates: true,
+    showGeorgianDates: true,
 };
 
 type JalaaliDate = {

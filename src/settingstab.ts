@@ -48,6 +48,16 @@ export default class PersianCalendarSettingTab extends PluginSettingTab {
                     await this.plugin.saveSettings();
                     this.plugin.refreshViews();
                 }));
+        new Setting(containerEl)
+        .setName('فعال‌سازی نمایش تقویم میلادی')
+        .setDesc('می‌توانید مشخص کنید تقویم میلادی زیر تقویم شمسی نمایش داده شود.')
+        .addToggle(toggle => toggle
+            .setValue(this.plugin.settings.showGeorgianDates)
+            .onChange(async (value) => {
+                this.plugin.settings.showGeorgianDates = value;
+                await this.plugin.saveSettings();
+                this.plugin.refreshViews();
+            }));
         this.addPathSetting(containerEl, 'مسیر سال‌نوشت‌ها', 'yearlyNotesFolderPath');
         const githubadvice = containerEl.createEl('p');
         githubadvice.appendText('پیش از هر اقدامی توصیه می‌کنم راهنمای افزونه در ');
@@ -72,7 +82,7 @@ export default class PersianCalendarSettingTab extends PluginSettingTab {
         paragraph.createEl('a', { text: 'کارفکر', href: 'https://t.me/karfekr' }),
         paragraph.appendText(' را دنبال کنید.'),
         paragraph.createEl('br'),
-        paragraph.appendText(' نسخه 2.0.0');
+        paragraph.appendText(' نسخه 2.1.0');
     }
     
 

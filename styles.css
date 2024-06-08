@@ -7,35 +7,65 @@
 
 .calendar-header {
     align-items: center;
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     margin: 0.5rem;
     padding: 0px 14px;
     width: 100%;
-
 }
 
-.calendar-change-month-arrow {
-    cursor: pointer;
-    font-size: 0.8rem;
-    display: flex;
-    align-items: center;
-    font-weight: bold;
+.calendar-navigation{
+    display: inherit;
+    grid-template-columns: 0.1fr 0.2fr 0.1fr;
 }
-
-.calendar-month-year {
-    flex-grow: 1;
-    text-align: right;
-    font-size: 1.25rem;
-    font-weight: bold;
-    padding: 0 20px;
-    cursor: pointer;
-}
-
 .calendar-today-button {
     cursor: pointer;
     color: var(--interactive-accent);
     font-weight: bold;
     margin: 0 7px 0 7px;
+}
+
+.calendar-change-month-arrow {
+    cursor: pointer;
+    font-size: 0.8rem;
+    display: inherit;
+    align-items: center;
+    font-weight: bold;
+}
+
+.calendar-month-year {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+        "year month"
+        "georgian georgian";
+    align-items: center;
+    padding-right: 10px;
+    padding-top: 5px;
+    justify-content: center;
+}
+
+.calendar-month{
+    color: var(--interactive-accent);
+    padding-left: 5px;
+    grid-area: month;
+    font-weight: bold;
+    font-size: large;
+}
+
+.calendar-year{
+    grid-area: year;
+    font-size: large;
+    font-weight: bold;
+}
+
+.calendar-georgian-month-year {
+    font-size: small;
+    color: gray;
+    grid-area: georgian;
+    display: flex;
+    justify-content: space-around;
 }
 
 .calendar-content {
@@ -114,7 +144,16 @@
 }
 
 .calendar-day.dim {
-    opacity: 0.25;
+    opacity: 0.1;
+}
+
+.calendar-day.no-notes {
+    opacity: 0.4;
+}
+
+.georgian-date {
+    font-size: 0.55rem;
+    color: var(--text-normal);
 }
 
 .calendar-day:hover {
@@ -134,6 +173,7 @@
     position: absolute;
     bottom: 5px;
     right: 5px;
+    font-weight: bold;
 }
 
 
@@ -146,20 +186,12 @@
     display: flex;
 }
 
-.calendar-month{
-    color: var(--interactive-accent);
-    padding-left: 5px;
-}
 
 
-.note-indicator {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    line-height: 6px;
-    min-height: 6px;
-    position: absolute;
-    bottom: 3px;
+
+
+.calendar-week-number.no-notes {
+    opacity: 0.3;
 }
 
 
@@ -202,3 +234,4 @@
     color: var(--interactive-accent-text);
     opacity: 1;
 }
+

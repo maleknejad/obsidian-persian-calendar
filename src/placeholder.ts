@@ -191,5 +191,6 @@ export default class PersianPlaceholders {
         }
         return null;
     }
+
 }
 

@@ -1,6 +1,7 @@
 import { WorkspaceLeaf, Notice, App, View, TFile,MarkdownView } from 'obsidian';
 import { getTodayJalaali } from './calendar';
-import { toJalaali, jalaaliMonthLength , toGregorian} from 'jalaali-js';
+import {  toJalaali, jalaaliMonthLength , toGregorian} from 'jalaali-js';
+import * as jalaali from 'jalaali-js';
 import type { PluginSettings , JalaaliDate } from './settings'; 
 import moment from 'moment-jalaali';
 
@@ -67,39 +68,70 @@ export default class PersianCalendarView extends View {
         }
     }
     
+    
     private async renderHeader(containerEl: HTMLElement): Promise<void> {
-         
         const headerEl = containerEl.createEl('div', { cls: 'calendar-header' });
     
-        const nextMonthArrow = headerEl.createEl('span', { cls: 'calendar-change-month-arrow' });
-        nextMonthArrow.textContent = '<';
-        nextMonthArrow.addEventListener('click', () => this.changeMonth(1));
-       
-        const todayButton = headerEl.createEl('span', { cls: 'calendar-today-button' });
+        const navContainerEl = headerEl.createEl('div', { cls: 'calendar-navigation' });
+
+        const prevMonthArrow = navContainerEl.createEl('span', { cls: 'calendar-change-month-arrow' });
+        prevMonthArrow.textContent = '<';
+        prevMonthArrow.addEventListener('click', () => this.changeMonth(1));
+    
+        const todayButton = navContainerEl.createEl('span', { cls: 'calendar-today-button' });
         todayButton.textContent = 'امروز';
         todayButton.addEventListener('click', () => this.goToToday());
     
-        const prevMonthArrow = headerEl.createEl('span', { cls: 'calendar-change-month-arrow' });
-        prevMonthArrow.textContent = '>';
-        prevMonthArrow.addEventListener('click', () => this.changeMonth(-1));
+        const nextMonthArrow = navContainerEl.createEl('span', { cls: 'calendar-change-month-arrow' });
+        nextMonthArrow.textContent = '>';
+        nextMonthArrow.addEventListener('click', () => this.changeMonth(-1));
+    
         const monthYearEl = headerEl.createEl('div', { cls: 'calendar-month-year' });
         const monthEl = monthYearEl.createEl('span', { cls: 'calendar-month' });
-        const yearEl = monthYearEl.createEl('span', { cls: 'calendar-year' });    
+        const yearEl = monthYearEl.createEl('span', { cls: 'calendar-year' });
+        const georgianMonthYearEl = monthYearEl.createEl('div', { cls: 'calendar-georgian-month-year' });
+    
         const monthName = this.getMonthName(this.currentJalaaliMonth);
         monthEl.textContent = monthName;
         yearEl.textContent = this.toFarsiDigits(this.currentJalaaliYear);
-
+    
+        if (this.settings.showGeorgianDates) {
+            const georgianMonthRange = this.getGeorgianMonthRange(this.currentJalaaliYear, this.currentJalaaliMonth);
+            georgianMonthYearEl.textContent = georgianMonthRange;
+        }
+    
         monthEl.addEventListener('click', (e) => {
             e.stopPropagation();
             this.openOrCreateMonthlyNote(this.currentJalaaliMonth, this.currentJalaaliYear);
         });
     
-         
         yearEl.addEventListener('click', (e) => {
             e.stopPropagation(); 
             this.openOrCreateYearlyNote(this.currentJalaaliYear);
         });
+    }
     
+    private getGeorgianMonthRange(jy: number, jm: number): string {
+        const firstDayOfMonthGeorgian = jalaali.toGregorian(jy, jm, 1);
+        const lastDayOfMonthJalaali = jalaali.jalaaliMonthLength(jy, jm);
+        const lastDayOfMonthGeorgian = jalaali.toGregorian(jy, jm, lastDayOfMonthJalaali);
+    
+        const startMonthName = this.getGeorgianMonthName(firstDayOfMonthGeorgian.gm);
+        const endMonthName = this.getGeorgianMonthName(lastDayOfMonthGeorgian.gm);
+    
+        if (firstDayOfMonthGeorgian.gm === lastDayOfMonthGeorgian.gm) {
+            return `${startMonthName} ${firstDayOfMonthGeorgian.gy}`;
+        } else {
+            return `${startMonthName}-${endMonthName} ${lastDayOfMonthGeorgian.gy}`;
+        }
+    }
+    
+    private getGeorgianMonthName(month: number): string {
+        const georgianMonthNames = [
+            'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+        ];
+        return georgianMonthNames[month - 1];
     }
     
     private async renderWeekNumbers(contentEl: HTMLElement, jalaaliDate: { jy: number, jm: number }) {
@@ -120,10 +152,9 @@ export default class PersianCalendarView extends View {
     
             if (i < weekNumbers.length) {
                 weekEl.textContent = this.toFarsiDigits(weekNumbers[i]);
-                 
-                if (weeksWithNotes.includes(weekNumbers[i])) {
-                    const dotEl = weekEl.createDiv({ cls: 'note-indicator' });
-                    dotEl.setText('•');  
+                
+                if (!weeksWithNotes.includes(weekNumbers[i])) {
+                    weekEl.addClass('no-notes');
                 }
     
                 weekEl.addEventListener('click', async () => {
@@ -139,15 +170,14 @@ export default class PersianCalendarView extends View {
     
     
     private async renderDaysGrid(contentEl: HTMLElement, jalaaliDate: { jy: number, jm: number }) {
-         
         let gridEl = contentEl.querySelector('.calendar-days-grid');
         if (gridEl) {
             gridEl.remove();
         }
         gridEl = contentEl.createEl('div', { cls: 'calendar-days-grid' });
-                
+    
         const weekdays = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
-
+    
         weekdays.forEach((weekday, index) => {
             if (!gridEl) {
                 new Notice('Calendar grid element not found. Please ensure the calendar is properly loaded.');
@@ -158,41 +188,46 @@ export default class PersianCalendarView extends View {
             headerCell.classList.add("dynamic-grid-placement");  
             headerCell.style.setProperty('--dynamic-grid-start', (index + 2).toString());
         });
-         
+    
         const daysWithNotes = await this.getDaysWithNotes();
-        const daysInMonth = jalaaliMonthLength(jalaaliDate.jy, jalaaliDate.jm);
+        const daysInMonth = jalaali.jalaaliMonthLength(jalaaliDate.jy, jalaaliDate.jm);
         const firstDayOfWeekIndex = this.calculateFirstDayOfWeekIndex(jalaaliDate.jy, jalaaliDate.jm);
         const totalCells = 42;  
         const daysFromPrevMonth = this.calculateDaysFromPreviousMonth(firstDayOfWeekIndex);
         const daysFromNextMonth = this.calculateDaysFromNextMonth(firstDayOfWeekIndex, daysInMonth);
+    
         for (let i = 0; i < totalCells; i++) {
             const dayEl = gridEl.createEl('div', { cls: 'calendar-day' });
-            const dayIndex = i - firstDayOfWeekIndex;       
+            const dayIndex = i - firstDayOfWeekIndex;
+            let dayNumber = dayIndex + 1;
+    
             if (dayIndex < 0) {
                 dayEl.textContent = this.toFarsiDigits(daysFromPrevMonth[daysFromPrevMonth.length + dayIndex]);
                 dayEl.addClass('dim');
+                dayNumber = daysFromPrevMonth[daysFromPrevMonth.length + dayIndex];
             } else if (dayIndex < daysInMonth) {
-                 
-                const dayNumber = dayIndex + 1;
                 dayEl.textContent = this.toFarsiDigits(dayNumber);
                 if (this.isToday({ jy: jalaaliDate.jy, jm: jalaaliDate.jm, jd: dayNumber })) {
                     dayEl.addClass('today');
                 }
-                if (daysWithNotes.includes(dayNumber)) {
-                    const dotEl = dayEl.createEl('div', { cls: 'note-indicator' });
-                    dotEl.setText('•');
+                if (!daysWithNotes.includes(dayNumber)) {
+                    dayEl.addClass('no-notes');
                 }
-                if (dayIndex >= 0 && dayIndex < daysInMonth) {
-                    dayEl.addEventListener('click', () => {
-                        this.openOrCreateDailyNote(dayNumber);
-                    });
-                }
-                
+                dayEl.addEventListener('click', () => {
+                    this.openOrCreateDailyNote(dayNumber);
+                });
             } else {
-                 
                 dayEl.textContent = this.toFarsiDigits(daysFromNextMonth[dayIndex - daysInMonth]);
                 dayEl.addClass('dim');
+                dayNumber = daysFromNextMonth[dayIndex - daysInMonth];
             }
+    
+            if (this.settings.showGeorgianDates) {
+                const georgianDate = jalaali.toGregorian(jalaaliDate.jy, jalaaliDate.jm, dayNumber);
+                const georgianDayEl = dayEl.createEl('div', { cls: 'georgian-date' });
+                georgianDayEl.textContent = georgianDate.gd.toString();
+            }
+    
             dayEl.classList.add("dynamic-day-grid-placement"); 
             dayEl.style.setProperty('--day-grid-start', ((i % 7) + 2).toString());
         }
@@ -422,7 +457,7 @@ public async openOrCreateDailyNote(dayNumber: number) {
         let dailyNoteFile = await this.app.vault.getAbstractFileByPath(filePath);
         if (!dailyNoteFile) {
             await this.app.vault.create(filePath, '');
-            new Notice(`روزنوشت ساخته شد: ${filePath}`);
+           
             dailyNoteFile = await this.app.vault.getAbstractFileByPath(filePath);
         }
 
@@ -435,7 +470,7 @@ public async openOrCreateDailyNote(dayNumber: number) {
             }
         }
     } catch (error) {
-        console.error("Error creating/opening daily note: ", error);
+        console.error("خطا در حین ساخت روزنوشت رخ داد: ", error);
     }
 }
 
@@ -451,7 +486,6 @@ public async openOrCreateDailyNote(dayNumber: number) {
     
             if (!weeklyNoteFile) {
                 await this.app.vault.create(filePath, '');
-                new Notice(`هفته‌نوشت ساخته شد: ${filePath}`);
                 weeklyNoteFile = await this.app.vault.getAbstractFileByPath(filePath);
                 this.render();
             }
@@ -469,7 +503,7 @@ public async openOrCreateDailyNote(dayNumber: number) {
             }
         } catch (error) {
             if (error instanceof Error) {
-                new Notice('Error creating/opening weekly note');
+                new Notice('خطا در حین ساخت یا باز کردن یادداشت هفتگی');
             } else {
                 new Notice('Error creating/opening weekly note');
             }
@@ -487,7 +521,6 @@ public async openOrCreateDailyNote(dayNumber: number) {
     
             if (!monthlyNoteFile) {
                 await this.app.vault.create(filePath, '');
-                new Notice(`ماه‌نوشت ساخته شد: ${filePath}`);
                  
                 monthlyNoteFile = await this.app.vault.getAbstractFileByPath(filePath);
             }
@@ -518,7 +551,6 @@ public async openOrCreateDailyNote(dayNumber: number) {
              
             if (!quarterlyNoteFile) {
                 await this.app.vault.create(filePath, '');
-                new Notice(`فصل‌نوشت ساخته شد: ${filePath}`);
                  
                 quarterlyNoteFile = await this.app.vault.getAbstractFileByPath(filePath);
             }
@@ -548,7 +580,6 @@ public async openOrCreateDailyNote(dayNumber: number) {
     
             if (!yearlyNoteFile) {
                 await this.app.vault.create(filePath, '');
-                new Notice(`سال‌نوشت ساخته شد: ${filePath}`);
                  
                 yearlyNoteFile = await this.app.vault.getAbstractFileByPath(filePath);
             }
