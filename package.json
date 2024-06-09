@@ -24,6 +24,7 @@
 		"typescript": "4.7.4"
 	},
 	"dependencies": {
+		"@types/moment": "^2.13.0",
 		"jalaali-js": "^1.2.6",
 		"moment": "^2.30.1",
 		"moment-jalaali": "^0.10.0",

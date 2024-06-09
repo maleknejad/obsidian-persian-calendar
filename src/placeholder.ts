@@ -1,13 +1,14 @@
-import { TFile  } from 'obsidian';
+import { TFile } from 'obsidian';
 import moment from 'moment-jalaali';
+import jalaali from 'jalaali-js';
+
 import PersianCalendarPlugin from './main';
 
 export default class PersianPlaceholders {
-    plugin: PersianCalendarPlugin;  
-    
+    plugin: PersianCalendarPlugin;
+
     constructor(plugin: PersianCalendarPlugin) {
         this.plugin = plugin;
-        
     }
 
     public async insertPersianDate(file: TFile): Promise<void> {
@@ -15,16 +16,16 @@ export default class PersianPlaceholders {
             console.error("File object is undefined.");
             return;
         }
-    
+
         // Set the timeout duration in the plugin's settings
         const timeoutDuration = this.plugin.settings.timeoutDuration || 1250;
-    
+
         setTimeout(async () => {
             const fileContent = await this.plugin.app.vault.read(file);
             let updatedContent = fileContent;
-    
+
             type PlaceholderValue = (() => Promise<string | null> | string | null) | string | null;
-    
+
             const placeholders: { [key: string]: PlaceholderValue } = {
                 '{{امروز}}': this.getPersianDate(),
                 '{{این روز}}': this.getFormattedDateFromFileTitle(file.basename, this.plugin.settings.dateFormat),
@@ -40,17 +41,19 @@ export default class PersianPlaceholders {
                 '{{این سال}}': this.getYearNumberFromFileTitle(file.basename, this.plugin.settings.dateFormat),
                 '{{روزهای گذشته}}': this.getDaysPassedFromFileTitle(file.basename, this.plugin.settings.dateFormat),
                 '{{روزهای باقیمانده}}': this.getDaysUntilEndOfYear(file.basename, this.plugin.settings.dateFormat),
+                '{{اول هفته}}': this.isWeeklyFile(file.basename) ? this.getWeekStartDate(parseInt(file.basename.split('-W')[0]), parseInt(file.basename.split('-W')[1]), this.plugin.settings.dateFormat) : null,
+                '{{آخر هفته}}': this.isWeeklyFile(file.basename) ? this.getWeekEndDate(parseInt(file.basename.split('-W')[0]), parseInt(file.basename.split('-W')[1]), this.plugin.settings.dateFormat) : null,
             };
-    
+
             for (const [placeholder, value] of Object.entries(placeholders)) {
                 if (fileContent.includes(placeholder)) {
                     const result = typeof value === 'function' ? await value() : value;
-                    if (result != null) {  
+                    if (result != null) {
                         updatedContent = updatedContent.replace(new RegExp(placeholder, 'g'), result);
                     }
                 }
             }
-    
+
             if (updatedContent !== fileContent) {
                 await this.plugin.app.vault.modify(file, updatedContent);
             }
@@ -65,28 +68,28 @@ export default class PersianPlaceholders {
         const now = this.getJalaaliMoment();
         return now.format('jYYYY-jMM-jDD');
     }
-    
+
     private getCurrentWeekday(): string {
         const now = this.getJalaaliMoment();
         return now.format('dddd');
     }
-    
+
     private getCurrentWeek(): string {
         const now = this.getJalaaliMoment();
         return `${now.jYear()}-W${now.jWeek()}`;
     }
-    
+
     private getCurrentMonth(): string {
         const now = this.getJalaaliMoment();
-        return `${now.jYear()}-${now.jMonth() + 1}`; 
+        return `${now.jYear()}-${now.jMonth() + 1}`;
     }
-    
+
     private getCurrentQuarter(): string {
         const now = this.getJalaaliMoment();
-        const quarter = Math.ceil((now.jMonth() + 1) / 3); 
+        const quarter = Math.ceil((now.jMonth() + 1) / 3);
         return `${now.jYear()}-Q${quarter}`;
     }
-    
+
     private getCurrentYear(): string {
         const now = this.getJalaaliMoment();
         return `${now.jYear()}`;
@@ -112,15 +115,15 @@ export default class PersianPlaceholders {
         }
         return null;
     }
-    
+
     private getWeekdayFromFileTitle(title: string, dateFormat: string): string | null {
         const parsedDate = this.parseDateFromTitle(title, dateFormat);
         if (parsedDate) {
-            return parsedDate.format('dddd'); 
+            return parsedDate.format('dddd');
         }
         return null;
     }
-    
+
     private getWeekNumberFromFileTitle(title: string, dateFormat: string): string | null {
         const parsedDate = this.parseDateFromTitle(title, dateFormat);
         if (parsedDate) {
@@ -130,7 +133,7 @@ export default class PersianPlaceholders {
         }
         return null;
     }
-    
+
     private getMonthNumberFromFileTitle(title: string, dateFormat: string): string | null {
         const parsedDate = this.parseDateFromTitle(title, dateFormat);
         if (parsedDate) {
@@ -140,7 +143,7 @@ export default class PersianPlaceholders {
         }
         return null;
     }
-    
+
     private getYearNumberFromFileTitle(title: string, dateFormat: string): string | null {
         const parsedDate = this.parseDateFromTitle(title, dateFormat);
         if (parsedDate) {
@@ -148,24 +151,25 @@ export default class PersianPlaceholders {
         }
         return null;
     }
-    
+
     private getQuarterNumberFromFileTitle(title: string, dateFormat: string): string | null {
         const parsedDate = this.parseDateFromTitle(title, dateFormat);
         if (parsedDate) {
-            const jMonth = parsedDate.jMonth() + 1; 
+            const jMonth = parsedDate.jMonth() + 1;
             const quarter = Math.ceil(jMonth / 3);
             const jYear = parsedDate.jYear();
             return `${jYear}-Q${quarter}`;
         }
         return null;
     }
+
     private getDaysPassedFromFileTitle(title: string, dateFormat: string): string | null {
         try {
             let parsedDate;
             if (dateFormat === 'georgian') {
                 parsedDate = moment(title, 'YYYY-MM-DD');
                 if (parsedDate.isValid()) {
-                    parsedDate = parsedDate.locale('fa'); 
+                    parsedDate = parsedDate.locale('fa');
                 }
             } else {
                 parsedDate = moment(title, 'jYYYY/jMM/jDD');
@@ -177,22 +181,89 @@ export default class PersianPlaceholders {
             }
 
             const startOfYear = moment(`${parsedDate.jYear()}/1/1`, 'jYYYY/jM/jD').locale('fa');
-            const daysPassed = parsedDate.diff(startOfYear, 'days') + 1; 
+            const daysPassed = parsedDate.diff(startOfYear, 'days') + 1;
             return daysPassed.toString();
         } catch (error) {
             console.error("Error calculating days passed: ", error);
             return null;
         }
     }
+
     private getDaysUntilEndOfYear(dateStr: string, dateFormat: string): string | null {
         const parsedDate = this.parseDateFromTitle(dateStr, dateFormat);
         if (parsedDate) {
-            const endOfYear = moment(`${parsedDate.jYear()}/12/29`, 'jYYYY/jMM/jDD').locale('fa'); // Last day of the Persian year
+            const endOfYear = moment(`${parsedDate.jYear()}/12/29`, 'jYYYY/jMM/jDD').locale('fa');
             const daysUntilEnd = endOfYear.diff(parsedDate, 'days');
             return daysUntilEnd.toString();
         }
         return null;
     }
 
+    private isWeeklyFile(title: string): boolean {
+        const weeklyPattern = /^\d{4}-W\d{1,2}$/;
+        return weeklyPattern.test(title);
+    }
+
+    getFirstSaturday(year: number): { jy: number, jm: number, jd: number } {
+        const firstDayGregorian = jalaali.toGregorian(year, 1, 1);
+        const firstDay = new Date(firstDayGregorian.gy, firstDayGregorian.gm - 1, firstDayGregorian.gd);
+        const firstDayWeekday = firstDay.getDay();
+        const offset = firstDayWeekday === 6 ? 0 : 6 - firstDayWeekday + 1;
+        const firstSaturday = new Date(firstDay.getTime());
+        firstSaturday.setDate(firstSaturday.getDate() + offset);
+        return jalaali.toJalaali(firstSaturday.getFullYear(), firstSaturday.getMonth() + 1, firstSaturday.getDate());
+    }
+
+    // Function to get the start date of the week in Jalaali
+    getWeekStartDate(year: number, week: number, dateFormat: string): string {
+        try {
+            const firstDayOfYearGregorian = jalaali.toGregorian(year, 1, 1);
+            const firstDayOfYear = new Date(firstDayOfYearGregorian.gy, firstDayOfYearGregorian.gm - 1, firstDayOfYearGregorian.gd);
+            const firstDayWeekday = firstDayOfYear.getDay();
+            const adjustedWeek = firstDayWeekday === 6 ? week : week - 1;
+
+            const firstSaturday = this.getFirstSaturday(year);
+            const startDate = jalaali.toGregorian(firstSaturday.jy, firstSaturday.jm, firstSaturday.jd);
+            const start = new Date(startDate.gy, startDate.gm - 1, startDate.gd);
+            start.setDate(start.getDate() + (adjustedWeek - 1) * 7);
+
+            // Adjust back to the correct Saturday if it lands on a different day
+            while (start.getDay() !== 6) {
+                start.setDate(start.getDate() - 1);
+            }
+            const weekStartJalaali = jalaali.toJalaali(start.getFullYear(), start.getMonth() + 1, start.getDate());
+            return this.formatDate(weekStartJalaali, dateFormat);
+        } catch (error) {
+            console.error('Error in getWeekStartDate:', error);
+            throw error;
+        }
+    }
+
+    // Function to get the end date of the week in Jalaali
+    getWeekEndDate(year: number, week: number, dateFormat: string): string {
+        try {
+            const weekStart = this.getWeekStartDate(year, week, 'persian');
+            const [jy, jm, jd] = weekStart.split('-').map(Number);
+            const startDateGregorian = jalaali.toGregorian(jy, jm, jd);
+            const startDate = new Date(startDateGregorian.gy, startDateGregorian.gm - 1, startDateGregorian.gd);
+            startDate.setDate(startDate.getDate() + 6);
+            const weekEndJalaali = jalaali.toJalaali(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate());
+            return this.formatDate(weekEndJalaali, dateFormat);
+        } catch (error) {
+            console.error('Error in getWeekEndDate:', error);
+            throw error;
+        }
+    }
+
+    // Function to format date based on user settings
+    formatDate(date: { jy: number, jm: number, jd: number }, dateFormat: string): string {
+        if (dateFormat === 'persian') {
+            return `${date.jy}-${date.jm.toString().padStart(2, '0')}-${date.jd.toString().padStart(2, '0')}`;
+        } else {
+            const gregorian = jalaali.toGregorian(date.jy, date.jm, date.jd);
+            return `${gregorian.gy}-${gregorian.gm.toString().padStart(2, '0')}-${gregorian.gd.toString().padStart(2, '0')}`;
+        }
+    }
 }
+
 
