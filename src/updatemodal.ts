@@ -1,4 +1,3 @@
-// src/gui/UpdateModal/UpdateModal.ts
 import { Modal, App } from 'obsidian';
 
 export default class UpdateModal extends Modal {
@@ -9,22 +8,34 @@ export default class UpdateModal extends Modal {
     onOpen() {
         const { contentEl } = this;
         contentEl.setAttribute('dir', 'rtl');
-        contentEl.createEl('h3', { text: 'جدیدترین قابلیت‌های افزونه تقویم فارسی' });
-        contentEl.createEl('p', { text: '- امکان تعیین نام‌گذاری روزنوشت‌ها بر اساس تاریخ میلادی: اکنون می‌توانید از تنظیمات، نام‌گذاری روزنوشت‌ها را بر اساس تاریخ میلادی تعریف کنید و با افزونه‌هایی مانند تقویم گوگل هماهنگ سازی نمایید.' });
-        contentEl.createEl('p', { text: '- ارجاع به یادداشت‌ها با استفاده از علامت "@": با تایپ "@" می‌توانید به سادگی به یادداشت‌های مرتبط ارجاع دهید، مثلاً با نوشتن «امروز» به یادداشت امروز ارجاع دهید.' });
-        contentEl.createEl('p', { text: '- دستور جدید برای ارتباط مستقیم با یادداشت‌های معنادار: با انتخاب کلمات کلیدی مثل «امروز» و استفاده از دستور «ارجاع متن به یادداشت دوره‌ای»، به طور مستقیم به یادداشت مرتبط وصل شوید.' });
-        contentEl.createEl('p', { text: '- قرار دادن تاریخ معنادار در نوشته‌ها: با قرار دادن عبارت {{امروز}} در قالب‌ها، تاریخ روز جاری به طور خودکار در نوشته‌های جدید شما ظاهر می‌شود.' });
-        contentEl.createEl('p', { text: '- تبدیل فرمت تاریخ بین شمسی و میلادی: با انتخاب تاریخ مورد نظر و اجرای دستور مرتبط، تبدیل بین تاریخ‌های شمسی و میلادی را به سادگی انجام دهید.' });
-        contentEl.createEl('p', { text: '- حذف فوری نقاط در یادداشت: اگر نقطه‌ای را حذف کنید، بلافاصله از تقویم محو می‌شود.' });
-        contentEl.createEl('p', { text: '- مطالعه راهنمای افزونه توصیه می‌شود: برای استفاده بهینه از افزونه، مطالعه راهنما در گیت‌هاب را فراموش نکنید.' });        
-        contentEl.createEl('br'),
-        contentEl.createEl('a', { text: 'کانال تلگرام کارفکر را برای اطلاعات بیشتر دنبال کنید.', href: 'https://t.me/karafkar' }),
-        contentEl.createEl('br');
+        contentEl.createEl('h3', { text: 'تغییرات نسخه 2.1 افزونه تقویم فارسی' });
         
+        contentEl.createEl('p', { text: 'اضافه شدن نمای میلادی به تقویم: حالا دیگر میتوانید همزمان از تقویم شمسی و میلادی استفاده کنید. روزهای میلادی زیر روزهای شمسی با فونت کوچکتر نمایش داده می‌شوند. ماه‌های مرتبط با ماه تقویم شمسی نیز در هدر نمایش داده می‌شود. اگر نیازی به این مورد نمی‌بینید میتوانید از تنظیمات افزونه غیرفعالش کنید.' });
+        contentEl.createEl('p', { text: 'اضافه شدن تایم اوت برای {{عبارت‌های معنادار}}: اگر سیستم شما ضعیف است می‌توانید زمان فعال شدن افزونه پس از ساخته شدن فایل‌ها را بیشتر کنید.' });
+        contentEl.createEl('p', { text: 'اضافه شدن چهار عبارت معنادار: میتوانید با درج {{اول هفته}} و {{آخر هفته}} در هفته‌نوشت یا {{اول ماه}} و {{آخر ماه}} در ماه‌نوشت روزهای مرتبط با این ماه را به تقویم انتخابی خودتان در تنظیمات (شمسی یا میلادی) برگردانید.' });
+        
+        contentEl.createEl('p', { text: 'کانال تلگرام کارفکر را برای پیگیری و مشارکت در توسعه مسیر افزونه دنبال کنید.' });
+        
+        const buttonContainer = contentEl.createEl('div', { cls: 'button-container' });
+
+        const button = buttonContainer.createEl('button', { text: 'کارفکر در تلگرام' });
+        button.style.color = 'var(--interactive-accent)';
+        button.style.backgroundColor = 'transparent'; 
+        button.style.border = '1px solid var(--interactive-accent)';
+        button.style.padding = '0.5em 1em'; 
+        button.style.cursor = 'pointer'; 
+        
+        button.onclick = () => {
+            window.open('https://t.me/karafkar', '_blank');
+        };
+
+        buttonContainer.style.display = 'flex';
+        buttonContainer.style.justifyContent = 'center';
+        buttonContainer.style.marginTop = '1em'; 
+        
+        contentEl.createEl('br');
     }
-
     
-
     onClose() {
         this.contentEl.empty();
         this.close();
