@@ -26,7 +26,7 @@ export default class UpdateModal extends Modal {
         button.style.cursor = 'pointer'; 
         
         button.onclick = () => {
-            window.open('https://t.me/karafkar', '_blank');
+            window.open('https://t.me/karfekr', '_blank');
         };
 
         buttonContainer.style.display = 'flex';
