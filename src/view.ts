@@ -4,6 +4,8 @@ import {  toJalaali, jalaaliMonthLength , toGregorian} from 'jalaali-js';
 import * as jalaali from 'jalaali-js';
 import type { PluginSettings , JalaaliDate } from './settings'; 
 import moment from 'moment-jalaali';
+import hijriMoment from 'moment-hijri';
+
 
 
 export default class PersianCalendarView extends View {
@@ -169,6 +171,9 @@ export default class PersianCalendarView extends View {
     
     
     
+    
+
+    
     private async renderDaysGrid(contentEl: HTMLElement, jalaaliDate: { jy: number, jm: number }) {
         let gridEl = contentEl.querySelector('.calendar-days-grid');
         if (gridEl) {
@@ -202,11 +207,11 @@ export default class PersianCalendarView extends View {
             let dayNumber = dayIndex + 1;
     
             if (dayIndex < 0) {
-                dayEl.textContent = this.toFarsiDigits(daysFromPrevMonth[daysFromPrevMonth.length + dayIndex]);
-                dayEl.addClass('dim');
                 dayNumber = daysFromPrevMonth[daysFromPrevMonth.length + dayIndex];
+                dayEl.createEl('div', { cls: 'persian-date' }).textContent = this.toFarsiDigits(dayNumber);
+                dayEl.addClass('dim');
             } else if (dayIndex < daysInMonth) {
-                dayEl.textContent = this.toFarsiDigits(dayNumber);
+                dayEl.createEl('div', { cls: 'persian-date' }).textContent = this.toFarsiDigits(dayNumber);
                 if (this.isToday({ jy: jalaaliDate.jy, jm: jalaaliDate.jm, jd: dayNumber })) {
                     dayEl.addClass('today');
                 }
@@ -217,22 +222,29 @@ export default class PersianCalendarView extends View {
                     this.openOrCreateDailyNote(dayNumber);
                 });
             } else {
-                dayEl.textContent = this.toFarsiDigits(daysFromNextMonth[dayIndex - daysInMonth]);
-                dayEl.addClass('dim');
                 dayNumber = daysFromNextMonth[dayIndex - daysInMonth];
+                dayEl.createEl('div', { cls: 'persian-date' }).textContent = this.toFarsiDigits(dayNumber);
+                dayEl.addClass('dim');
             }
     
+            const showBothCalendars = this.settings.showGeorgianDates && this.settings.showHijriDates;
             if (this.settings.showGeorgianDates) {
                 const georgianDate = jalaali.toGregorian(jalaaliDate.jy, jalaaliDate.jm, dayNumber);
-                const georgianDayEl = dayEl.createEl('div', { cls: 'georgian-date' });
+                const georgianDayEl = dayEl.createEl('div', { cls: showBothCalendars ? 'georgian-date-corner' : 'georgian-date' });
                 georgianDayEl.textContent = georgianDate.gd.toString();
+            }
+    
+            if (this.settings.showHijriDates) {
+                const gregorianDate = jalaali.toGregorian(jalaaliDate.jy, jalaaliDate.jm, dayNumber);
+                const hijriDate = hijriMoment(`${gregorianDate.gy}-${gregorianDate.gm}-${gregorianDate.gd}`, 'YYYY-M-D').add(this.settings.hijriDateAdjustment, 'days').format('iD');
+                const hijriDayEl = dayEl.createEl('div', { cls: showBothCalendars ? 'hijri-date-corner' : 'hijri-date' });
+                hijriDayEl.textContent = this.toFarsiDigits(hijriDate);
             }
     
             dayEl.classList.add("dynamic-day-grid-placement"); 
             dayEl.style.setProperty('--day-grid-start', ((i % 7) + 2).toString());
         }
     }
-    
 
     private async renderQuarterlyNotesRow(containerEl: HTMLElement) {    
         const quartersRow = containerEl.createDiv({ cls: 'calendar-quarters-row' });

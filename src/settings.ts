@@ -10,6 +10,7 @@ interface PluginSettings {
     announceUpdates: boolean;
     showGeorgianDates: boolean;
     timeoutDuration: number;
+    hijriDateAdjustment: number;
 }
 
 
@@ -25,6 +26,7 @@ const DEFAULT_SETTINGS: PluginSettings = {
     timeoutDuration: 1250,
     announceUpdates: true,
     showGeorgianDates: true,
+    hijriDateAdjustment: -1,
 };
 
 type JalaaliDate = {

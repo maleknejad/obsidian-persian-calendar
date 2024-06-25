@@ -61,6 +61,36 @@ export default class PersianCalendarSettingTab extends PluginSettingTab {
             }));
 
         new Setting(containerEl)
+            .setName('نمایش تقویم هجری قمری')
+            .setDesc('می‌توانید مشخص کنید تقویم هجری قمری کنار تقویم هجری شمسی نمایش داده شود.')
+            .addToggle(toggle => toggle
+                .setValue(this.plugin.settings.showHijriDates)
+                .onChange(async (value) => {
+                    this.plugin.settings.showHijriDates = value;
+                    await this.plugin.saveSettings();
+                    this.plugin.refreshViews();
+                }));
+        
+        new Setting(containerEl) ;{
+            new Setting(containerEl)
+                .setName('تنظیم تقویم هجری قمری')
+                .setDesc('تاریخ هجری قمری را میتوانید تنظیم کنید. معمولا در ایران یک روز عقب‌تر از تقویم استاندارد هجری تنظیم می‌شود.')
+                .addDropdown(dropdown => dropdown
+                    .addOption('-2', '-2 روز')
+                    .addOption('-1', '-1 روز')
+                    .addOption('0', '0 روز')
+                    .addOption('1', '+1 روز')
+                    .addOption('2', '+2 روز')
+                    .setValue(this.plugin.settings.hijriDateAdjustment.toString())
+                    .onChange(async (value) => {
+                        this.plugin.settings.hijriDateAdjustment = parseInt(value);
+                        await this.plugin.saveSettings();
+                        this.plugin.refreshViews();
+                    }));
+        }
+            
+
+        new Setting(containerEl)
         .setName('مدت زمان تاخیر در اجرای {{عبارت‌های معنادار}}')
         .setDesc('{{عبارت‌های معنادار}} پس از ساخته شدن فایل با تاخیر زمانی اجرا می‌گردند. در سیستم‌های با قدرت پایین تر این مقدار را افزایش دهید. (مقدار پیش‌فرض: 1250 میلی‌ثانیه)')
         .addText(text => text
@@ -113,5 +143,6 @@ export default class PersianCalendarSettingTab extends PluginSettingTab {
     }
       
 }
+
 
 
