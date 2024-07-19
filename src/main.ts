@@ -9,22 +9,27 @@ import PersianPlaceholders from './placeholder';
 import UpdateModal from './updatemodal';
 import PersianCalendarSettingTab from './settingstab';
 
-//Authored by Hossein Maleknejad, for support and development follow Karfekr. Telegram at https://t.me/karfekr
+//Authored by Hossein Maleknejad, for support and development ideas, follow Karfekr Telegram at https://t.me/karfekr
 //I know this repository has lots of duplicate codes and must be cleaned. I will clean it in next releases. 
-//I am working on it. 1403-02-09
+//I am working on it. 1403-04-06
+
+
+
 
 export default class PersianCalendarPlugin extends Plugin {
     settings: PluginSettings = DEFAULT_SETTINGS;
     dateSuggester: DateSuggester | undefined;
     placeholder: PersianPlaceholders  | undefined;
     pluginsettingstab: PersianCalendarSettingTab | undefined;
+    plugin: PersianCalendarPlugin = this;
+
 
 
 
     
     async onload() {
         await this.loadSettings();
-        this.registerView('persian-calendar', (leaf) => new PersianCalendarView(leaf, this.app, this.settings));
+        this.registerView('persian-calendar', (leaf) => new PersianCalendarView(leaf, this.app, this.settings, this.plugin));
         this.addRibbonIcon('calendar', 'روزنوشت امروز', async () => {
             const todayJalaali = toJalaali(new Date());
             const dayNumber = todayJalaali.jd;

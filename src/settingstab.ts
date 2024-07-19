@@ -71,24 +71,78 @@ export default class PersianCalendarSettingTab extends PluginSettingTab {
                     this.plugin.refreshViews();
                 }));
         
-        new Setting(containerEl) ;{
-            new Setting(containerEl)
-                .setName('تنظیم تقویم هجری قمری')
-                .setDesc('تاریخ هجری قمری را میتوانید تنظیم کنید. معمولا در ایران یک روز عقب‌تر از تقویم استاندارد هجری تنظیم می‌شود.')
-                .addDropdown(dropdown => dropdown
-                    .addOption('-2', '-2 روز')
-                    .addOption('-1', '-1 روز')
-                    .addOption('0', '0 روز')
-                    .addOption('1', '+1 روز')
-                    .addOption('2', '+2 روز')
-                    .setValue(this.plugin.settings.hijriDateAdjustment.toString())
-                    .onChange(async (value) => {
-                        this.plugin.settings.hijriDateAdjustment = parseInt(value);
-                        await this.plugin.saveSettings();
-                        this.plugin.refreshViews();
-                    }));
-        }
-            
+
+        new Setting(containerEl)
+            .setName('تقویم هجری قمری')
+            .setDesc('انتخاب تنظیمات تقویم هجری قمری بین ایران و تقویم رسمی عربستان.')
+            .addDropdown(dropdown => dropdown
+                .addOption('iran', 'ایران')
+                .addOption('ummalqura', 'ام‌القرى')
+                .setValue(this.plugin.settings.hijriCalendarType)
+                .onChange(async (value) => {
+                    this.plugin.settings.hijriCalendarType = value;
+                    await this.plugin.saveSettings();
+                    this.plugin.refreshViews();
+                }));
+        
+        new Setting(containerEl)
+            .setName('نمایش روزهای تعطیل رسمی در تقویم')
+            .setDesc('مشخص کنید آیا مایلید روزهای تعطیل رسمی در تقویم با رنگ قرمز نمایش داده شوند یا خیر.')
+            .addToggle(toggle => toggle
+                .setValue(this.plugin.settings.showHolidays)
+                .onChange(async (value) => {
+                    this.plugin.settings.showHolidays = value;
+                    await this.plugin.saveSettings();
+                    this.plugin.refreshViews();
+                }));
+
+
+        new Setting(containerEl)
+            .setName('روزهای تعطیل هفته')
+            .setDesc('مشخص کنید چه روزهایی در هفته با رنگ قرمز  به عنوان تعطیلی نمایش داده شوند')
+            .addDropdown(dropdown => dropdown
+                .addOption('friday', 'جمعه')
+                .addOption('thursday-friday', 'پنجشنبه و جمعه')
+                .addOption('friday-saturday', 'جمعه و شنبه')
+                .setValue(this.plugin.settings.weekendDays)
+                .onChange(async (value) => {
+                    this.plugin.settings.weekendDays = value;
+                    await this.plugin.saveSettings();
+                    this.plugin.refreshViews();
+                }));
+        new Setting(containerEl)
+            .setName('نمایش تعطیلات رسمی تقویم ایران')
+            .setDesc('مشخص کنید آیا مایلید رویدادهای تقویم رسمی ایران در تولتیپ نمایش داده شود یا خیر')
+            .addToggle(toggle => toggle
+                .setValue(this.plugin.settings.showOfficialIranianCalendar)
+                .onChange(async (value) => {
+                    this.plugin.settings.showOfficialIranianCalendar = value;
+                    await this.plugin.saveSettings();
+                })
+            );
+
+        new Setting(containerEl)
+            .setName('نمایش رویدادهای تقویم ایران باستان')
+            .setDesc('مشخص کنید آیا مایلید رویدادهای تقویم ایران باستان در تولتیپ نمایش داده شود یا خیر.')
+            .addToggle(toggle => toggle
+                .setValue(this.plugin.settings.showAncientIranianCalendar)
+                .onChange(async (value) => {
+                    this.plugin.settings.showAncientIranianCalendar = value;
+                    await this.plugin.saveSettings();
+                })
+            );
+
+        new Setting(containerEl)
+            .setName('نمایش رویدادهای تقویم شیعی')
+            .setDesc('مشخص کنید آیا مایلید رویدادهای تقویم شیعی در تولتیپ نمایش اده شود یا خیر.')
+            .addToggle(toggle => toggle
+                .setValue(this.plugin.settings.showShiaCalendar)
+                .onChange(async (value) => {
+                    this.plugin.settings.showShiaCalendar = value;
+                    await this.plugin.saveSettings();
+                })
+            );
+        
 
         new Setting(containerEl)
         .setName('مدت زمان تاخیر در اجرای {{عبارت‌های معنادار}}')

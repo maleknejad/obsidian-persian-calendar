@@ -11,8 +11,22 @@ interface PluginSettings {
     showGeorgianDates: boolean;
     timeoutDuration: number;
     hijriDateAdjustment: number;
+    showHijriDates: boolean;
+    weekendDays: string;
+    showHolidays: boolean;
+    showOfficialIranianCalendar: boolean;
+    showAncientIranianCalendar: boolean;
+    showShiaCalendar: boolean;
+    hijriCalendarType: string;
 }
 
+export interface HolidayEvent {
+    holiday: boolean;
+    month: number;
+    day: number;
+    type: string;
+    title: string;
+}
 
 const DEFAULT_SETTINGS: PluginSettings = {
     dailyNotesFolderPath: '/',
@@ -27,7 +41,20 @@ const DEFAULT_SETTINGS: PluginSettings = {
     announceUpdates: true,
     showGeorgianDates: true,
     hijriDateAdjustment: -1,
+    showHijriDates: true,
+    weekendDays: 'friday',
+    showHolidays: true,
+    showOfficialIranianCalendar: true,
+    showAncientIranianCalendar: true,
+    showShiaCalendar: true,
+    hijriCalendarType: 'iran',
 };
+
+export interface HijriAdjustments {
+    [year: number]: {
+        [month: number]: number;
+    };
+}
 
 type JalaaliDate = {
     jy: number;

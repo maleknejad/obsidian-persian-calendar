@@ -12,6 +12,8 @@ This tool lets you add and organize notes from daily to yearly on the Persian ca
 - Can reference notes by typing `@` or selecting them.
 - Can add {{placeholders}} in templates to enrich your templates. Works fine with [Templater](https://github.com/SilentVoid13/Templater) plugin for note templates.
 - Works fine with all obsidian daily plugins.
+- Works with Georgian and Hijri calendar in one view.
+- Showing events of Iranian official calendar. 
 
 # افزونه تقویم فارسی ابسیدین
 
@@ -28,7 +30,9 @@ This tool lets you add and organize notes from daily to yearly on the Persian ca
 - امکان رفرنس دادن به یادداشت‌ها از طریق تایپ کردن '@' یا سلکت کردن عبارت‌ها برای قالب‌ها.
 - امکان قرار دادن {{عبارت‌های معنادار}} در قالب‌ها برای غنی‌تر کردن یادداشت‌ها
 - ذخیره‌سازی فایل‌های روزنوشت به میلادی برای سازگاری بیشتر با افزونه‌های ابسیدین
-- قابلیت نمایش همزمان تقویم میلادی
+- قابلیت نمایش همزمان تقویم میلادی و قمری
+- نمایش رویدادهای تقویم شمسی و میلادی و هجری
+- امکان تنظیم نمایش رویدادها
 
 ## راهنمای نصب
 
@@ -107,6 +111,10 @@ This tool lets you add and organize notes from daily to yearly on the Persian ca
 اگر از تقویم میلادی زیاد استفاده می‌کنید و می‌خواهید همزمان در افزونه تقویم میلادی نمایش داده ‌شود می‌توانید در تنظیمات افزونه با فعال‌سازی آن، تقویم میلادی را در کنار تقویم شمسی داشته باشید.
 
 ![افزونه به همراه تقویم میلادی](Instructions/calendar-with-georgian.png)
+
+## قابلیت نمایش تقویم قمری و میلادی به صورت همزمان
+
+## تنظیم نمایش رویدادها در تقویم
 
 ## مسیر مشارکت در توسعه افزونه
 
