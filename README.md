@@ -1,9 +1,9 @@
 
 # Obsidian Persian Calendar
 
-This tool lets you add and organize notes from daily to yearly on the Persian calendar, use templates with placeholders, and works with all Obsidian daily plugins.
+This tool lets you see events, add and organize notes from daily to yearly on the Persian calendar, use templates with placeholders, and works with all Obsidian daily plugins.
 
-![تقویم فارسی ابسیدین](Instructions/calendar-with-georgian.png)
+![تقویم فارسی ایسیدین](Instructions/events.png)
 
 ## Usage
 
@@ -13,7 +13,7 @@ This tool lets you add and organize notes from daily to yearly on the Persian ca
 - Can add {{placeholders}} in templates to enrich your templates. Works fine with [Templater](https://github.com/SilentVoid13/Templater) plugin for note templates.
 - Works fine with all obsidian daily plugins.
 - Works with Georgian and Hijri calendar in one view.
-- Showing events of Iranian official calendar. 
+- Showing events of Iranian official calendar.
 
 # افزونه تقویم فارسی ابسیدین
 
@@ -74,6 +74,7 @@ This tool lets you add and organize notes from daily to yearly on the Persian ca
 - `{{آخر هفته}}`: بر اساس تنظیمات شما روز آخر هفته‌نوشت را به شمسی یا میلادی برمیگرداند.
 - `{{اول ماه}}`: بر اساس تنظیمات شما روز اول ماه‌نوشت را به شمسی یا میلادی برمیگرداند.
 - `{{آخر ماه}}`: بر اساس تنظیمات شما روز آخر ماه‌نوشت را به شمسی یا میلادی برمیگرداند.
+- `{{مناسبت‌}}`: مناسبت‌های هر روز را بر اساس تنظیماتی که در تقویم اعمال شده و در تولتیپ نمایش داده می‌شود را در روزنوشت درج می‌کند.
 
 دقت داشته باشید باید دقیقا این عبارت ها با همین فرمت در روزنوشت‌ها درج شود.
 این قابلیت افزونه با طور کامل با قابلیت‌های افزونه `Templater` هماهنگ است و پس از ساخته شدن قالب توسط این افزونه با 500 میلی‌ثانیه تاخیر اجرا می‌شود.
@@ -114,7 +115,17 @@ This tool lets you add and organize notes from daily to yearly on the Persian ca
 
 ## قابلیت نمایش تقویم قمری و میلادی به صورت همزمان
 
-## تنظیم نمایش رویدادها در تقویم
+در تنظیمات تقویم میتوانید مشخص کنید تقویم قمری نمایش داده شود یا خیر. این تنظیمات باعث میشود که بتوانید در کنار تقویم شمسی و میلادی تقویم قمری را هم داشته باشید.
+
+## تنظیم نمایش مناسبت‌های در تقویم
+
+مناسبت‌های تقویم ایران به این افزونه اضافه شده است. میتوانید تنظیم کنید در تولتیپ (وقتی موس را روی روز قرار می‌دهید باکسی نمایش داده می‌شود که به آن تولتیپ می‌گویند) چه رویدادهایی را نمایش دهد. به صورت معمول سه دسته رویداد در تقویم ایران وجود دارد: 
+
+- رویدادهای تقویم رسمی: این رویدادها به صورت رسمی در کشور تصویب شده‌اند
+- رویدادهای باستانی:‌ رویدادهای که در تقویم باستانی ایران وجود دارد
+- رویدادهای شیعی: رویدادهایی که در تقویم شیعیان درج شده است و با تقویم هجری تنظیم شده است. تقویم رسمی ایران با برخی از رویدادهای شیعی تقارن دارد. بنابراین اگر مایلید رویدادهای تقویم رسمی ایران را داشته باشید همزمان رویدادهای شیعی را فعال کنید.
+
+![نمایش رویدادهای تقویم شمسی](Instructions/events.png)
 
 ## مسیر مشارکت در توسعه افزونه
 

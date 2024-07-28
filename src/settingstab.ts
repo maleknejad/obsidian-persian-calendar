@@ -72,18 +72,18 @@ export default class PersianCalendarSettingTab extends PluginSettingTab {
                 }));
         
 
-        new Setting(containerEl)
-            .setName('تقویم هجری قمری')
-            .setDesc('انتخاب تنظیمات تقویم هجری قمری بین ایران و تقویم رسمی عربستان.')
-            .addDropdown(dropdown => dropdown
-                .addOption('iran', 'ایران')
-                .addOption('ummalqura', 'ام‌القرى')
-                .setValue(this.plugin.settings.hijriCalendarType)
-                .onChange(async (value) => {
-                    this.plugin.settings.hijriCalendarType = value;
-                    await this.plugin.saveSettings();
-                    this.plugin.refreshViews();
-                }));
+        // new Setting(containerEl)
+        //     .setName('تقویم هجری قمری')
+        //     .setDesc('انتخاب تنظیمات تقویم هجری قمری بین ایران و تقویم رسمی عربستان.')
+        //     .addDropdown(dropdown => dropdown
+        //         .addOption('iran', 'ایران')
+        //         .addOption('ummalqura', 'ام‌القرى')
+        //         .setValue(this.plugin.settings.hijriCalendarType)
+        //         .onChange(async (value) => {
+        //             this.plugin.settings.hijriCalendarType = value;
+        //             await this.plugin.saveSettings();
+        //             this.plugin.refreshViews();
+        //         }));
         
         new Setting(containerEl)
             .setName('نمایش روزهای تعطیل رسمی در تقویم')
@@ -179,7 +179,7 @@ export default class PersianCalendarSettingTab extends PluginSettingTab {
         paragraph.createEl('a', { text: 'کارفکر', href: 'https://t.me/karfekr' }),
         paragraph.appendText(' را دنبال کنید.'),
         paragraph.createEl('br'),
-        paragraph.appendText(' نسخه 2.1.0');
+        paragraph.appendText(' نسخه 3.0.0');
     }
     
 

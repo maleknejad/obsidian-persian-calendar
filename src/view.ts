@@ -288,8 +288,19 @@ export default class PersianCalendarView extends View {
                         this.showTooltip(e, dayEl, events);
                     }
                 });
-    
+                
                 dayEl.addEventListener('mouseleave', () => {
+                    this.hideTooltip();
+                });
+                
+                dayEl.addEventListener('touchstart', (e) => {
+                    const events = this.getEventsForDate(jalaaliDate.jy, jalaaliDate.jm, dayNumber);
+                    if (events.length > 0) {
+                        this.showTooltip(e, dayEl, events);
+                    }
+                });
+                
+                dayEl.addEventListener('touchend', () => {
                     this.hideTooltip();
                 });
             } else {
@@ -309,6 +320,9 @@ export default class PersianCalendarView extends View {
                     if (this.plugin.settings.showHolidays && this.isHoliday('GregorianCalendar', georgianDate.gm, georgianDate.gd)) {
                         isHoliday = true;
                     }
+                    if (this.isToday({ jy: jalaaliDate.jy, jm: jalaaliDate.jm, jd: dayNumber })) {
+                        dayEl.addClass('today');
+                    }
                 }
     
                 if (this.plugin.settings.showHijriDates) {
@@ -326,6 +340,9 @@ export default class PersianCalendarView extends View {
                     // Check Hijri holidays
                     if (this.plugin.settings.showHolidays && this.isHoliday('HijriCalendar', hijriMonth, parseInt(hijriDate))) {
                         isHoliday = true;
+                    }
+                    if (this.isToday({ jy: jalaaliDate.jy, jm: jalaaliDate.jm, jd: dayNumber })) {
+                        dayEl.addClass('today');
                     }
                 }
     
@@ -849,7 +866,7 @@ public async openOrCreateDailyNote(dayNumber: number) {
     
     
 
-    private showTooltip(e: MouseEvent, dayElement: HTMLElement, events: { title: string, isHoliday: boolean }[]): void {
+    private showTooltip(e: MouseEvent | TouchEvent, dayElement: HTMLElement, events: { title: string, isHoliday: boolean }[]): void {
         let tooltip = document.querySelector('.calendar-tooltip') as HTMLElement;
     
         if (!tooltip) {
@@ -860,10 +877,25 @@ public async openOrCreateDailyNote(dayNumber: number) {
     
         tooltip.innerHTML = events.map(event => `<div style="color: ${event.isHoliday ? 'red' : 'black'}">${event.title}</div>`).join('');
         tooltip.style.display = 'block';
-        tooltip.style.left = `${e.pageX - tooltip.offsetWidth - 10}px`;
-        tooltip.style.top = `${e.pageY + 10}px`;
-    }
     
+        let x: number | undefined;
+        let y: number | undefined;
+        
+        if (e instanceof MouseEvent) {
+            x = e.pageX;
+            y = e.pageY;
+        } else if (e instanceof TouchEvent) {
+            const touch = e.touches[0];
+            x = touch.pageX;
+            y = touch.pageY;
+        }
+    
+        if (x !== undefined && y !== undefined) {
+            tooltip.style.left = `${x - tooltip.offsetWidth - 10}px`;
+            tooltip.style.top = `${y + 10}px`;
+        }
+    }
+
     private hideTooltip(): void {
         const tooltip = document.querySelector('.calendar-tooltip') as HTMLElement;
         if (tooltip) {

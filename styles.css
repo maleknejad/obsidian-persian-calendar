@@ -147,7 +147,7 @@
 
 .georgian-date {
     font-size: 0.7rem;
-    color: var(--text-normal);
+    color: inherit;
     position: absolute;
     bottom: 0;
     left: 50%;
@@ -156,7 +156,7 @@
 
 .hijri-date {
     font-size: 0.7rem;
-    color: var(--text-normal);
+    color: inherit;
     position: absolute;
     bottom: 0;
     right: 50%;
@@ -164,8 +164,8 @@
 }
 
 .georgian-date-corner {
-    font-size: 0.6rem;
-    color: var(--text-normal);
+    font-size: 0.55rem;
+    color: inherit;
     position: absolute;
     bottom: 0;
     left: 0;
@@ -173,13 +173,15 @@
 }
 
 .hijri-date-corner {
-    font-size: 0.6rem;
-    color: var(--text-normal);
+    font-size: 0.55rem;
+    color: inherit;
     position: absolute;
     bottom: 0;
     right: 0;
     margin-right: 3px;
 }
+
+
 
 .calendar-day.dim {
     opacity: 0.2;
@@ -193,10 +195,10 @@
     background-color: var(--background-secondary-alt);
 }
 
-.calendar-day.today {
-    color: var(--interactive-accent);
-    border-radius: 50%;
+.calendar-day.today{
+    background: var(--interactive-accent);
     font-weight: bold;
+    color: var(--interactive-normal) !important;
 }
 
 .calendar-day.has-note::before {
