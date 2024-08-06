@@ -49,7 +49,7 @@ export default class PersianPlaceholders {
                 '{{آخر هفته}}': this.isWeeklyFile(file.basename) ? this.getWeekEndDate(parseInt(file.basename.split('-W')[0]), parseInt(file.basename.split('-W')[1]), this.plugin.settings.dateFormat) : null,
                 '{{اول ماه}}': this.isMonthlyFile(file.basename) ? this.getMonthStartDate(file.basename, this.plugin.settings.dateFormat) : null,
                 '{{آخر ماه}}': this.isMonthlyFile(file.basename) ? this.getMonthEndDate(file.basename, this.plugin.settings.dateFormat) : null, 
-                '{{مناسبت‌ها}}': () => this.getEvents(file.basename),       
+                '{{مناسبت‌}}': () => this.getEvents(file.basename),       
             };
 
             for (const [placeholder, value] of Object.entries(placeholders)) {
