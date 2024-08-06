@@ -112,7 +112,7 @@ export default class PersianCalendarSettingTab extends PluginSettingTab {
                 }));
         new Setting(containerEl)
             .setName('نمایش تعطیلات رسمی تقویم ایران')
-            .setDesc('مشخص کنید آیا مایلید رویدادهای تقویم رسمی ایران در تولتیپ نمایش داده شود یا خیر')
+            .setDesc('مشخص کنید آیا مایلید رویدادهای تقویم رسمی ایران در تولتیپ و {{مناسبت}} نمایش داده شود یا خیر')
             .addToggle(toggle => toggle
                 .setValue(this.plugin.settings.showOfficialIranianCalendar)
                 .onChange(async (value) => {
@@ -123,7 +123,7 @@ export default class PersianCalendarSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName('نمایش رویدادهای تقویم ایران باستان')
-            .setDesc('مشخص کنید آیا مایلید رویدادهای تقویم ایران باستان در تولتیپ نمایش داده شود یا خیر.')
+            .setDesc('مشخص کنید آیا مایلید رویدادهای تقویم ایران باستان در تولتیپ و {{مناسبت}} نمایش داده شود یا خیر.')
             .addToggle(toggle => toggle
                 .setValue(this.plugin.settings.showAncientIranianCalendar)
                 .onChange(async (value) => {
@@ -134,7 +134,7 @@ export default class PersianCalendarSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName('نمایش رویدادهای تقویم شیعی')
-            .setDesc('مشخص کنید آیا مایلید رویدادهای تقویم شیعی در تولتیپ نمایش اده شود یا خیر.')
+            .setDesc('مشخص کنید آیا مایلید رویدادهای تقویم شیعی در تولتیپ و {{مناسبت}} نمایش داده شود یا خیر.')
             .addToggle(toggle => toggle
                 .setValue(this.plugin.settings.showShiaCalendar)
                 .onChange(async (value) => {
