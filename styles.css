@@ -212,7 +212,7 @@
 }
 
 .holiday {
-    color: var(--color-red) !important;
+    color: var(--text-error) !important;
 }
 
 .calendar-week-header {
@@ -275,13 +275,13 @@
 
 .calendar-tooltip {
     position: absolute;
-    background: var(--background-primary);
+    background-color: var(--background-secondary);
+    color: var(--text-normal);
     border: 1px solid var(--background-secondary);
     border-radius: 4px;
     padding: 8px;
     z-index: 1000;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    color: var(--text-normal);
     display: none;
     direction: rtl;
 }

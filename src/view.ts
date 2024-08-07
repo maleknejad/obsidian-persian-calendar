@@ -875,7 +875,7 @@ public async openOrCreateDailyNote(dayNumber: number) {
             document.body.appendChild(tooltip);
         }
     
-        tooltip.innerHTML = events.map(event => `<div style="color: ${event.isHoliday ? 'red' : 'black'}">${event.title}</div>`).join('');
+        tooltip.innerHTML = events.map(event => `<div style="color: ${event.isHoliday ? 'var(--text-error)' : 'var(--text-normal)'}">${event.title}</div>`).join('');
         tooltip.style.display = 'block';
     
         let x: number | undefined;

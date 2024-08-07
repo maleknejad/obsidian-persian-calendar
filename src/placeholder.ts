@@ -49,7 +49,9 @@ export default class PersianPlaceholders {
                 '{{آخر هفته}}': this.isWeeklyFile(file.basename) ? this.getWeekEndDate(parseInt(file.basename.split('-W')[0]), parseInt(file.basename.split('-W')[1]), this.plugin.settings.dateFormat) : null,
                 '{{اول ماه}}': this.isMonthlyFile(file.basename) ? this.getMonthStartDate(file.basename, this.plugin.settings.dateFormat) : null,
                 '{{آخر ماه}}': this.isMonthlyFile(file.basename) ? this.getMonthEndDate(file.basename, this.plugin.settings.dateFormat) : null, 
-                '{{مناسبت‌}}': () => this.getEvents(file.basename),       
+                '{{اول سال}}': this.getFirstDayOfYear(file.basename, this.plugin.settings.dateFormat),
+                '{{آخر سال}}': this.getLastDayOfYear(file.basename, this.plugin.settings.dateFormat),
+                '{{رویداد}}': () => this.getEvents(file.basename),       
             };
 
             for (const [placeholder, value] of Object.entries(placeholders)) {
@@ -293,6 +295,37 @@ export default class PersianPlaceholders {
             return `${gregorianEnd.gy}-${gregorianEnd.gm.toString().padStart(2, '0')}-${gregorianEnd.gd.toString().padStart(2, '0')}`;
         }
     }
+
+    private getFirstDayOfYear(fileBasename: string, dateFormat: string): string {
+        const year = parseInt(fileBasename);
+        if (isNaN(year)) {
+            return '';
+        }
+    
+        if (this.plugin.settings.dateFormat.toLowerCase() === 'georgian') {
+            const georgianDate = jalaali.toGregorian(year, 1, 1);
+            return `${georgianDate.gy}-${georgianDate.gm.toString().padStart(2, '0')}-${georgianDate.gd.toString().padStart(2, '0')}`;
+        } else {
+            return `${year}-01-01`;
+        }
+    }
+    private getLastDayOfYear(fileBasename: string, dateFormat: string): string {
+        const year = parseInt(fileBasename);
+        if (isNaN(year)) {
+            return '';
+        }
+    
+        if (this.plugin.settings.dateFormat.toLowerCase() === 'georgian') {
+            const nextYear = jalaali.toGregorian(year + 1, 1, 1);
+            const lastDay = new Date(nextYear.gy, nextYear.gm - 1, nextYear.gd - 1);
+            return `${lastDay.getFullYear()}-${String(lastDay.getMonth() + 1).padStart(2, '0')}-${String(lastDay.getDate()).padStart(2, '0')}`;
+        } else {
+            const isLeapYear = jalaali.isLeapJalaaliYear(year);
+            return isLeapYear ? `${year}-12-30` : `${year}-12-29`;
+        }
+    }
+
+
 
     private async getEvents(title: string): Promise<string> {
         const date = this.parseDateFromTitle(title, this.plugin.settings.dateFormat);

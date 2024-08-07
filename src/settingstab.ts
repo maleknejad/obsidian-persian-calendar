@@ -179,7 +179,7 @@ export default class PersianCalendarSettingTab extends PluginSettingTab {
         paragraph.createEl('a', { text: 'کارفکر', href: 'https://t.me/karfekr' }),
         paragraph.appendText(' را دنبال کنید.'),
         paragraph.createEl('br'),
-        paragraph.appendText(' نسخه 3.0.0');
+        paragraph.appendText(' نسخه 3.0.1');
     }
     
 
