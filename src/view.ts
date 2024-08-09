@@ -276,8 +276,18 @@ export default class PersianCalendarView extends View {
                     this.openOrCreateDailyNote(dayNumber);
                 });
     
+
+                const persianDate = { jy: jalaaliDate.jy, jm: jalaaliDate.jm, jd: dayNumber };
+                const ummalquraAdjustment = this.plugin.settings.hijriDateAdjustment;
+                const hijriDateResult = this.getHijriDate(persianDate, this.plugin.settings.hijriCalendarType, ummalquraAdjustment);
+
+                const hijriDate = hijriDateResult.hd.toString();
+                const hijriMonth = hijriDateResult.hm;
                 // Check Persian holidays
                 if (this.plugin.settings.showHolidays && this.isHoliday('PersianCalendar', jalaaliDate.jm, dayNumber)) {
+                    isHoliday = true;
+                }
+                if (this.plugin.settings.showHolidays && this.isHoliday('HijriCalendar', hijriMonth, parseInt(hijriDate))) {
                     isHoliday = true;
                 }
     
@@ -314,6 +324,15 @@ export default class PersianCalendarView extends View {
                 if (this.plugin.settings.showGeorgianDates) {
                     const georgianDate = jalaali.toGregorian(jalaaliDate.jy, jalaaliDate.jm, dayNumber);
                     const georgianDateEl = dayEl.createEl('div', { cls: showBothCalendars ? 'georgian-date-corner' : 'georgian-date' });
+                       
+
+                    const persianDate = { jy: jalaaliDate.jy, jm: jalaaliDate.jm, jd: dayNumber };
+                    const ummalquraAdjustment = this.plugin.settings.hijriDateAdjustment;
+                    const hijriDateResult = this.getHijriDate(persianDate, this.plugin.settings.hijriCalendarType, ummalquraAdjustment);
+    
+                    const hijriDate = hijriDateResult.hd.toString();
+                    const hijriMonth = hijriDateResult.hm;
+                    
                     georgianDateEl.textContent = georgianDate.gd.toString();
     
                     // Check Georgian holidays
@@ -322,6 +341,9 @@ export default class PersianCalendarView extends View {
                     }
                     if (this.isToday({ jy: jalaaliDate.jy, jm: jalaaliDate.jm, jd: dayNumber })) {
                         dayEl.addClass('today');
+                    }
+                    if (this.plugin.settings.showHolidays && this.isHoliday('HijriCalendar', hijriMonth, parseInt(hijriDate))) {
+                        isHoliday = true;
                     }
                 }
     
@@ -827,6 +849,7 @@ public async openOrCreateDailyNote(dayNumber: number) {
                     if (this.plugin.settings.showAncientIranianCalendar && event.type === "Ancient Iran") {
                         addEvent({ title: event.title, isHoliday: event.holiday });
                     }
+                    
                 }
             });
         }
