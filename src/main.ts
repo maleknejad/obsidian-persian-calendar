@@ -1,5 +1,5 @@
 /* eslint-disable no-useless-escape */
-import { Notice, Plugin, TFile ,MarkdownView, TAbstractFile ,Editor} from 'obsidian';
+import { Notice, Plugin, TFile ,MarkdownView, TAbstractFile ,Editor, WorkspaceLeaf} from 'obsidian';
 import PersianCalendarView from './view';
 import { PluginSettings, DEFAULT_SETTINGS } from './settings';
 import { toJalaali , toGregorian } from 'jalaali-js';
@@ -22,6 +22,7 @@ export default class PersianCalendarPlugin extends Plugin {
     placeholder: PersianPlaceholders  | undefined;
     pluginsettingstab: PersianCalendarSettingTab | undefined;
     plugin: PersianCalendarPlugin = this;
+    view: PersianCalendarView | undefined;
 
 
 
@@ -29,19 +30,20 @@ export default class PersianCalendarPlugin extends Plugin {
     
     async onload() {
         await this.loadSettings();
-        this.registerView('persian-calendar', (leaf) => new PersianCalendarView(leaf, this.app, this.settings, this.plugin));
+        this.registerView(
+            'persian-calendar',
+            (leaf: WorkspaceLeaf) => (this.view = new PersianCalendarView(leaf, this.app, this.settings, this.plugin))
+        );       
+        
+        if (this.app.workspace.getLeavesOfType('persian-calendar').length === 0) {
+            this.activateView();
+        }
+        
         this.addRibbonIcon('calendar', 'روزنوشت امروز', async () => {
-            const todayJalaali = toJalaali(new Date());
+            const today = new Date();
+            const todayJalaali = toJalaali(today);
             const dayNumber = todayJalaali.jd;
-            const leaf = this.app.workspace.getLeavesOfType('persian-calendar')[0];
-            if (leaf) {
-                const view = leaf.view;
-                if (view instanceof PersianCalendarView) {
-                    await view.openOrCreateDailyNote(dayNumber);
-                }
-            } else {
-                console.error('Persian Calendar view is not open. Please open the Persian Calendar first.');
-            }
+            openNoteForDate(todayJalaali.jy, todayJalaali.jm, dayNumber);
         });
         super.onload();
         this.registerEditorSuggest(new DateSuggester(this));
@@ -49,6 +51,7 @@ export default class PersianCalendarPlugin extends Plugin {
         this.pluginsettingstab = new PersianCalendarSettingTab(this.app, this);
         this.placeholder = new PersianPlaceholders(this);
         this.announceUpdate();
+        
         
 
         this.registerEvent(this.app.vault.on('create', (file: TAbstractFile) => {
@@ -293,23 +296,13 @@ export default class PersianCalendarPlugin extends Plugin {
         const currentWeekNumber = currentDate.jWeek();
         return currentWeekNumber;
     }
-    private async activateView() {
-        let leaf = this.app.workspace.getLeavesOfType('persian-calendar').first();
-        
-        if (!leaf) {
-            leaf = this.app.workspace.getRightLeaf(false);
-            await leaf.setViewState({
-                type: 'persian-calendar',
-            });
-        }
-
-        if (!leaf || !(leaf.view instanceof PersianCalendarView)) {
-            new Notice('Unable to open Persian Calendar view. Please make sure the plugin is correctly installed from community plugins directroy.');
-            return;
-        }
-
-        this.app.workspace.revealLeaf(leaf);
-        leaf.view.focus();
+    async activateView() {
+        const leaf = this.app.workspace.getRightLeaf(false); // Get a leaf in the right sidebar
+        await leaf.setViewState({
+            type: 'persian-calendar',
+            active: true
+        });
+        this.app.workspace.revealLeaf(leaf); // Ensure the leaf is visible
     }
 
     refreshViews() {
@@ -321,4 +314,11 @@ export default class PersianCalendarPlugin extends Plugin {
             });
         }
     }
+
+    onunload(): void {
+        this.app.workspace
+            .getLeavesOfType('persian-calendar')
+            .forEach((leaf) => leaf.detach());
+    }
+    
 }
