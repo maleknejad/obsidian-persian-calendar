@@ -51,7 +51,7 @@ export default class PersianPlaceholders {
                 '{{آخر ماه}}': this.isMonthlyFile(file.basename) ? this.getMonthEndDate(file.basename, this.plugin.settings.dateFormat) : null, 
                 '{{اول سال}}': this.getFirstDayOfYear(file.basename, this.plugin.settings.dateFormat),
                 '{{آخر سال}}': this.getLastDayOfYear(file.basename, this.plugin.settings.dateFormat),
-                '{{رویداد}}': () => this.getEvents(file.basename),       
+                '{{مناسبت}}': () => this.getEvents(file.basename),       
             };
 
             for (const [placeholder, value] of Object.entries(placeholders)) {
