@@ -82,7 +82,23 @@ export default class PersianCalendarPlugin extends Plugin {
 
 
         this.addSettingTab(new PersianCalendarSettingTab(this.app, this));
-        this.addCommand({
+		this.addCommand({
+            id: 'replace-placeholders',
+            name: 'Replace Placeholders - جایگزین کردن عبارت های معنا دار',
+            callback: async () => {
+				const file = this.app.workspace.getActiveFile()
+				if (this.placeholder) {
+                    if(file) {
+						this.placeholder?.insertPersianDate(file);
+					} else {
+						console.error('Not a File to Replace Placeholders')
+					}
+				} else {
+                    console.error("Placeholder is not initialized");
+                }
+            }
+        });
+		this.addCommand({
             id: 'open-todays-daily-note',
             name: 'Today - باز کردن روزنوشت امروز',
             callback: async () => {
