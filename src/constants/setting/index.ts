@@ -1,6 +1,6 @@
-import type { PluginSettingType } from "src/types";
+import type { TPluginSetting } from "src/types";
 
-export const DEFAULT_SETTING: PluginSettingType = {
+export const DEFAULT_SETTING: TPluginSetting = {
 	dailyNotesFolderPath: "/",
 	weeklyNotesFolderPath: "/",
 	monthlyNotesFolderPath: "/",

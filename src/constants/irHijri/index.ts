@@ -23,6 +23,7 @@ export const IRHIJRI_MONTHS_BY_YEAR = {
 
 export type SupportedHijriYearType = keyof typeof IRHIJRI_MONTHS_BY_YEAR;
 
+//todo: move in the end
 function hijriMonthsLength(year: number): readonly number[] | null {
 	return IRHIJRI_MONTHS_BY_YEAR[year as SupportedHijriYearType] ?? null;
 }
