@@ -1,5 +1,6 @@
 import { toJalaali, toGregorian, jalaaliMonthLength } from "jalaali-js";
 import { getQuarter, weekStartNumber } from "..";
+import { dayFormat } from "src/utils/format";
 import type { TJalali, TGregorian, TWeekStart, TGetWeekStartDatePraps } from "src/types";
 
 // => (now){jy, jm, jd}
@@ -47,7 +48,7 @@ export function gregorianDashToJalali(dateStr: string): TJalali | null {
 }
 
 // ("gy-gm-gd"|"gygmgd") => "jy-jm-jd"
-export function gregorianDashToJalaliDash(dateStr: string): string | null {
+export function gregorianDashToJalaliDash(dateStr: string, separator?: string): string | null {
 	const match = dateStr.match(/^(\d{4})-?(\d{2})-?(\d{2})$/);
 	if (!match) return null;
 
@@ -61,11 +62,11 @@ export function gregorianDashToJalaliDash(dateStr: string): string | null {
 	}
 
 	const { jy, jm, jd } = toJalaali(gy, gm, gd);
-	return `${jy}-${String(jm).padStart(2, "0")}-${String(jd).padStart(2, "0")}`;
+	return dayFormat(jy, jm, jd, { separator });
 }
 
 // ("jy-jm-jd"|"jyjmjd") => "gy-gm-gd"
-export function jalaliDashToGregorianDash(dateStr: string): string | null {
+export function jalaliDashToGregorianDash(dateStr: string, separator?: string): string | null {
 	const match = dateStr.match(/^(\d{4})-?(\d{2})-?(\d{2})$/);
 	if (!match) return null;
 
@@ -75,7 +76,7 @@ export function jalaliDashToGregorianDash(dateStr: string): string | null {
 
 	try {
 		const { gy, gm, gd } = toGregorian(jy, jm, jd);
-		return `${gy}-${String(gm).padStart(2, "0")}-${String(gd).padStart(2, "0")}`;
+		return dayFormat(gy, gm, gd, { separator });
 	} catch {
 		return null;
 	}
