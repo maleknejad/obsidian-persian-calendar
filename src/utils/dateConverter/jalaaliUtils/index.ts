@@ -1,6 +1,6 @@
 import { toJalaali, toGregorian, jalaaliMonthLength } from "jalaali-js";
 import { weekStartNumber } from "..";
-import { JalaliType, GregorianType, WeekStartType, getWeekStartDatePraps } from "src/types";
+import type { JalaliType, GregorianType, WeekStartType, getWeekStartDatePraps } from "src/types";
 
 // => (now){jy, jm, jd}
 export function getJalaliNow(): JalaliType {
@@ -46,9 +46,9 @@ export function gregorianDashToJalali(dateStr: string): JalaliType | null {
 	return toJalaali(gy, gm, gd);
 }
 
-// ("gy-gm-gd") => "jy-jm-jd"
+// ("gy-gm-gd"|"gygmgd") => "jy-jm-jd"
 export function gregorianDashToJalaliDash(dateStr: string): string | null {
-	const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+	const match = dateStr.match(/^(\d{4})-?(\d{2})-?(\d{2})$/);
 	if (!match) return null;
 
 	const gy = +match[1];
@@ -60,13 +60,13 @@ export function gregorianDashToJalaliDash(dateStr: string): string | null {
 		return null;
 	}
 
-	const j = toJalaali(gy, gm, gd);
-	return `${j.jy}-${String(j.jm).padStart(2, "0")}-${String(j.jd).padStart(2, "0")}`;
+	const { jy, jm, jd } = toJalaali(gy, gm, gd);
+	return `${jy}-${String(jm).padStart(2, "0")}-${String(jd).padStart(2, "0")}`;
 }
 
-// ("jy-jm-jd") => "gy-gm-gd"
+// ("jy-jm-jd"|"jyjmjd") => "gy-gm-gd"
 export function jalaliDashToGregorianDash(dateStr: string): string | null {
-	const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+	const match = dateStr.match(/^(\d{4})-?(\d{2})-?(\d{2})$/);
 	if (!match) return null;
 
 	const jy = +match[1];
@@ -74,29 +74,21 @@ export function jalaliDashToGregorianDash(dateStr: string): string | null {
 	const jd = +match[3];
 
 	try {
-		const g = toGregorian(jy, jm, jd);
-		return `${g.gy}-${String(g.gm).padStart(2, "0")}-${String(g.gd).padStart(2, "0")}`;
+		const { gy, gm, gd } = toGregorian(jy, jm, jd);
+		return `${gy}-${String(gm).padStart(2, "0")}-${String(gd).padStart(2, "0")}`;
 	} catch {
 		return null;
 	}
 }
 
-//todo: remove this in the end
-// convert jalali or gregorian dash date
-export function convertDashDate(dateStr: string): string {
-	const year = Number(dateStr.slice(0, 4));
-	if (Number.isNaN(year)) return dateStr;
-
-	if (year > 1600) {
-		return gregorianDashToJalaliDash(dateStr) ?? dateStr;
-	}
-
-	return jalaliDashToGregorianDash(dateStr) ?? dateStr;
-}
-
 // exp: (1404, 12) => 29
 export function jalaliMonthLength(jy: number, jm: number): number {
 	return jalaaliMonthLength(jy, jm);
+}
+
+// (date) => {jy, jm, jd}
+export function dateToJalali(date: Date): JalaliType {
+	return toJalaali(date);
 }
 
 // (jy, jm, jd) => Date
@@ -120,7 +112,7 @@ export function getCurrentQuarter(): { quarter: number; jy: number } {
 }
 
 // Date => jalali_week_number
-export function getJalaliWeekNumber(date: Date, weekStart: WeekStartType = "sat"): number {
+export function getJalaliWeekNumberFromDate(date: Date, weekStart: WeekStartType = "sat"): number {
 	// Normalize to midnight to ignore hours/minutes
 	const targetDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 

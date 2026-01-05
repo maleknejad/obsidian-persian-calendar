@@ -1,14 +1,14 @@
-const hijriToJulian = (year: number, month: number, day: number): number => {
-	return (
-		Math.floor((11 * year + 3) / 30) +
-		Math.floor(354 * year) +
-		Math.floor(30 * month) -
-		Math.floor((month - 1) / 2) +
-		day +
-		1948440 -
-		386
-	);
-};
+import type { HijriType, GregorianType, JalaliType } from "src/types";
+import { gregorianToJalali, jalaliToGregorian } from "..";
+
+const hijriToJulian = (year: number, month: number, day: number): number =>
+	Math.floor((11 * year + 3) / 30) +
+	354 * year +
+	30 * month -
+	Math.floor((month - 1) / 2) +
+	day +
+	1948440 -
+	386;
 
 const gregorianToJulian = (year: number, month: number, day: number): number => {
 	if (month < 3) {
@@ -16,85 +16,76 @@ const gregorianToJulian = (year: number, month: number, day: number): number => 
 		month += 12;
 	}
 
-	const a = Math.floor(year / 100.0);
+	const a = Math.floor(year / 100);
 	const b =
 		year === 1582 && (month > 10 || (month === 10 && day > 4))
 			? -10
-			: year === 1582 && month === 10
-			? 0
-			: year < 1583
-			? 0
-			: 2 - a + Math.floor(a / 4.0);
+			: year > 1582
+			? 2 - a + Math.floor(a / 4)
+			: 0;
 
 	return Math.floor(365.25 * (year + 4716)) + Math.floor(30.6001 * (month + 1)) + day + b - 1524;
 };
 
-interface HijriDate {
-	year: number;
-	month: number;
-	day: number;
-}
+const julianToHijri = (julianDay: number): HijriType => {
+	const cycleDays = 10631;
+	const yearDays = 10631 / 30;
+	const epoch = 1948084;
+	const shift = 8.01 / 60;
 
-const julianToHijri = (julianDay: number): HijriDate => {
-	const y = 10631.0 / 30.0;
-	const epochAstro = 1948084;
-	const shift1 = 8.01 / 60.0;
+	let z = julianDay - epoch;
+	const cycle = Math.floor(z / cycleDays);
+	z -= cycle * cycleDays;
 
-	let z = julianDay - epochAstro;
-	const cyc = Math.floor(z / 10631.0);
-	z -= 10631 * cyc;
-	const j = Math.floor((z - shift1) / y);
-	z -= Math.floor(j * y + shift1);
+	const yearInCycle = Math.floor((z - shift) / yearDays);
+	z -= Math.floor(yearInCycle * yearDays + shift);
 
-	const year = 30 * cyc + j;
-	let month = Math.floor(parseInt(String((z + 28.5001) / 29.5)));
-	if (month === 13) {
-		month = 12;
-	}
-
-	const day = z - Math.floor(29.5001 * month - 29);
+	const hm = Math.min(12, Math.floor((z + 28.5001) / 29.5));
+	const hd = z - Math.floor(29.5001 * hm - 29);
 
 	return {
-		year: parseInt(String(year)),
-		month: parseInt(String(month)),
-		day: parseInt(String(day)),
+		hy: cycle * 30 + yearInCycle,
+		hm,
+		hd,
 	};
 };
 
-interface GregorianDate {
-	year: number;
-	month: number;
-	day: number;
-}
-
-const julianToGregorian = (julianDate: number): GregorianDate => {
+const julianToGregorian = (julianDay: number): GregorianType => {
 	let b = 0;
-	if (julianDate > 2299160) {
-		const a = Math.floor((julianDate - 1867216.25) / 36524.25);
-		b = 1 + a - Math.floor(a / 4.0);
+
+	if (julianDay > 2299160) {
+		const a = Math.floor((julianDay - 1867216.25) / 36524.25);
+		b = 1 + a - Math.floor(a / 4);
 	}
 
-	const bb = julianDate + b + 1524;
-	let cc = Math.floor((bb - 122.1) / 365.25);
-	const dd = Math.floor(365.25 * cc);
-	const ee = Math.floor((bb - dd) / 30.6001);
+	const julday = julianDay + b + 1524;
+	let c = Math.floor((julday - 122.1) / 365.25);
+	const d = Math.floor(365.25 * c);
+	const e = Math.floor((julday - d) / 30.6001);
 
-	const day = bb - dd - Math.floor(30.6001 * ee);
-	let month = ee - 1;
+	const gd = julday - d - Math.floor(30.6001 * e);
+	const gm = e > 13 ? e - 13 : e - 1;
+	const gy = gm > 2 ? c - 4716 : c - 4715;
 
-	if (ee > 13) {
-		cc += 1;
-		month = ee - 13;
-	}
-
-	const year = cc - 4716;
-
-	return {
-		year: parseInt(String(year)),
-		month: parseInt(String(month)),
-		day: parseInt(String(day)),
-	};
+	return { gy, gm, gd };
 };
 
-export { hijriToJulian, gregorianToJulian, julianToHijri, julianToGregorian };
-export type { HijriDate, GregorianDate };
+export const gregorianToHijri = ({ gy, gm, gd }: GregorianType): HijriType => {
+	const julday = gregorianToJulian(gy, gm, gd);
+	return julianToHijri(julday);
+};
+
+export const hijriToGregorian = ({ hy, hm, hd }: HijriType): GregorianType => {
+	const julday = hijriToJulian(hy, hm, hd);
+	return julianToGregorian(julday);
+};
+
+export function jalaliToHijri({ jy, jm, jd }: JalaliType): HijriType {
+	const { gy, gm, gd } = jalaliToGregorian(jy, jm, jd);
+	return gregorianToHijri({ gy, gm, gd });
+}
+
+export function hijriToJalali({ hy, hm, hd }: HijriType): JalaliType {
+	const { gy, gm, gd } = hijriToGregorian({ hy, hm, hd });
+	return gregorianToJalali(gy, gm, gd);
+}

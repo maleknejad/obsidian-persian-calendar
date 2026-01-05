@@ -5,10 +5,11 @@ export {
 	gregorianToJalali,
 	gregorianDashToJalali,
 	jalaliMonthLength,
+	dateToJalali,
 	jalaliToDate,
 	getQuarter,
 	getCurrentQuarter,
-	getJalaliWeekNumber,
+	getJalaliWeekNumberFromDate,
 	daysBetweenJalaali,
 	getDaysRemainingInYear,
 	getDaysPassedInYear,
@@ -17,7 +18,6 @@ export {
 	getJalaliEndDayOfWeek,
 	gregorianDashToJalaliDash,
 	jalaliDashToGregorianDash,
-	convertDashDate,
 } from "./jalaaliUtils";
 export {
 	dateToYMD,
@@ -29,3 +29,4 @@ export {
 	jalaliDashTojalali,
 	weekStartNumber,
 } from "./pureUtils";
+export { gregorianToHijri, hijriToGregorian, hijriToJalali, jalaliToHijri } from "./hijriUtils";

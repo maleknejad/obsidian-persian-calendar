@@ -13,3 +13,6 @@ node_modules
 *.ico
 *.svg
 *.pdf
+
+src/constants/*
+!src/constants/index.ts

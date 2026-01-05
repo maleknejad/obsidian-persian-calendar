@@ -1,4 +1,3 @@
-/* eslint-disable no-useless-escape */
 import {
 	Notice,
 	Plugin,
@@ -8,21 +7,24 @@ import {
 	Editor,
 	WorkspaceLeaf,
 } from "obsidian";
+import {
+	getJalaliWeekNumberFromDate,
+	getJalaliNow,
+	addDayDate,
+	dateToJalali,
+	gregorianDashToJalaliDash,
+	jalaliDashToGregorianDash,
+} from "src/utils/dateConverter";
+import { DEFAULT_SETTING } from "src/constants";
+import type { PluginSettingType } from "src/types";
 import PersianCalendarView from "./view";
-import { PluginSettings, DEFAULT_SETTINGS } from "./settings";
-import { toJalaali, toGregorian } from "jalaali-js";
-import moment from "moment-jalaali";
 import DateSuggester from "./suggester";
 import PersianPlaceholders from "./placeholder";
 import UpdateModal from "./updatemodal";
 import PersianCalendarSettingTab from "./settingstab";
 
-//Authored by Hossein Maleknejad, for support and development ideas, follow Karfekr Telegram at https://t.me/karfekr
-//I know this repository has lots of duplicate codes and must be cleaned. I will clean it in next releases.
-//I am working on it. 1403-04-31
-
 export default class PersianCalendarPlugin extends Plugin {
-	settings: PluginSettings = DEFAULT_SETTINGS;
+	settings: PluginSettingType = DEFAULT_SETTING;
 	dateSuggester: DateSuggester | undefined;
 	placeholder: PersianPlaceholders | undefined;
 	pluginsettingstab: PersianCalendarSettingTab | undefined;
@@ -31,6 +33,7 @@ export default class PersianCalendarPlugin extends Plugin {
 
 	async onload() {
 		await this.loadSettings();
+
 		this.registerView(
 			"persian-calendar",
 			(leaf: WorkspaceLeaf) =>
@@ -42,16 +45,20 @@ export default class PersianCalendarPlugin extends Plugin {
 		}
 
 		this.addRibbonIcon("calendar", "روزنوشت امروز", async () => {
-			const today = new Date();
-			const todayJalaali = toJalaali(today);
-			const dayNumber = todayJalaali.jd;
-			openNoteForDate(todayJalaali.jy, todayJalaali.jm, dayNumber);
+			const { jd } = getJalaliNow();
+			openNoteForDate(jd);
 		});
+
 		super.onload();
+
 		this.registerEditorSuggest(new DateSuggester(this));
+
 		this.dateSuggester = new DateSuggester(this);
+
 		this.pluginsettingstab = new PersianCalendarSettingTab(this.app, this);
+
 		this.placeholder = new PersianPlaceholders(this);
+
 		this.announceUpdate();
 
 		this.registerEvent(
@@ -84,36 +91,31 @@ export default class PersianCalendarPlugin extends Plugin {
 		);
 
 		this.addSettingTab(new PersianCalendarSettingTab(this.app, this));
+
 		this.addCommand({
 			id: "open-todays-daily-note",
 			name: "Today - باز کردن روزنوشت امروز",
 			callback: async () => {
-				const today = new Date();
-				const todayJalaali = toJalaali(today);
-				const dayNumber = todayJalaali.jd;
-				openNoteForDate(todayJalaali.jy, todayJalaali.jm, dayNumber);
+				const { jd } = getJalaliNow();
+				openNoteForDate(jd);
 			},
 		});
+
 		this.addCommand({
 			id: "open-tomorrow-daily-note",
 			name: "Tomorrow - باز کردن روزنوشت فردا",
 			callback: async () => {
-				const tomorrow = new Date();
-				tomorrow.setDate(tomorrow.getDate() + 1);
-				const tomorrowJalaali = toJalaali(tomorrow);
-				const dayNumber = tomorrowJalaali.jd;
-				openNoteForDate(tomorrowJalaali.jy, tomorrowJalaali.jm, dayNumber);
+				const { jd } = dateToJalali(addDayDate(new Date(), 1));
+				openNoteForDate(jd);
 			},
 		});
+
 		this.addCommand({
 			id: "open-yesterday-daily-note",
 			name: "Yesterday - باز کردن روزنوشت دیروز",
 			callback: async () => {
-				const yesterday = new Date();
-				yesterday.setDate(yesterday.getDate() - 1);
-				const yesterdayJalaali = toJalaali(yesterday);
-				const dayNumber = yesterdayJalaali.jd;
-				openNoteForDate(yesterdayJalaali.jy, yesterdayJalaali.jm, dayNumber);
+				const { jd } = dateToJalali(addDayDate(new Date(), -1));
+				openNoteForDate(jd);
 			},
 		});
 
@@ -129,14 +131,13 @@ export default class PersianCalendarPlugin extends Plugin {
 			id: "open-this-weeks-note",
 			name: "Weekly - باز کردن هفته‌نوشت این هفته",
 			callback: async () => {
-				const today = new Date();
-				const todayJalaali = toJalaali(today);
-				const currentWeekNumber = this.calculateCurrentWeekNumber(todayJalaali);
+				const { jy } = getJalaliNow();
+				const currentWeekNumber = getJalaliWeekNumberFromDate(new Date());
 				const leaf = this.app.workspace.getLeavesOfType("persian-calendar")[0];
 				if (leaf) {
 					const view = leaf.view;
 					if (view instanceof PersianCalendarView) {
-						view.openOrCreateWeeklyNote(currentWeekNumber, todayJalaali.jy);
+						view.openOrCreateWeeklyNote(currentWeekNumber, jy);
 					}
 				} else {
 					console.error("Persian Calendar view is not open.");
@@ -162,15 +163,12 @@ export default class PersianCalendarPlugin extends Plugin {
 			id: "open-current-months-note",
 			name: "Monthly - بازکردن ماه‌نوشت این ماه",
 			callback: async () => {
-				const today = new Date();
-				const todayJalaali = toJalaali(today);
-				const jy = todayJalaali.jy;
-				const month = todayJalaali.jm;
+				const { jy, jm } = getJalaliNow();
 				const leaf = this.app.workspace.getLeavesOfType("persian-calendar")[0];
 				if (leaf) {
 					const view = leaf.view;
 					if (view instanceof PersianCalendarView) {
-						await view.openOrCreateMonthlyNote(month, jy);
+						await view.openOrCreateMonthlyNote(jm, jy);
 					}
 				} else {
 					console.error(
@@ -179,13 +177,12 @@ export default class PersianCalendarPlugin extends Plugin {
 				}
 			},
 		});
+
 		this.addCommand({
 			id: "open-current-years-note",
 			name: "Yearly - باز کردن سال‌نوشت امسال",
 			callback: async () => {
-				const today = new Date();
-				const todayJalaali = toJalaali(today);
-				const jy = todayJalaali.jy;
+				const { jy } = getJalaliNow();
 				const leaf = this.app.workspace.getLeavesOfType("persian-calendar")[0];
 				if (leaf) {
 					const view = leaf.view;
@@ -201,26 +198,6 @@ export default class PersianCalendarPlugin extends Plugin {
 		});
 
 		this.addCommand({
-			id: "convert-date", // For my friend, Amir Napster.
-			name: "Convert Date Format - تبدیل تاریخ بین شمسی و میلادی",
-			checkCallback: (checking: boolean) => {
-				const editor = this.app.workspace.getActiveViewOfType(MarkdownView)?.editor;
-				if (editor) {
-					const cursorPos = editor.getCursor();
-					const lineText = editor.getLine(cursorPos.line);
-					const hasDate = /(\d{4}[\/\-]\d{1,2}[\/\-]\d{1,2}|\d{8})/.test(lineText);
-
-					if (checking) {
-						return hasDate;
-					} else if (hasDate) {
-						this.convertDate(editor, cursorPos.line, lineText);
-					}
-				}
-				return false;
-			},
-		});
-
-		this.addCommand({
 			id: "convert-to-date",
 			name: "Link Text to Periodic Note - ارجاع متن به یادداشت‌های دوره‌ای",
 			editorCallback: (editor, view) => {
@@ -228,7 +205,7 @@ export default class PersianCalendarPlugin extends Plugin {
 			},
 		});
 
-		const openNoteForDate = (year: number, month: number, dayNumber: number) => {
+		const openNoteForDate = (dayNumber: number) => {
 			const leaf = this.app.workspace.getLeavesOfType("persian-calendar")[0];
 			if (leaf) {
 				const view = leaf.view;
@@ -239,36 +216,44 @@ export default class PersianCalendarPlugin extends Plugin {
 				console.error("Persian Calendar view is not open.");
 			}
 		};
+
+		this.addCommand({
+			id: "convert-date", // For my friend, Amir Napster.
+			name: "Convert Date Format - تبدیل تاریخ بین شمسی و میلادی",
+			checkCallback: (checking: boolean) => {
+				const editor = this.app.workspace.getActiveViewOfType(MarkdownView)?.editor;
+				if (!editor) return false;
+
+				const { line } = editor.getCursor();
+				const text = editor.getLine(line);
+
+				if (!/^\b\d{4}-?\d{2}-?\d{2}\b$/.test(text)) return false;
+
+				if (!checking) {
+					this.convertDate(editor, line, text);
+				}
+
+				return true;
+			},
+		});
 	}
 
 	public convertDate(editor: Editor, lineIndex: number, textLine: string) {
-		// eslint-disable-next-line no-useless-escape
-		const regex = /(\d{4})[\/\-]?(\d{1,2})[\/\-]?(\d{1,2})/g;
-		let match;
-		while ((match = regex.exec(textLine)) !== null) {
-			const [fullMatch, year, month, day] = match;
+		const dateRegex = /\b(\d{4})-?(\d{2})-?(\d{2})\b/g;
 
-			if (parseInt(year) > 1500) {
-				const persianDate = toJalaali(parseInt(year), parseInt(month), parseInt(day));
-				const formatted = `${persianDate.jy}-${persianDate.jm
-					.toString()
-					.padStart(2, "0")}-${persianDate.jd.toString().padStart(2, "0")}`;
-				editor.replaceRange(
-					formatted,
-					{ line: lineIndex, ch: match.index },
-					{ line: lineIndex, ch: match.index + fullMatch.length },
-				);
-			} else {
-				const georgianDate = toGregorian(parseInt(year), parseInt(month), parseInt(day));
-				const formatted = `${georgianDate.gy}-${georgianDate.gm
-					.toString()
-					.padStart(2, "0")}-${georgianDate.gd.toString().padStart(2, "0")}`;
-				editor.replaceRange(
-					formatted,
-					{ line: lineIndex, ch: match.index },
-					{ line: lineIndex, ch: match.index + fullMatch.length },
-				);
-			}
+		const newLine = textLine.replace(dateRegex, (full, y, m, d) => {
+			const date = `${y}-${m}-${d}`;
+			const convert = +y > 2000 ? gregorianDashToJalaliDash : jalaliDashToGregorianDash;
+
+			return convert(date) ?? full;
+		});
+
+		if (newLine !== textLine) {
+			editor.replaceRange(
+				newLine,
+				{ line: lineIndex, ch: 0 },
+				{ line: lineIndex, ch: textLine.length },
+			);
 		}
 	}
 
@@ -284,7 +269,7 @@ export default class PersianCalendarPlugin extends Plugin {
 	}
 
 	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		this.settings = Object.assign({}, DEFAULT_SETTING, await this.loadData());
 	}
 
 	async saveSettings() {
@@ -298,22 +283,34 @@ export default class PersianCalendarPlugin extends Plugin {
 		}
 	}
 
-	private calculateCurrentWeekNumber(jalaaliDate: { jy: number; jm: number; jd: number }): number {
-		moment.loadPersian({ usePersianDigits: false, dialect: "persian-modern" });
-		const currentDate = moment(
-			`${jalaaliDate.jy}/${jalaaliDate.jm}/${jalaaliDate.jd}`,
-			"jYYYY/jM/jD",
-		);
-		const currentWeekNumber = currentDate.jWeek();
-		return currentWeekNumber;
-	}
-	async activateView() {
-		const leaf = this.app.workspace.getRightLeaf(false); // Get a leaf in the right sidebar
-		await leaf.setViewState({
-			type: "persian-calendar",
-			active: true,
-		});
-		this.app.workspace.revealLeaf(leaf); // Ensure the leaf is visible
+	async activateView(): Promise<WorkspaceLeaf | null> {
+		try {
+			let leaf = this.app.workspace.getRightLeaf(false);
+
+			if (!leaf) {
+				leaf = this.app.workspace.getRightLeaf(true);
+			}
+
+			if (!leaf) {
+				leaf = this.app.workspace.getLeaf(true);
+			}
+
+			if (!leaf) {
+				throw new Error("Unable to obtain any workspace leaf");
+			}
+
+			await leaf.setViewState({
+				type: "persian-calendar",
+				active: true,
+			});
+
+			this.app.workspace.revealLeaf(leaf);
+			return leaf;
+		} catch (error) {
+			console.error("Failed to activate Persian Calendar view:", error);
+			new Notice("❌ خطا در باز کردن نمای تقویم فارسی");
+			return null;
+		}
 	}
 
 	refreshViews() {

@@ -1,5 +1,5 @@
-export const jalaliMonthMap = Object.freeze({
-	fa: Object.freeze({
+export const JALALI_MONTHS = {
+	fa: {
 		1: "فروردین",
 		2: "اردیبهشت",
 		3: "خرداد",
@@ -12,8 +12,8 @@ export const jalaliMonthMap = Object.freeze({
 		10: "دی",
 		11: "بهمن",
 		12: "اسفند",
-	}),
-	en: Object.freeze({
+	},
+	en: {
 		1: "Farvardin",
 		2: "Ordibehesht",
 		3: "Khordad",
@@ -26,5 +26,5 @@ export const jalaliMonthMap = Object.freeze({
 		10: "Dey",
 		11: "Bahman",
 		12: "Esfand",
-	}),
-} as const);
+	},
+} as const;

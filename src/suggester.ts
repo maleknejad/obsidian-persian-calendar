@@ -1,14 +1,12 @@
 /* eslint-disable no-case-declarations */
 import {
 	EditorSuggest,
-	EditorPosition,
 	Editor,
-	EditorSuggestTriggerInfo,
-	EditorSuggestContext,
 	TFile,
 	MarkdownView,
 	Notice,
 } from "obsidian";
+import type {EditorPosition, EditorSuggestTriggerInfo, EditorSuggestContext} from "obsidian"
 import { toJalaali } from "jalaali-js";
 import PersianCalendarPlugin from "./main";
 import moment from "moment-jalaali";

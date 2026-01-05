@@ -1,8 +1,12 @@
-export { type LocalType } from "./local";
-export {
-  type GregorianType,
-  type JalaliType,
-  type WeekStartType,
-  type NumberOfMonthsType,
-  type getWeekStartDatePraps,
+export type { LocalType } from "./local";
+export type {
+	GregorianType,
+	JalaliType,
+	HijriType,
+	WeekStartType,
+	NumberOfMonthsType,
+	getWeekStartDatePraps,
+	HolidayEvent,
+	HijriAdjustments, //todo: remove in the end
 } from "./date";
+export type { PluginSettingType } from "./setting";

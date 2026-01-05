@@ -14,6 +14,7 @@
 		"forceConsistentCasingInFileNames": true,
 		"strict": true,
 		"strictNullChecks": true,
+		"verbatimModuleSyntax": true,
 		"lib": ["DOM", "ES2022"]
 	},
 	"include": ["**/*.ts"]

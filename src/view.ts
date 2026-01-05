@@ -1,17 +1,13 @@
 import { WorkspaceLeaf, Notice, App, View, TFile, MarkdownView } from "obsidian";
 import { getJalaliNow } from "src/utils/dateConverter";
 import { toJalaali, jalaaliMonthLength, toGregorian } from "jalaali-js";
+import PersianCalendarPlugin from "./main";
+import { JALALI_HOLIDAYS, HIJRI_HOLIDAYS, GLOBAL_HOLIDAYS } from "src/constants";
+import type { PluginSettingType, JalaliType, HolidayEvent } from "src/types";
 import * as jalaali from "jalaali-js";
-import type { PluginSettings, JalaaliDate, HolidayEvent } from "./settings";
+import { iranianHijriAdjustments, basePersianDate, baseHijriDate } from "./constants/irHijri";
 import moment from "moment-jalaali";
 import hijriMoment from "moment-hijri";
-import PersianCalendarPlugin from "./main";
-import {
-	PersianCalendarHolidays,
-	HijriCalendarHolidays,
-	GregorianCalendarHolidays,
-} from "./constants/holidays";
-import { iranianHijriAdjustments, basePersianDate, baseHijriDate } from "./hijri";
 
 export default class PersianCalendarView extends View {
 	dailyCheckInterval: number | undefined;
@@ -22,7 +18,7 @@ export default class PersianCalendarView extends View {
 	constructor(
 		leaf: WorkspaceLeaf,
 		app: App,
-		settings: PluginSettings,
+		settings: PluginSettingType,
 		plugin: PersianCalendarPlugin,
 	) {
 		super(leaf);
@@ -40,9 +36,9 @@ export default class PersianCalendarView extends View {
 	}
 
 	private holidayData: { [key: string]: HolidayEvent[] } = {
-		PersianCalendar: PersianCalendarHolidays,
-		HijriCalendar: HijriCalendarHolidays,
-		GregorianCalendar: GregorianCalendarHolidays,
+		PersianCalendar: JALALI_HOLIDAYS,
+		HijriCalendar: HIJRI_HOLIDAYS,
+		GregorianCalendar: GLOBAL_HOLIDAYS,
 	};
 
 	async initializeHolidayData() {
@@ -79,7 +75,7 @@ export default class PersianCalendarView extends View {
 	private currentJalaaliYear: number;
 	private currentJalaaliMonth: number;
 
-	private settings: PluginSettings;
+	private settings: PluginSettingType;
 
 	public async render() {
 		const containerEl = this.containerEl;
@@ -630,7 +626,7 @@ export default class PersianCalendarView extends View {
 		this.currentJalaaliMonth = jm;
 	}
 
-	private getCurrentJalaaliDate(): JalaaliDate {
+	private getCurrentJalaaliDate(): JalaliType {
 		const now = new Date();
 		const todayJalaali = toJalaali(now.getFullYear(), now.getMonth() + 1, now.getDate());
 		return {
@@ -908,7 +904,7 @@ export default class PersianCalendarView extends View {
 			this.plugin.settings.showOfficialIranianCalendar ||
 			this.plugin.settings.showAncientIranianCalendar
 		) {
-			PersianCalendarHolidays.forEach((event) => {
+			JALALI_HOLIDAYS.forEach((event) => {
 				if (event.month === jm && event.day === jd) {
 					if (this.plugin.settings.showOfficialIranianCalendar && event.type === "Iran") {
 						addEvent({ title: event.title, isHoliday: event.holiday });
@@ -940,7 +936,7 @@ export default class PersianCalendarView extends View {
 			hijriMomentDate.iMonth(hijriDateResult.hm - 1); // iMonth is 0-indexed
 			hijriMomentDate.iDate(hijriDateResult.hd);
 
-			HijriCalendarHolidays.forEach((event) => {
+			HIJRI_HOLIDAYS.forEach((event) => {
 				if (event.month === hijriMomentDate.iMonth() + 1 && event.day === hijriMomentDate.iDate()) {
 					addEvent({ title: event.title, isHoliday: event.holiday });
 				}
@@ -950,7 +946,7 @@ export default class PersianCalendarView extends View {
 		// Gregorian Calendar Holidays
 		if (this.plugin.settings.showOfficialIranianCalendar) {
 			const gregorianDate = jalaali.toGregorian(jy, jm, jd);
-			GregorianCalendarHolidays.forEach((event) => {
+			GLOBAL_HOLIDAYS.forEach((event) => {
 				if (event.month === gregorianDate.gm && event.day === gregorianDate.gd) {
 					addEvent({ title: event.title, isHoliday: event.holiday });
 				}

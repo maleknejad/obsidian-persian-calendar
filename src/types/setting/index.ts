@@ -1,0 +1,21 @@
+export type PluginSettingType = {
+	dailyNotesFolderPath: string;
+	weeklyNotesFolderPath: string;
+	monthlyNotesFolderPath: string;
+	yearlyNotesFolderPath: string;
+	enableQuarterlyNotes: boolean;
+	quarterlyNotesFolderPath: string;
+	dateFormat: string;
+	version: string;
+	announceUpdates: boolean;
+	showGeorgianDates: boolean;
+	timeoutDuration: number;
+	hijriDateAdjustment: number;
+	showHijriDates: boolean;
+	weekendDays: string;
+	showHolidays: boolean;
+	showOfficialIranianCalendar: boolean;
+	showAncientIranianCalendar: boolean;
+	showShiaCalendar: boolean;
+	hijriCalendarType: string;
+};

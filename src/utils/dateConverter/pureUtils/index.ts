@@ -1,5 +1,11 @@
-import { GregorianType, NumberOfMonthsType, LocalType, WeekStartType, JalaliType } from "src/types";
-import { jalaliMonthMap } from "src/constants/jalaliMonths";
+import type {
+	GregorianType,
+	NumberOfMonthsType,
+	LocalType,
+	WeekStartType,
+	JalaliType,
+} from "src/types";
+import { JALALI_MONTHS } from "src/constants";
 
 // Maps week start ("sat" | "sun" | "mon") to JS weekday number (0=Sun, 6=Sat)
 export const weekStartNumber = (weekStart: WeekStartType): number =>
@@ -24,7 +30,7 @@ export function dateToYMD(date: Date): GregorianType {
 
 // 12 => اسفند
 export function getJalaliMonthName(month: NumberOfMonthsType, local: "fa" | "en" = "fa"): string {
-	return jalaliMonthMap[local][month];
+	return JALALI_MONTHS[local][month];
 }
 
 // (Gregorian)Date => weekday name(fa or en)
@@ -73,6 +79,7 @@ export function dateToDash(year: number, month: number, day: number): string {
 	return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 }
 
+// (date, days) => (with days added)Date
 export function addDayDate(date: Date, days: number): Date {
 	const result = new Date(date);
 	result.setDate(result.getDate() + days);

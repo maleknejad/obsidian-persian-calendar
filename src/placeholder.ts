@@ -1,15 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { TFile } from "obsidian";
-import moment from "moment-jalaali";
 import jalaali from "jalaali-js";
-import {
-	PersianCalendarHolidays,
-	HijriCalendarHolidays,
-	GregorianCalendarHolidays,
-} from "src/constants/holidays";
 import PersianCalendarPlugin from "src/main";
+import { JALALI_HOLIDAYS, HIJRI_HOLIDAYS, GLOBAL_HOLIDAYS } from "src/constants";
+import moment from "moment-jalaali";
 import hijriMoment from "moment-hijri";
-import { iranianHijriAdjustments, basePersianDate, baseHijriDate } from "./hijri";
+import { iranianHijriAdjustments, basePersianDate, baseHijriDate } from "./constants/irHijri";
 
 export default class PersianPlaceholders {
 	plugin: PersianCalendarPlugin;
@@ -412,11 +408,7 @@ export default class PersianPlaceholders {
 
 		// Persian (Jalaali) events
 		if (settings.showOfficialIranianCalendar || settings.showAncientIranianCalendar) {
-			const persianEvents = this.getEventsForDate(
-				PersianCalendarHolidays,
-				date.jMonth() + 1,
-				date.jDate(),
-			);
+			const persianEvents = this.getEventsForDate(JALALI_HOLIDAYS, date.jMonth() + 1, date.jDate());
 			events.push(
 				...persianEvents.filter(
 					(event) =>
@@ -427,7 +419,7 @@ export default class PersianPlaceholders {
 		}
 
 		// Gregorian events
-		events.push(...this.getEventsForDate(GregorianCalendarHolidays, date.month() + 1, date.date()));
+		events.push(...this.getEventsForDate(GLOBAL_HOLIDAYS, date.month() + 1, date.date()));
 
 		// Hijri events
 		if (settings.showShiaCalendar) {
@@ -444,7 +436,7 @@ export default class PersianPlaceholders {
 			hijriMomentDate.iMonth(hijriDate.hm - 1); // iMonth is 0-indexed
 			hijriMomentDate.iDate(hijriDate.hd);
 
-			const hijriEvents = HijriCalendarHolidays.filter(
+			const hijriEvents = HIJRI_HOLIDAYS.filter(
 				(event) =>
 					event.month === hijriMomentDate.iMonth() + 1 && event.day === hijriMomentDate.iDate(),
 			);
