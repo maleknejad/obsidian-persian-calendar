@@ -1,9 +1,9 @@
 import { toJalaali, toGregorian, jalaaliMonthLength } from "jalaali-js";
-import { weekStartNumber } from "..";
-import type { JalaliType, GregorianType, WeekStartType, getWeekStartDatePraps } from "src/types";
+import { getQuarter, weekStartNumber } from "..";
+import type { TJalali, TGregorian, TWeekStart, TGetWeekStartDatePraps } from "src/types";
 
 // => (now){jy, jm, jd}
-export function getJalaliNow(): JalaliType {
+export function getJalaliNow(): TJalali {
 	return toJalaali(new Date());
 }
 
@@ -13,7 +13,7 @@ export function isKabiseh(jy: number): boolean {
 }
 
 // (jy, jm, jd) => {gy, gm, gd}
-export function jalaliToGregorian(jy: number, jm: number, jd: number): GregorianType {
+export function jalaliToGregorian(jy: number, jm: number, jd: number): TGregorian {
 	return toGregorian(jy, jm, jd);
 }
 
@@ -28,7 +28,7 @@ export function gregorianToJalali(
 }
 
 // ("gy-gm-gd") => {jy, jm, jd}
-export function gregorianDashToJalali(dateStr: string): JalaliType | null {
+export function gregorianDashToJalali(dateStr: string): TJalali | null {
 	const match = dateStr.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
 	if (!match) return null;
 
@@ -87,7 +87,7 @@ export function jalaliMonthLength(jy: number, jm: number): number {
 }
 
 // (date) => {jy, jm, jd}
-export function dateToJalali(date: Date): JalaliType {
+export function dateToJalali(date: Date): TJalali {
 	return toJalaali(date);
 }
 
@@ -95,11 +95,6 @@ export function dateToJalali(date: Date): JalaliType {
 export function jalaliToDate(jy: number, jm: number, jd: number): Date {
 	const { gy, gm, gd } = toGregorian(jy, jm, jd);
 	return new Date(gy, gm - 1, gd);
-}
-
-// (month_number) => quarter_number
-export function getQuarter(month: number): number {
-	return Math.ceil(month / 3);
 }
 
 // => (now){quarter, jy}
@@ -112,7 +107,7 @@ export function getCurrentQuarter(): { quarter: number; jy: number } {
 }
 
 // Date => jalali_week_number
-export function getJalaliWeekNumberFromDate(date: Date, weekStart: WeekStartType = "sat"): number {
+export function getJalaliWeekNumberFromDate(date: Date, weekStart: TWeekStart = "sat"): number {
 	// Normalize to midnight to ignore hours/minutes
 	const targetDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
@@ -139,7 +134,7 @@ export function getJalaliWeekNumberFromDate(date: Date, weekStart: WeekStartType
 }
 
 // (jy) => (first saturday in jy){jy, jm, jd}
-export function getFirstWeekStartOfYear(jy: number, weekStart: WeekStartType = "sat"): JalaliType {
+export function getFirstWeekStartOfYear(jy: number, weekStart: TWeekStart = "sat"): TJalali {
 	const { gy, gm, gd } = toGregorian(jy, 1, 1);
 	const firstDayOfYear = new Date(gy, gm - 1, gd);
 
@@ -156,9 +151,9 @@ export function getFirstWeekStartOfYear(jy: number, weekStart: WeekStartType = "
 
 // ({jYear, jWeekNumber}) => (start day of week){jy, jm, jd}
 export function getJalaliStartDayOfWeek(
-	{ jYear, jWeekNumber }: getWeekStartDatePraps,
-	weekStart: WeekStartType = "sat",
-): JalaliType {
+	{ jYear, jWeekNumber }: TGetWeekStartDatePraps,
+	weekStart: TWeekStart = "sat",
+): TJalali {
 	const { gy, gm, gd } = toGregorian(jYear, 1, 1);
 	const firstDayOfYear = new Date(gy, gm - 1, gd);
 
@@ -184,9 +179,9 @@ export function getJalaliStartDayOfWeek(
 
 // ({jYear, jWeekNumber}) => (end day of week){jy, jm, jd}
 export function getJalaliEndDayOfWeek(
-	{ jYear, jWeekNumber }: getWeekStartDatePraps,
-	weekStart: WeekStartType = "sat",
-): JalaliType {
+	{ jYear, jWeekNumber }: TGetWeekStartDatePraps,
+	weekStart: TWeekStart = "sat",
+): TJalali {
 	// Get start date of the requested Jalali week
 	const { jy, jm, jd } = getJalaliStartDayOfWeek({ jYear, jWeekNumber }, weekStart);
 

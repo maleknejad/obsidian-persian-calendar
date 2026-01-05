@@ -3,7 +3,7 @@ import { getJalaliNow } from "src/utils/dateConverter";
 import { toJalaali, jalaaliMonthLength, toGregorian } from "jalaali-js";
 import PersianCalendarPlugin from "./main";
 import { JALALI_HOLIDAYS, HIJRI_HOLIDAYS, GLOBAL_HOLIDAYS } from "src/constants";
-import type { PluginSettingType, JalaliType, HolidayEvent } from "src/types";
+import type { TPluginSetting, TJalali, THolidayEvent } from "src/types";
 import * as jalaali from "jalaali-js";
 import { iranianHijriAdjustments, basePersianDate, baseHijriDate } from "./constants/irHijri";
 import moment from "moment-jalaali";
@@ -18,7 +18,7 @@ export default class PersianCalendarView extends View {
 	constructor(
 		leaf: WorkspaceLeaf,
 		app: App,
-		settings: PluginSettingType,
+		settings: TPluginSetting,
 		plugin: PersianCalendarPlugin,
 	) {
 		super(leaf);
@@ -35,7 +35,7 @@ export default class PersianCalendarView extends View {
 		this.plugin = plugin;
 	}
 
-	private holidayData: { [key: string]: HolidayEvent[] } = {
+	private holidayData: { [key: string]: THolidayEvent[] } = {
 		PersianCalendar: JALALI_HOLIDAYS,
 		HijriCalendar: HIJRI_HOLIDAYS,
 		GregorianCalendar: GLOBAL_HOLIDAYS,
@@ -75,7 +75,7 @@ export default class PersianCalendarView extends View {
 	private currentJalaaliYear: number;
 	private currentJalaaliMonth: number;
 
-	private settings: PluginSettingType;
+	private settings: TPluginSetting;
 
 	public async render() {
 		const containerEl = this.containerEl;
@@ -626,7 +626,7 @@ export default class PersianCalendarView extends View {
 		this.currentJalaaliMonth = jm;
 	}
 
-	private getCurrentJalaaliDate(): JalaliType {
+	private getCurrentJalaaliDate(): TJalali {
 		const now = new Date();
 		const todayJalaali = toJalaali(now.getFullYear(), now.getMonth() + 1, now.getDate());
 		return {

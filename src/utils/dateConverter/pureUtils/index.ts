@@ -1,14 +1,8 @@
-import type {
-	GregorianType,
-	NumberOfMonthsType,
-	LocalType,
-	WeekStartType,
-	JalaliType,
-} from "src/types";
+import type { TGregorian, TNumberOfMonths, TLocal, TWeekStart, TJalali } from "src/types";
 import { JALALI_MONTHS } from "src/constants";
 
 // Maps week start ("sat" | "sun" | "mon") to JS weekday number (0=Sun, 6=Sat)
-export const weekStartNumber = (weekStart: WeekStartType): number =>
+export const weekStartNumber = (weekStart: TWeekStart): number =>
 	({
 		sat: 6,
 		sun: 0,
@@ -16,7 +10,7 @@ export const weekStartNumber = (weekStart: WeekStartType): number =>
 	}[weekStart]);
 
 // (Gregorian)Date => {gy, gm, gd}
-export function dateToYMD(date: Date): GregorianType {
+export function dateToYMD(date: Date): TGregorian {
 	if (isNaN(date.getTime())) {
 		throw new Error('Invalid Date for "dateToYMD" function');
 	}
@@ -29,12 +23,12 @@ export function dateToYMD(date: Date): GregorianType {
 }
 
 // 12 => اسفند
-export function getJalaliMonthName(month: NumberOfMonthsType, local: "fa" | "en" = "fa"): string {
+export function getJalaliMonthName(month: TNumberOfMonths, local: "fa" | "en" = "fa"): string {
 	return JALALI_MONTHS[local][month];
 }
 
 // (Gregorian)Date => weekday name(fa or en)
-export function getDateToWeekdayName(date: Date, local: LocalType = "fa"): string {
+export function getDateToWeekdayName(date: Date, local: TLocal = "fa"): string {
 	const locale = local === "fa" ? "fa-IR" : "en-US";
 
 	return new Intl.DateTimeFormat(locale, {
@@ -59,7 +53,7 @@ export function formatJalali(date: Date, local: "fa" | "en" = "en"): string {
 	return formatted.replace(/[\/\.]/g, "-");
 }
 
-export function jalaliDashTojalali(dateStr: string): JalaliType | null {
+export function jalaliDashTojalali(dateStr: string): TJalali | null {
 	const match = dateStr.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
 	if (!match) return null;
 
@@ -74,14 +68,14 @@ export function jalaliDashTojalali(dateStr: string): JalaliType | null {
 	return { jy, jm, jd };
 }
 
-// (year, month, day) => "year-month-day"
-export function dateToDash(year: number, month: number, day: number): string {
-	return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-}
-
 // (date, days) => (with days added)Date
 export function addDayDate(date: Date, days: number): Date {
 	const result = new Date(date);
 	result.setDate(result.getDate() + days);
 	return result;
+}
+
+// (month_number) => quarter_number
+export function getQuarter(month: number): number {
+	return Math.ceil(month / 3);
 }

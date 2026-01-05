@@ -1,15 +1,16 @@
-/* eslint-disable no-case-declarations */
 import {
 	EditorSuggest,
 	Editor,
-	TFile,
 	MarkdownView,
 	Notice,
+	TFile,
+	type EditorPosition,
+	type EditorSuggestTriggerInfo,
+	type EditorSuggestContext,
 } from "obsidian";
-import type {EditorPosition, EditorSuggestTriggerInfo, EditorSuggestContext} from "obsidian"
-import { toJalaali } from "jalaali-js";
-import PersianCalendarPlugin from "./main";
-import moment from "moment-jalaali";
+import PersianCalendarPlugin from "src/main";
+import { getJalaliWeekNumberFromDate, dateToJalali, getQuarter } from "src/utils/dateConverter";
+import { dayFormat, monthFormat, quarterFormat, weekFormat, yearFormat } from "src/utils/format";
 
 export default class DateSuggester extends EditorSuggest<string> {
 	plugin: PersianCalendarPlugin;
@@ -34,16 +35,6 @@ export default class DateSuggester extends EditorSuggest<string> {
 			};
 		}
 		return null;
-	}
-
-	public calculateCurrentWeekNumber(jalaaliDate: { jy: number; jm: number; jd: number }): number {
-		moment.loadPersian({ usePersianDigits: false, dialect: "persian-modern" });
-		const currentDate = moment(
-			`${jalaaliDate.jy}/${jalaaliDate.jm}/${jalaaliDate.jd}`,
-			"jYYYY/jM/jD",
-		);
-		const currentWeekNumber = currentDate.jWeek();
-		return currentWeekNumber;
 	}
 
 	getSuggestions(context: EditorSuggestContext): string[] | Promise<string[]> {
@@ -100,44 +91,35 @@ export default class DateSuggester extends EditorSuggest<string> {
 		const now = new Date();
 		let dateText = "";
 		const formatDate = (date: Date) => {
-			const jalaaliDate = toJalaali(date);
 			if (this.plugin.settings.dateFormat === "georgian") {
-				return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date
-					.getDate()
-					.toString()
-					.padStart(2, "0")}`;
-			} else {
-				return `${jalaaliDate.jy}-${jalaaliDate.jm.toString().padStart(2, "0")}-${jalaaliDate.jd
-					.toString()
-					.padStart(2, "0")}`;
+				return dayFormat(date.getFullYear(), date.getMonth() + 1, date.getDate());
 			}
+
+			const { jy, jm, jd } = dateToJalali(date);
+			return dayFormat(jy, jm, jd);
 		};
 
 		const formatWeek = (date: Date) => {
-			const jalaaliDate = toJalaali(date);
-			const weekNumber = this.calculateCurrentWeekNumber(jalaaliDate);
-			return `${jalaaliDate.jy}-W${weekNumber.toString().padStart(1, "0")}`;
+			const { jy } = dateToJalali(date);
+			const currentWeekNumber = getJalaliWeekNumberFromDate(date);
+
+			return weekFormat(jy, currentWeekNumber);
 		};
 
 		const formatMonth = (date: Date) => {
-			const jalaaliDate = toJalaali(date);
-			return `${jalaaliDate.jy}-${jalaaliDate.jm.toString().padStart(2, "0")}`;
+			const { jy, jm } = dateToJalali(date);
+			return monthFormat(jy, jm);
 		};
 
 		const formatQuarter = (date: Date) => {
-			const jalaaliDate = toJalaali(date);
-			let quarterNum = 1;
-			const month = jalaaliDate.jm;
-			if (month >= 1 && month <= 3) quarterNum = 1;
-			else if (month >= 4 && month <= 6) quarterNum = 2;
-			else if (month >= 7 && month <= 9) quarterNum = 3;
-			else if (month >= 10 && month <= 12) quarterNum = 4;
-			return `${jalaaliDate.jy}-Q${quarterNum}`;
+			const { jm } = dateToJalali(date);
+			const quarter = getQuarter(jm);
+			return quarterFormat(jm, quarter);
 		};
 
 		const formatYear = (date: Date) => {
-			const jalaaliDate = toJalaali(date);
-			return `${jalaaliDate.jy}`;
+			const { jy } = dateToJalali(date);
+			return yearFormat(jy);
 		};
 
 		const weekdayNames = ["شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنج‌شنبه", "جمعه"];
@@ -170,13 +152,15 @@ export default class DateSuggester extends EditorSuggest<string> {
 				case "دیروز":
 				case "پریروز":
 				case "پس‌فردا":
+					// prettier-ignore
 					const dateAdjustment = {
-						امروز: 0,
-						فردا: 1,
-						دیروز: -1,
-						پریروز: -2,
-						پس‌فردا: 2,
-					}[keyword];
+            "امروز": 0,
+            "فردا": 1,
+            "دیروز": -1,
+            "پریروز": -2,
+            "پس‌فردا": 2,
+        	}[keyword];
+
 					date.setDate(date.getDate() + dateAdjustment);
 					return `[[${formatDate(date)}|${keyword}]]`;
 

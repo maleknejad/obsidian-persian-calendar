@@ -1,1 +1,1 @@
-export type LocalType = "fa" | "en";
+export type TLocal = "fa" | "en";

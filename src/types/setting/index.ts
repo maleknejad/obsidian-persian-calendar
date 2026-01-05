@@ -1,4 +1,4 @@
-export type PluginSettingType = {
+export type TPluginSetting = {
 	dailyNotesFolderPath: string;
 	weeklyNotesFolderPath: string;
 	monthlyNotesFolderPath: string;

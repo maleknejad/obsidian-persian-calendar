@@ -1,6 +1,6 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
 import PersianCalendarPlugin from "src/main";
-import type { PluginSettingType } from "src/types";
+import type { TPluginSetting } from "src/types";
 
 export default class PersianCalendarSettingTab extends PluginSettingTab {
 	plugin: PersianCalendarPlugin;
@@ -213,7 +213,7 @@ export default class PersianCalendarSettingTab extends PluginSettingTab {
 			paragraph.appendText(" نسخه 3.0.1");
 	}
 
-	addPathSetting(containerEl: HTMLElement, name: string, settingKey: keyof PluginSettingType) {
+	addPathSetting(containerEl: HTMLElement, name: string, settingKey: keyof TPluginSetting) {
 		new Setting(containerEl).setName(name).addText((text) =>
 			text
 				.setPlaceholder("Path/for/notes")

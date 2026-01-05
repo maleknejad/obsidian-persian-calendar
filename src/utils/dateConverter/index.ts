@@ -7,7 +7,6 @@ export {
 	jalaliMonthLength,
 	dateToJalali,
 	jalaliToDate,
-	getQuarter,
 	getCurrentQuarter,
 	getJalaliWeekNumberFromDate,
 	daysBetweenJalaali,
@@ -23,10 +22,10 @@ export {
 	dateToYMD,
 	getJalaliMonthName,
 	addDayDate,
-	dateToDash,
 	formatJalali,
 	getDateToWeekdayName,
 	jalaliDashTojalali,
 	weekStartNumber,
+	getQuarter,
 } from "./pureUtils";
 export { gregorianToHijri, hijriToGregorian, hijriToJalali, jalaliToHijri } from "./hijriUtils";

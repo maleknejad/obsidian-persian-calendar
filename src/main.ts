@@ -1,11 +1,11 @@
 import {
 	Notice,
 	Plugin,
-	TFile,
 	MarkdownView,
-	TAbstractFile,
 	Editor,
 	WorkspaceLeaf,
+	TFile,
+	TAbstractFile,
 } from "obsidian";
 import {
 	getJalaliWeekNumberFromDate,
@@ -16,15 +16,15 @@ import {
 	jalaliDashToGregorianDash,
 } from "src/utils/dateConverter";
 import { DEFAULT_SETTING } from "src/constants";
-import type { PluginSettingType } from "src/types";
 import PersianCalendarView from "./view";
 import DateSuggester from "./suggester";
 import PersianPlaceholders from "./placeholder";
 import UpdateModal from "./updatemodal";
 import PersianCalendarSettingTab from "./settingstab";
+import type { TPluginSetting } from "src/types";
 
 export default class PersianCalendarPlugin extends Plugin {
-	settings: PluginSettingType = DEFAULT_SETTING;
+	settings: TPluginSetting = DEFAULT_SETTING;
 	dateSuggester: DateSuggester | undefined;
 	placeholder: PersianPlaceholders | undefined;
 	pluginsettingstab: PersianCalendarSettingTab | undefined;
