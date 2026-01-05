@@ -21,6 +21,7 @@ export const IRHIJRI_MONTHS_BY_YEAR = {
 	1447: [29, 30, 30, 29, 30, 30, 29, 30, 30, 30, 29, 30],
 } as const;
 
+//todo: move in the end
 export type SupportedHijriYearType = keyof typeof IRHIJRI_MONTHS_BY_YEAR;
 
 //todo: move in the end
