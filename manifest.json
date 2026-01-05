@@ -1,7 +1,7 @@
 {
 	"id": "persian-calendar",
 	"name": "Persian Calendar",
-	"version": "3.0.2",
+	"version": "4.0.0",
 	"minAppVersion": "0.15.0",
 	"description": "This tool lets you see events, add and organize notes from daily to yearly on the Persian calendar, use templates with placeholders, and works with all Obsidian daily plugins.",
 	"author": "Hossein Maleknejad",

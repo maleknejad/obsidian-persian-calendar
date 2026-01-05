@@ -1,0 +1,15 @@
+README.md
+LICENSE
+
+*.min.js
+*.min.css
+
+node_modules
+
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.svg
+*.pdf

@@ -1,35 +1,45 @@
 {
-	"name": "obsidian-persian-calendar",
-	"version": "1.0.0",
-	"description": "Persian (Shamsi) Calendar",
-	"main": "main.js",
-	"scripts": {
-		"dev": "node esbuild.config.mjs",
-		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
-		"version": "node version-bump.mjs && git add manifest.json versions.json"
-	},
-	"keywords": [],
-	"author": "",
-	"license": "MIT",
-	"devDependencies": {
-		"@types/jalaali-js": "^1.1.3",
-		"@types/moment-hijri": "^2.1.4",
-		"@types/moment-jalaali": "^0.7.9",
-		"@types/node": "^16.11.6",
-		"@typescript-eslint/eslint-plugin": "5.29.0",
-		"@typescript-eslint/parser": "5.29.0",
-		"builtin-modules": "3.3.0",
-		"esbuild": "0.17.3",
-		"obsidian": "latest",
-		"tslib": "2.4.0",
-		"typescript": "4.7.4"
-	},
-	"dependencies": {
-		"@types/moment": "^2.13.0",
-		"jalaali-js": "^1.2.6",
-		"moment": "^2.30.1",
-		"moment-hijri": "^2.1.2",
-		"moment-jalaali": "^0.10.0",
-		"momentjs": "^2.0.0"
-	}
+  "name": "obsidian-persian-calendar",
+  "version": "4.0.0",
+  "description": "This tool lets you see events, add and organize notes from daily to yearly on the Persian calendar, use templates with placeholders, and works with all Obsidian daily plugins.",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+    "version": "node version-bump.mjs && git add manifest.json versions.json"
+  },
+  "keywords": [],
+  "author": {
+    "name": "Hossein Maleknejad",
+    "url": "http://karfekr.ir"
+  },
+  "contributors": [
+    {
+      "name": "Muhammadhussein Ammari",
+      "url": "https://github.com/xmha97"
+    },
+    {
+      "name": "Alireza Mohammadzadeh(NedaMani)",
+      "url": "https://github.com/NedaMani"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/obsidian-persian-calendar"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jalaali-js": "^1.2.0",
+    "@types/node": "^25.0.3",
+    "@typescript-eslint/eslint-plugin": "8.51.0",
+    "@typescript-eslint/parser": "8.51.0",
+    "builtin-modules": "5.0.0",
+    "esbuild": "0.27.2",
+    "obsidian": "latest",
+    "tslib": "2.8.1",
+    "typescript": "5.9.3"
+  },
+  "dependencies": {
+    "jalaali-js": "^1.2.8"
+  }
 }
