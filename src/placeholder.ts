@@ -18,10 +18,11 @@ import {
 	dateToGregorian,
 	jalaliToHijri,
 } from "src/utils/dateConverter";
-import type { THolidayEvent } from "src/types";
+import type { THolidayEvent, TBuildContext } from "src/types";
 
 export default class PersianPlaceholders {
 	plugin: PersianCalendarPlugin;
+	private placeholderPatterns: Map<string, RegExp> = new Map();
 
 	constructor(plugin: PersianCalendarPlugin) {
 		this.plugin = plugin;
@@ -33,121 +34,150 @@ export default class PersianPlaceholders {
 			return;
 		}
 
-		const timeoutDuration = this.plugin.settings.timeoutDuration || 1250;
+		const fileContent = await this.plugin.app.vault.read(file);
+		const updatedContent = await this.processPlaceholders(file, fileContent);
 
-		setTimeout(async () => {
-			const fileContent = await this.plugin.app.vault.read(file);
-			let updatedContent = fileContent;
+		if (updatedContent !== fileContent) {
+			await this.plugin.app.vault.modify(file, updatedContent);
+		}
+	}
 
-			//! base=now
-			const currentDate = new Date();
+	private async processPlaceholders(file: TFile, content: string): Promise<string> {
+		const context = this.buildContext(file);
+		if (!context) return content;
 
-			//! base=fileName
-			const fileName = file.basename;
-			const baseDate = this.plugin.settings.dateFormat;
-			const fileDate = dashToDate(fileName, baseDate);
-			if (!fileDate) return null;
+		const placeholders = this.getPlaceholderMap(context);
 
-			const isWeekly = this.isWeeklyFile(fileName);
-			const isMonthly = this.isMonthlyFile(fileName);
+		// Single pass replacement with proper escaping
+		let result = content;
+		for (const [placeholder, value] of placeholders.entries()) {
+			if (!content.includes(placeholder)) continue;
 
-			const placeholders: Record<string, any> = {
-				"{{امروز}}": dateToJDayDash(currentDate),
-				"{{این روز}}": dateToJDayDash(fileDate),
-				"{{روز هفته}}": dateToWeekdayName(currentDate),
-				"{{این روز هفته}}": dateToWeekdayName(fileDate),
-				"{{هفته}}": dateToJWeekDash(currentDate),
-				"{{این هفته}}": dateToJWeekDash(fileDate),
-				"{{ماه}}": dateToJMonthDash(currentDate),
-				"{{این ماه}}": dateToJMonthDash(fileDate),
-				"{{فصل}}": dateToJQuarterDash(currentDate),
-				"{{این فصل}}": dateToJQuarterDash(fileDate),
-				"{{سال}}": dateToJYearDash(currentDate),
-				"{{این سال}}": dateToJYearDash(fileDate),
-				"{{روزهای گذشته}}": dateToDaysPassedJYear(currentDate),
-				"{{روزهای باقیمانده}}": dateToDaysRemainingJYear(currentDate),
-				"{{اول هفته}}": isWeekly ? dateToStartDayOfWeekDash(fileDate, { baseDate }) : null,
-				"{{آخر هفته}}": isWeekly ? dateToEndDayOfWeekDash(fileDate, { baseDate }) : null,
-				"{{اول ماه}}": isMonthly ? this.getMonthStartDate(fileName, baseDate) : null,
-				"{{آخر ماه}}": isMonthly ? this.getMonthEndDate(fileName, baseDate) : null,
-				"{{اول سال}}": this.getFirstDayOfYear(fileName),
-				"{{آخر سال}}": this.getLastDayOfYear(fileName),
-				"{{مناسبت}}": this.getEvents(fileName),
-			};
-
-			for (const [placeholder, value] of Object.entries(placeholders)) {
-				if (fileContent.includes(placeholder)) {
-					const result = typeof value === "function" ? await value() : value;
-					if (result != null) {
-						updatedContent = updatedContent.replace(new RegExp(placeholder, "g"), result);
-					}
-				}
+			const resolvedValue = typeof value === "function" ? await value() : value;
+			if (resolvedValue != null) {
+				const pattern = this.getOrCreatePattern(placeholder);
+				result = result.replace(pattern, resolvedValue);
 			}
+		}
 
-			if (updatedContent !== fileContent) {
-				await this.plugin.app.vault.modify(file, updatedContent);
-			}
-		}, timeoutDuration);
+		return result;
+	}
+
+	private buildContext(file: TFile): TBuildContext | null {
+		const fileName = file.basename;
+		const baseDate = this.plugin.settings.dateFormat;
+		const fileDate = dashToDate(fileName, baseDate);
+
+		if (!fileDate) return null;
+
+		return {
+			currentDate: new Date(),
+			fileDate,
+			fileName,
+			baseDate,
+			isWeekly: this.isWeeklyFile(fileName),
+			isMonthly: this.isMonthlyFile(fileName),
+		};
+	}
+
+	private getPlaceholderMap({
+		currentDate,
+		fileName,
+		fileDate,
+		baseDate,
+		isMonthly,
+		isWeekly,
+	}: TBuildContext): Map<string, unknown> {
+		return new Map<string, unknown>([
+			["{{امروز}}", dateToJDayDash(currentDate)],
+			["{{این روز}}", dateToJDayDash(fileDate)],
+			["{{روز هفته}}", dateToWeekdayName(currentDate)],
+			["{{این روز هفته}}", dateToWeekdayName(fileDate)],
+			["{{هفته}}", dateToJWeekDash(currentDate)],
+			["{{این هفته}}", dateToJWeekDash(fileDate)],
+			["{{ماه}}", dateToJMonthDash(currentDate)],
+			["{{این ماه}}", dateToJMonthDash(fileDate)],
+			["{{فصل}}", dateToJQuarterDash(currentDate)],
+			["{{این فصل}}", dateToJQuarterDash(fileDate)],
+			["{{سال}}", dateToJYearDash(currentDate)],
+			["{{این سال}}", dateToJYearDash(fileDate)],
+			["{{روزهای گذشته}}", dateToDaysPassedJYear(currentDate)],
+			["{{روزهای باقیمانده}}", dateToDaysRemainingJYear(currentDate)],
+			["{{اول هفته}}", isWeekly ? dateToStartDayOfWeekDash(fileDate, { baseDate }) : null],
+			["{{آخر هفته}}", isWeekly ? dateToEndDayOfWeekDash(fileDate, { baseDate }) : null],
+			["{{اول ماه}}", isMonthly ? this.getMonthStartDate(fileName, baseDate) : null],
+			["{{آخر ماه}}", isMonthly ? this.getMonthEndDate(fileName, baseDate) : null],
+			["{{اول سال}}", this.getFirstDayOfYear(fileName)],
+			["{{آخر سال}}", this.getLastDayOfYear(fileName)],
+			["{{مناسبت}}", () => this.getEvents(fileName)],
+		]);
+	}
+
+	private getOrCreatePattern(placeholder: string): RegExp {
+		if (!this.placeholderPatterns.has(placeholder)) {
+			const escaped = placeholder.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+			this.placeholderPatterns.set(placeholder, new RegExp(escaped, "g"));
+		}
+		return this.placeholderPatterns.get(placeholder)!;
 	}
 
 	private isWeeklyFile(title: string): boolean {
-		const weeklyPattern = /^\d{4}-W\d{1,2}$/;
-		return weeklyPattern.test(title);
+		return /^\d{4}-W\d{1,2}$/.test(title);
 	}
 
 	private isMonthlyFile(title: string): boolean {
-		const monthlyPattern = /^\d{4}-\d{2}$/;
-		return monthlyPattern.test(title);
+		return /^\d{4}-\d{1,2}$/.test(title);
 	}
 
 	private getMonthStartDate(title: string, dateFormat: string): string | null {
 		const [year, month] = title.split("-").map(Number);
+		if (!year || !month) return null;
+
 		if (dateFormat === "jalali") {
 			return `${year}-${month.toString().padStart(2, "0")}-01`;
-		} else {
-			const gregorianStart = jalaali.toGregorian(year, month, 1);
-			return `${gregorianStart.gy}-${gregorianStart.gm
-				.toString()
-				.padStart(2, "0")}-${gregorianStart.gd.toString().padStart(2, "0")}`;
 		}
+
+		const gregorianStart = jalaali.toGregorian(year, month, 1);
+		return `${gregorianStart.gy}-${gregorianStart.gm
+			.toString()
+			.padStart(2, "0")}-${gregorianStart.gd.toString().padStart(2, "0")}`;
 	}
 
 	private getMonthEndDate(title: string, dateFormat: string): string | null {
 		const [year, month] = title.split("-").map(Number);
+		if (!year || !month) return null;
+
+		const jalaaliEndDay = jalaali.jalaaliMonthLength(year, month);
+
 		if (dateFormat === "jalali") {
-			const jalaaliEndDay = jalaali.jalaaliMonthLength(year, month);
 			return `${year}-${month.toString().padStart(2, "0")}-${jalaaliEndDay
 				.toString()
 				.padStart(2, "0")}`;
-		} else {
-			const jalaaliEndDay = jalaali.jalaaliMonthLength(year, month);
-			const gregorianEnd = jalaali.toGregorian(year, month, jalaaliEndDay);
-			return `${gregorianEnd.gy}-${gregorianEnd.gm.toString().padStart(2, "0")}-${gregorianEnd.gd
-				.toString()
-				.padStart(2, "0")}`;
 		}
+
+		const gregorianEnd = jalaali.toGregorian(year, month, jalaaliEndDay);
+		return `${gregorianEnd.gy}-${gregorianEnd.gm.toString().padStart(2, "0")}-${gregorianEnd.gd
+			.toString()
+			.padStart(2, "0")}`;
 	}
 
 	private getFirstDayOfYear(fileBasename: string): string {
 		const year = parseInt(fileBasename);
-		if (isNaN(year)) {
-			return "";
-		}
+		if (isNaN(year)) return "";
 
 		if (this.plugin.settings.dateFormat.toLowerCase() === "georgian") {
 			const georgianDate = jalaali.toGregorian(year, 1, 1);
 			return `${georgianDate.gy}-${georgianDate.gm.toString().padStart(2, "0")}-${georgianDate.gd
 				.toString()
 				.padStart(2, "0")}`;
-		} else {
-			return `${year}-01-01`;
 		}
+
+		return `${year}-01-01`;
 	}
+
 	private getLastDayOfYear(fileBasename: string): string {
 		const year = parseInt(fileBasename);
-		if (isNaN(year)) {
-			return "";
-		}
+		if (isNaN(year)) return "";
 
 		if (this.plugin.settings.dateFormat.toLowerCase() === "georgian") {
 			const nextYear = jalaali.toGregorian(year + 1, 1, 1);
@@ -155,10 +185,10 @@ export default class PersianPlaceholders {
 			return `${lastDay.getFullYear()}-${String(lastDay.getMonth() + 1).padStart(2, "0")}-${String(
 				lastDay.getDate(),
 			).padStart(2, "0")}`;
-		} else {
-			const isLeapYear = jalaali.isLeapJalaaliYear(year);
-			return isLeapYear ? `${year}-12-30` : `${year}-12-29`;
 		}
+
+		const isLeapYear = jalaali.isLeapJalaaliYear(year);
+		return isLeapYear ? `${year}-12-30` : `${year}-12-29`;
 	}
 
 	private getGregorianEvents(gm: number, gd: number): THolidayEvent[] {

@@ -109,7 +109,7 @@ const calculateHijriMonthLength = (hy: number, hm: number): number => {
 };
 
 const getHijriMonthLength = (hy: number, hm: number): number => {
-	const monthIndex = 12 - hm;
+	const monthIndex = hm - 1;
 
 	if (isSupportedIranHijriYear(hy)) {
 		const months = IRHIJRI_MONTHS_BY_YEAR[hy as keyof typeof IRHIJRI_MONTHS_BY_YEAR];

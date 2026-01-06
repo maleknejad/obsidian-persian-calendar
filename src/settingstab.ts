@@ -139,21 +139,6 @@ export default class PersianCalendarSettingTab extends PluginSettingTab {
 				}),
 			);
 
-		new Setting(containerEl)
-			.setName("مدت زمان تاخیر در اجرای {{عبارت‌های معنادار}}")
-			.setDesc(
-				"{{عبارت‌های معنادار}} پس از ساخته شدن فایل با تاخیر زمانی اجرا می‌گردند. در سیستم‌های با قدرت پایین تر این مقدار را افزایش دهید. (مقدار پیش‌فرض: 1250 میلی‌ثانیه)",
-			)
-			.addText((text) =>
-				text
-					.setPlaceholder("Enter timeout duration")
-					.setValue(this.plugin.settings.timeoutDuration.toString())
-					.onChange(async (value) => {
-						this.plugin.settings.timeoutDuration = parseInt(value);
-						await this.plugin.saveSettings();
-					}),
-			);
-
 		const githubadvice = containerEl.createEl("p");
 		githubadvice.appendText("پیش از هر اقدامی توصیه می‌کنم راهنمای افزونه در ");
 		githubadvice.createEl("a", {
@@ -197,7 +182,7 @@ export default class PersianCalendarSettingTab extends PluginSettingTab {
 			paragraph.createEl("a", { text: "کارفکر", href: "https://t.me/karfekr" }),
 			paragraph.appendText(" را دنبال کنید."),
 			paragraph.createEl("br"),
-			paragraph.appendText(" نسخه 3.0.1");
+			paragraph.appendText(" نسخه 4.0.0");
 	}
 
 	addPathSetting(containerEl: HTMLElement, name: string, settingKey: keyof TPluginSetting) {
@@ -206,8 +191,7 @@ export default class PersianCalendarSettingTab extends PluginSettingTab {
 				.setPlaceholder("Path/for/notes")
 				.setValue(this.plugin.settings[settingKey] as string)
 				.onChange(async (value) => {
-					// eslint-disable-next-line @typescript-eslint/no-explicit-any
-					(this.plugin.settings as any)[settingKey] = value;
+					(this.plugin.settings[settingKey] as string) = value;
 					await this.plugin.saveSettings();
 				}),
 		);

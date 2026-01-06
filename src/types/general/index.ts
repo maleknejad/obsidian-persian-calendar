@@ -11,7 +11,6 @@ export type TPluginSetting = {
 	version: string;
 	announceUpdates: boolean;
 	showGeorgianDates: boolean;
-	timeoutDuration: number;
 	hijriDateAdjustment: number;
 	showHijriDates: boolean;
 	weekendDays: string;
@@ -30,4 +29,13 @@ export type THolidayEvent = {
 	day: number;
 	type: string;
 	title: string;
+};
+
+export type TBuildContext = {
+	currentDate: Date;
+	fileDate: Date;
+	fileName: string;
+	baseDate: TBaseDate;
+	isWeekly: boolean;
+	isMonthly: boolean;
 };

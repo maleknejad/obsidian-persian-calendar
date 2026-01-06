@@ -6,4 +6,4 @@ export type {
 	TNumberOfMonths,
 	TGetDayOfWeek,
 } from "./date";
-export type { TPluginSetting, THolidayEvent, TBaseDate, TLocal } from "./setting";
+export type { TPluginSetting, THolidayEvent, TBaseDate, TLocal, TBuildContext } from "./general";

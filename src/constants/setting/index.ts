@@ -9,7 +9,6 @@ export const DEFAULT_SETTING: TPluginSetting = {
 	quarterlyNotesFolderPath: "/",
 	dateFormat: "jalali",
 	version: `4.0.0`,
-	timeoutDuration: 1250,
 	announceUpdates: true,
 	showGeorgianDates: true,
 	hijriDateAdjustment: -1,

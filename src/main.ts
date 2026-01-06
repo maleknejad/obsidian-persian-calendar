@@ -283,33 +283,24 @@ export default class PersianCalendarPlugin extends Plugin {
 	}
 
 	async activateView(): Promise<WorkspaceLeaf | null> {
-		try {
-			let leaf = this.app.workspace.getRightLeaf(false);
-
-			if (!leaf) {
-				leaf = this.app.workspace.getRightLeaf(true);
-			}
-
-			if (!leaf) {
-				leaf = this.app.workspace.getLeaf(true);
-			}
-
-			if (!leaf) {
-				throw new Error("Unable to obtain any workspace leaf");
-			}
-
-			await leaf.setViewState({
-				type: "persian-calendar",
-				active: true,
-			});
-
-			this.app.workspace.revealLeaf(leaf);
-			return leaf;
-		} catch (error) {
-			console.error("Failed to activate Persian Calendar view:", error);
-			new Notice("❌ خطا در باز کردن نمای تقویم فارسی");
-			return null;
+		const existingLeaves = this.app.workspace.getLeavesOfType("persian-calendar");
+		if (existingLeaves.length > 0) {
+			this.app.workspace.revealLeaf(existingLeaves[0]);
+			return existingLeaves[0];
 		}
+
+		const leaf =
+			this.app.workspace.getRightLeaf(false) ??
+			this.app.workspace.getRightLeaf(true) ??
+			this.app.workspace.getLeaf("tab");
+
+		await leaf.setViewState({
+			type: "persian-calendar",
+			active: true,
+		});
+
+		this.app.workspace.revealLeaf(leaf);
+		return leaf;
 	}
 
 	refreshViews() {
