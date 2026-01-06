@@ -1,17 +1,20 @@
 import { WorkspaceLeaf, Notice, App, View, TFile, MarkdownView } from "obsidian";
-import { dateToJalali } from "src/utils/dateConverter";
+import {
+	dateToJalali,
+	gregorianToHijri,
+	jalaliToHijri,
+	jalaliToDate,
+	dateToJWeekNumber,
+} from "src/utils/dateConverter";
 import { toJalaali, jalaaliMonthLength, toGregorian } from "jalaali-js";
 import PersianCalendarPlugin from "./main";
 import { JALALI_HOLIDAYS, HIJRI_HOLIDAYS, GLOBAL_HOLIDAYS } from "src/constants";
 import type { TPluginSetting, TJalali, THolidayEvent } from "src/types";
 import * as jalaali from "jalaali-js";
-import { iranianHijriAdjustments, basePersianDate, baseHijriDate } from "./constants/irHijri";
-import moment from "moment-jalaali";
-import hijriMoment from "moment-hijri";
 
 export default class PersianCalendarView extends View {
 	dailyCheckInterval: number | undefined;
-	lastCheckedDate: moment.Moment = moment().startOf("day");
+	lastCheckedDate: TJalali = dateToJalali(new Date());
 	noteDays: number[] = [];
 	plugin: PersianCalendarPlugin;
 
@@ -36,9 +39,9 @@ export default class PersianCalendarView extends View {
 	}
 
 	private holidayData: { [key: string]: THolidayEvent[] } = {
-		PersianCalendar: JALALI_HOLIDAYS,
-		HijriCalendar: HIJRI_HOLIDAYS,
-		GregorianCalendar: GLOBAL_HOLIDAYS,
+		PersianCalendar: [...JALALI_HOLIDAYS],
+		HijriCalendar: [...HIJRI_HOLIDAYS],
+		GregorianCalendar: [...GLOBAL_HOLIDAYS],
 	};
 
 	async initializeHolidayData() {
@@ -162,25 +165,28 @@ export default class PersianCalendarView extends View {
 	}
 
 	private getHijriMonthRange(jy: number, jm: number): string {
-		const firstDayOfMonthGeorgian = jalaali.toGregorian(jy, jm, 1);
 		const lastDayOfMonthJalaali = jalaali.jalaaliMonthLength(jy, jm);
+		const firstDayOfMonthGeorgian = jalaali.toGregorian(jy, jm, 1);
 		const lastDayOfMonthGeorgian = jalaali.toGregorian(jy, jm, lastDayOfMonthJalaali);
 
-		const startHijriDate = hijriMoment(
-			`${firstDayOfMonthGeorgian.gy}-${firstDayOfMonthGeorgian.gm}-${firstDayOfMonthGeorgian.gd}`,
-			"YYYY-M-D",
-		);
-		const endHijriDate = hijriMoment(
-			`${lastDayOfMonthGeorgian.gy}-${lastDayOfMonthGeorgian.gm}-${lastDayOfMonthGeorgian.gd}`,
-			"YYYY-M-D",
+		const startHijriDate = gregorianToHijri(
+			firstDayOfMonthGeorgian.gy,
+			firstDayOfMonthGeorgian.gm,
+			firstDayOfMonthGeorgian.gd,
 		);
 
-		const startHijriMonth = this.getHijriMonthName(startHijriDate.iMonth() + 1);
-		const startHijriYear = this.toFarsiDigits(startHijriDate.iYear());
-		const endHijriMonth = this.getHijriMonthName(endHijriDate.iMonth() + 1);
-		const endHijriYear = this.toFarsiDigits(endHijriDate.iYear());
+		const endHijriDate = gregorianToHijri(
+			lastDayOfMonthGeorgian.gy,
+			lastDayOfMonthGeorgian.gm,
+			lastDayOfMonthGeorgian.gd,
+		);
 
-		if (startHijriDate.iMonth() === endHijriDate.iMonth()) {
+		const startHijriMonth = this.getHijriMonthName(startHijriDate.hm);
+		const startHijriYear = this.toFarsiDigits(startHijriDate.hy);
+		const endHijriMonth = this.getHijriMonthName(endHijriDate.hm);
+		const endHijriYear = this.toFarsiDigits(endHijriDate.hy);
+
+		if (startHijriDate.hm === endHijriDate.hm) {
 			return `${startHijriMonth} ${startHijriYear}`;
 		} else {
 			return `${startHijriMonth}-${endHijriMonth} ${endHijriYear}`;
@@ -307,13 +313,8 @@ export default class PersianCalendarView extends View {
 					this.openOrCreateDailyNote(dayNumber);
 				});
 
-				const persianDate = { jy: jalaaliDate.jy, jm: jalaaliDate.jm, jd: dayNumber };
-				const ummalquraAdjustment = this.plugin.settings.hijriDateAdjustment;
-				const hijriDateResult = this.getHijriDate(
-					persianDate,
-					this.plugin.settings.hijriCalendarType,
-					ummalquraAdjustment,
-				);
+				const { jy, jm, jd } = { jy: jalaaliDate.jy, jm: jalaaliDate.jm, jd: dayNumber };
+				const hijriDateResult = jalaliToHijri(jy, jm, jd);
 
 				const hijriDate = hijriDateResult.hd.toString();
 				const hijriMonth = hijriDateResult.hm;
@@ -368,13 +369,8 @@ export default class PersianCalendarView extends View {
 						cls: showBothCalendars ? "georgian-date-corner" : "georgian-date",
 					});
 
-					const persianDate = { jy: jalaaliDate.jy, jm: jalaaliDate.jm, jd: dayNumber };
-					const ummalquraAdjustment = this.plugin.settings.hijriDateAdjustment;
-					const hijriDateResult = this.getHijriDate(
-						persianDate,
-						this.plugin.settings.hijriCalendarType,
-						ummalquraAdjustment,
-					);
+					const { jy, jm, jd } = { jy: jalaaliDate.jy, jm: jalaaliDate.jm, jd: dayNumber };
+					const hijriDateResult = jalaliToHijri(jy, jm, jd);
 
 					const hijriDate = hijriDateResult.hd.toString();
 					const hijriMonth = hijriDateResult.hm;
@@ -400,14 +396,9 @@ export default class PersianCalendarView extends View {
 				}
 
 				if (this.plugin.settings.showHijriDates) {
-					const persianDate = { jy: jalaaliDate.jy, jm: jalaaliDate.jm, jd: dayNumber };
-					const ummalquraAdjustment = this.plugin.settings.hijriDateAdjustment;
+					const { jy, jm, jd } = { jy: jalaaliDate.jy, jm: jalaaliDate.jm, jd: dayNumber };
 
-					const hijriDateResult = this.getHijriDate(
-						persianDate,
-						this.plugin.settings.hijriCalendarType,
-						ummalquraAdjustment,
-					);
+					const hijriDateResult = jalaliToHijri(jy, jm, jd);
 
 					const hijriDate = hijriDateResult.hd.toString();
 					const hijriMonth = hijriDateResult.hm;
@@ -485,9 +476,16 @@ export default class PersianCalendarView extends View {
 
 	private startDailyCheckInterval(): void {
 		this.dailyCheckInterval = setInterval(() => {
-			const today = moment().startOf("day");
-			if (!this.lastCheckedDate.isSame(today, "day")) {
-				this.lastCheckedDate = today;
+			const todayJalali = dateToJalali(new Date());
+
+			if (
+				!(
+					this.lastCheckedDate.jy === todayJalali.jy &&
+					this.lastCheckedDate.jm === todayJalali.jm &&
+					this.lastCheckedDate.jd === todayJalali.jd
+				)
+			) {
+				this.lastCheckedDate = todayJalali;
 				this.render();
 			}
 		}, 60 * 1000) as unknown as number;
@@ -501,10 +499,11 @@ export default class PersianCalendarView extends View {
 	}
 
 	private isToday(jalaaliDate: { jy: number; jm: number; jd: number }): boolean {
-		const today = moment().locale("fa");
-		return today.isSame(
-			moment(`${jalaaliDate.jy}/${jalaaliDate.jm}/${jalaaliDate.jd}`, "jYYYY/jM/jD"),
-			"day",
+		const todayJalali = dateToJalali(new Date());
+		return (
+			todayJalali.jy === jalaaliDate.jy &&
+			todayJalali.jm === jalaaliDate.jm &&
+			todayJalali.jd === jalaaliDate.jd
 		);
 	}
 
@@ -526,7 +525,7 @@ export default class PersianCalendarView extends View {
 
 			const [, year, month, day] = match.map(Number);
 
-			if (this.settings.dateFormat === "georgian") {
+			if (this.settings.dateFormat === "gregorian") {
 				const { jy: convJy, jm: convJm, jd: convJd } = toJalaali(new Date(year, month - 1, day));
 				if (convJy === jy && convJm === parseInt(jm)) {
 					noteDays.push(convJd);
@@ -637,35 +636,20 @@ export default class PersianCalendarView extends View {
 	}
 
 	private getWeekNumbersForMonth(jalaaliDate: { jy: number; jm: number }): number[] {
-		moment.loadPersian({ usePersianDigits: false, dialect: "persian-modern" });
-		const startOfMonth = moment(`${jalaaliDate.jy}/${jalaaliDate.jm}/1`, "jYYYY/jM/jD");
-		const startWeekNumber = startOfMonth.jWeek();
+		// تبدیل تاریخ اول ماه به Date
+		const startOfMonthDate = jalaliToDate(jalaaliDate.jy, jalaaliDate.jm, 1);
+
+		// محاسبه شماره هفته برای اول ماه
+		const startWeekNumber = dateToJWeekNumber(startOfMonthDate);
+
 		const weekNumbers = [];
 
 		for (let i = 0; i < 6; i++) {
 			let weekNumberForIthWeek = startWeekNumber + i;
-
-			if (weekNumberForIthWeek > 52) {
-				weekNumberForIthWeek -= 52;
-			}
-
 			weekNumbers.push(weekNumberForIthWeek);
 		}
 
 		return weekNumbers;
-	}
-
-	public calculateCurrentWeekNumber(jalaaliDate: { jy: number; jm: number; jd: number }): number {
-		moment.loadPersian({ usePersianDigits: false, dialect: "persian-modern" });
-
-		const currentDate = moment(
-			`${jalaaliDate.jy}/${jalaaliDate.jm}/${jalaaliDate.jd}`,
-			"jYYYY/jM/jD",
-		);
-
-		const currentWeekNumber = currentDate.jWeek();
-
-		return currentWeekNumber;
 	}
 
 	public async openOrCreateDailyNote(dayNumber: number) {
@@ -674,7 +658,7 @@ export default class PersianCalendarView extends View {
 		let dateString = `${year}-${month.toString().padStart(2, "0")}-${dayNumber
 			.toString()
 			.padStart(2, "0")}`;
-		if (this.settings.dateFormat === "georgian") {
+		if (this.settings.dateFormat === "gregorian") {
 			const gregorianDate = toGregorian(year, month, dayNumber);
 			dateString = `${gregorianDate.gy}-${gregorianDate.gm
 				.toString()
@@ -918,26 +902,10 @@ export default class PersianCalendarView extends View {
 
 		// Hijri Calendar Holidays
 		if (this.plugin.settings.showShiaCalendar) {
-			const gregorianDate = jalaali.toGregorian(jy, jm, jd);
-			const persianDate = { jy: jy, jm: jm, jd: jd };
-			const ummalquraAdjustment = this.plugin.settings.hijriDateAdjustment;
-
-			const hijriDateResult = this.getHijriDate(
-				persianDate,
-				this.plugin.settings.hijriCalendarType,
-				ummalquraAdjustment,
-			);
-
-			const hijriMomentDate = hijriMoment(
-				`${gregorianDate.gy}-${gregorianDate.gm}-${gregorianDate.gd}`,
-				"YYYY-M-D",
-			);
-			hijriMomentDate.iYear(hijriDateResult.hy);
-			hijriMomentDate.iMonth(hijriDateResult.hm - 1); // iMonth is 0-indexed
-			hijriMomentDate.iDate(hijriDateResult.hd);
+			const { hm, hd } = jalaliToHijri(jy, jm, jd);
 
 			HIJRI_HOLIDAYS.forEach((event) => {
-				if (event.month === hijriMomentDate.iMonth() + 1 && event.day === hijriMomentDate.iDate()) {
+				if (event.month === hm && event.day === hd) {
 					addEvent({ title: event.title, isHoliday: event.holiday });
 				}
 			});
@@ -1001,80 +969,6 @@ export default class PersianCalendarView extends View {
 		const tooltip = document.querySelector(".calendar-tooltip") as HTMLElement;
 		if (tooltip) {
 			tooltip.style.display = "none";
-		}
-	}
-
-	public calculateDayDifference(
-		fromDate: { jy: number; jm: number; jd: number },
-		toDate: { jy: number; jm: number; jd: number },
-	): number {
-		const fromGregorian = jalaali.toGregorian(fromDate.jy, fromDate.jm, fromDate.jd);
-		const toGregorian = jalaali.toGregorian(toDate.jy, toDate.jm, toDate.jd);
-		const fromDateObj = new Date(fromGregorian.gy, fromGregorian.gm - 1, fromGregorian.gd);
-		const toDateObj = new Date(toGregorian.gy, toGregorian.gm - 1, toGregorian.gd);
-		const timeDiff = toDateObj.getTime() - fromDateObj.getTime();
-		return timeDiff / (1000 * 3600 * 24);
-	}
-
-	public calculateIranianHijriDate(
-		baseDate: { hy: number; hm: number; hd: number },
-		dayDifference: number,
-	): { hy: number; hm: number; hd: number } {
-		let { hy, hm, hd } = baseDate;
-
-		while (dayDifference > 0) {
-			const monthLength = iranianHijriAdjustments[hy] ? iranianHijriAdjustments[hy][hm] : null;
-			if (monthLength) {
-				if (hd + dayDifference <= monthLength) {
-					hd += dayDifference;
-					dayDifference = 0;
-				} else {
-					dayDifference -= monthLength - hd + 1;
-					hd = 1;
-					hm += 1;
-					if (hm > 12) {
-						hm = 1;
-						hy += 1;
-					}
-				}
-			} else {
-				const gregorianDate = jalaali.toGregorian(baseDate.hy, baseDate.hm, baseDate.hd);
-				const gregorianDateStr = `${gregorianDate.gy}-${gregorianDate.gm}-${gregorianDate.gd}`;
-				const hijriMomentDate = hijriMoment(gregorianDateStr, "YYYY-M-D").add(
-					dayDifference,
-					"days",
-				);
-				return {
-					hy: hijriMomentDate.iYear(),
-					hm: hijriMomentDate.iMonth() + 1,
-					hd: hijriMomentDate.iDate(),
-				};
-			}
-		}
-
-		return { hy, hm, hd };
-	}
-
-	public getHijriDate(
-		persianDate: { jy: number; jm: number; jd: number },
-		calendarType: string,
-		ummalquraAdjustment: number,
-	): { hy: number; hm: number; hd: number } {
-		if (calendarType === "ummalqura") {
-			const gregorianDate = jalaali.toGregorian(persianDate.jy, persianDate.jm, persianDate.jd);
-			const gregorianDateStr = `${gregorianDate.gy}-${gregorianDate.gm}-${gregorianDate.gd}`;
-			const hijriMomentDate = hijriMoment(gregorianDateStr, "YYYY-M-D").add(
-				ummalquraAdjustment,
-				"days",
-			);
-			return {
-				hy: hijriMomentDate.iYear(),
-				hm: hijriMomentDate.iMonth() + 1,
-				hd: hijriMomentDate.iDate(),
-			};
-		} else {
-			const dayDifference = this.calculateDayDifference(basePersianDate, persianDate);
-			return this.calculateIranianHijriDate(baseHijriDate, dayDifference);
 		}
 	}
 }

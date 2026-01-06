@@ -14,7 +14,7 @@ import {
 	dateToJQuarterDash,
 	dateToJWeekDash,
 	dateToJYearDash,
-	dateToJalaliDash,
+	dateToJDayDash,
 } from "src/utils/dateConverter";
 
 export default class DateSuggester extends EditorSuggest<string> {
@@ -114,7 +114,7 @@ export default class DateSuggester extends EditorSuggest<string> {
 			} else {
 				now.setDate(now.getDate() + daysFromNowToWeekday);
 			}
-			dateText = dateToJalaliDash(now);
+			dateText = dateToJDayDash(now);
 			const formatSpecifier = specifier ? ` ${specifier.trim()}` : "";
 			return `[[${dateText}|${weekdayName}${formatSpecifier}]]`;
 		} else {
@@ -136,7 +136,7 @@ export default class DateSuggester extends EditorSuggest<string> {
         	}[keyword];
 
 					date.setDate(date.getDate() + dateAdjustment);
-					return `[[${dateToJalaliDash(date)}|${keyword}]]`;
+					return `[[${dateToJDayDash(date)}|${keyword}]]`;
 
 				case "این هفته":
 					return `[[${dateToJWeekDash(new Date())}|${keyword}]]`;

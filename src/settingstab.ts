@@ -1,6 +1,6 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
 import PersianCalendarPlugin from "src/main";
-import type { TPluginSetting } from "src/types";
+import type { TBaseDate, TPluginSetting } from "src/types";
 
 export default class PersianCalendarSettingTab extends PluginSettingTab {
 	plugin: PersianCalendarPlugin;
@@ -28,11 +28,11 @@ export default class PersianCalendarSettingTab extends PluginSettingTab {
 			)
 			.addDropdown((dropdown) =>
 				dropdown
-					.addOption("persian", "خورشیدی")
-					.addOption("georgian", "میلادی")
+					.addOption("jalali", "خورشیدی")
+					.addOption("gregorian", "میلادی")
 					.setValue(this.plugin.settings.dateFormat || "georgian")
 					.onChange(async (value) => {
-						this.plugin.settings.dateFormat = value;
+						this.plugin.settings.dateFormat = value as TBaseDate;
 						await this.plugin.saveSettings();
 						this.plugin.refreshViews(); // Optionally refresh views if necessary
 					}),

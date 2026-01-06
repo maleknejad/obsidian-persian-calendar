@@ -24,18 +24,3 @@ export type TWeekStart = "sat" | "sun" | "mon";
 export type TNumberOfMonths = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
 export type TGetDayOfWeek = { jYear: number; jWeekNumber: number };
-
-export type THolidayEvent = {
-	holiday: boolean;
-	month: number;
-	day: number;
-	type: string;
-	title: string;
-};
-
-//todo: remove in the end
-export type HijriAdjustments = {
-	[year: number]: {
-		[month: number]: number;
-	};
-};

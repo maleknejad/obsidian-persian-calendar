@@ -107,7 +107,7 @@ export function jalaliDashToDate(dashDate: string): Date | null {
 }
 
 export function dashToDate(dashDate: string, baseDate: string): Date | null {
-	if (baseDate === "persian") {
+	if (baseDate === "jalali") {
 		return jalaliDashToDate(dashDate);
 	}
 
@@ -186,14 +186,14 @@ export function dateToStartDayOfWeekDash(
 	date: Date,
 	option?: { separator?: string; baseDate?: TBaseDate },
 ) {
-	const baseDate = option?.baseDate ?? "persian";
+	const baseDate = option?.baseDate ?? "jalali";
 	const separator = option?.separator ?? "-";
 
 	const { jy: jYear } = dateToJalali(date);
 	const jWeekNumber = dateToJWeekNumber(date);
 
-	if (baseDate === "persian") {
-		const { jy, jm, jd } = jalaliToStartDayOfWeek({ jYear, jWeekNumber }, "persian") as TJalali;
+	if (baseDate === "jalali") {
+		const { jy, jm, jd } = jalaliToStartDayOfWeek({ jYear, jWeekNumber }, "jalali") as TJalali;
 		return dayFormat(jy, jm, jd, { separator });
 	}
 
@@ -205,14 +205,14 @@ export function dateToEndDayOfWeekDash(
 	date: Date,
 	option?: { separator?: string; baseDate?: TBaseDate },
 ) {
-	const baseDate = option?.baseDate ?? "persian";
+	const baseDate = option?.baseDate ?? "jalali";
 	const separator = option?.separator ?? "-";
 
 	const { jy: jYear } = dateToJalali(date);
 	const jWeekNumber = dateToJWeekNumber(date);
 
-	if (baseDate === "persian") {
-		const { jy, jm, jd } = jalaliToEndDayOfWeek({ jYear, jWeekNumber }, "persian") as TJalali;
+	if (baseDate === "jalali") {
+		const { jy, jm, jd } = jalaliToEndDayOfWeek({ jYear, jWeekNumber }, "jalali") as TJalali;
 		return dayFormat(jy, jm, jd);
 	}
 

@@ -104,7 +104,7 @@ export function getFirstWeekStartOfJYear(jy: number, weekStart: TWeekStart = "sa
 
 export function jalaliToStartDayOfWeek(
 	{ jYear, jWeekNumber }: TGetDayOfWeek,
-	baseDate: TBaseDate = "persian",
+	baseDate: TBaseDate = "jalali",
 	weekStart: TWeekStart = "sat",
 ): TJalali | TGregorian {
 	const { gy, gm, gd } = jalaliToGregorian(jYear, 1, 1);
@@ -127,19 +127,19 @@ export function jalaliToStartDayOfWeek(
 	const targetDate = new Date(firstWeekStartDate);
 	targetDate.setDate(firstWeekStartDate.getDate() + (jWeekNumber - 1) * 7);
 
-	return baseDate === "persian" ? dateToJalali(targetDate) : dateToGregorian(targetDate);
+	return baseDate === "jalali" ? dateToJalali(targetDate) : dateToGregorian(targetDate);
 }
 
 export function jalaliToEndDayOfWeek(
 	{ jYear, jWeekNumber }: TGetDayOfWeek,
-	baseDate: TBaseDate = "persian",
+	baseDate: TBaseDate = "jalali",
 	weekStart: TWeekStart = "sat",
 ): TJalali | TGregorian {
 	const startDate = jalaliToStartDayOfWeek({ jYear, jWeekNumber }, baseDate, weekStart);
 
 	let targetDate: Date;
 
-	if (baseDate === "persian") {
+	if (baseDate === "jalali") {
 		const jalaliStart = startDate as TJalali;
 		const { gy, gm, gd } = jalaliToGregorian(jalaliStart.jy, jalaliStart.jm, jalaliStart.jd);
 		targetDate = new Date(gy, gm - 1, gd);
@@ -150,5 +150,5 @@ export function jalaliToEndDayOfWeek(
 
 	targetDate.setDate(targetDate.getDate() + 6);
 
-	return baseDate === "persian" ? dateToJalali(targetDate) : dateToGregorian(targetDate);
+	return baseDate === "jalali" ? dateToJalali(targetDate) : dateToGregorian(targetDate);
 }

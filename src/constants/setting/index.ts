@@ -7,7 +7,7 @@ export const DEFAULT_SETTING: TPluginSetting = {
 	yearlyNotesFolderPath: "/",
 	enableQuarterlyNotes: true,
 	quarterlyNotesFolderPath: "/",
-	dateFormat: "persian",
+	dateFormat: "jalali",
 	version: `4.0.0`,
 	timeoutDuration: 1250,
 	announceUpdates: true,

@@ -1,4 +1,4 @@
-import type { TBaseDate } from "../local";
+export type TBaseDate = "jalali" | "gregorian";
 
 export type TPluginSetting = {
 	dailyNotesFolderPath: string;
@@ -20,4 +20,14 @@ export type TPluginSetting = {
 	showAncientIranianCalendar: boolean;
 	showShiaCalendar: boolean;
 	hijriCalendarType: string;
+};
+
+export type TLocal = "fa" | "en";
+
+export type THolidayEvent = {
+	holiday: boolean;
+	month: number;
+	day: number;
+	type: string;
+	title: string;
 };

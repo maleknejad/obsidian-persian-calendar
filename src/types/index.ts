@@ -1,4 +1,3 @@
-export type { TLocal, TBaseDate } from "./local";
 export type {
 	TGregorian,
 	TJalali,
@@ -6,7 +5,5 @@ export type {
 	TWeekStart,
 	TNumberOfMonths,
 	TGetDayOfWeek,
-	THolidayEvent,
-	HijriAdjustments, //todo: remove in the end
 } from "./date";
-export type { TPluginSetting } from "./setting";
+export type { TPluginSetting, THolidayEvent, TBaseDate, TLocal } from "./setting";

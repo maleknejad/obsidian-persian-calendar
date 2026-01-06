@@ -26,6 +26,7 @@ export {
 	hijriToGregorian, // (hy, hm, hd) => {gy, gm, gd}
 	hijriToJalali, // (hy, hm , hd) => {jy, jm, jd}
 	jalaliToHijri, // (jy, jm, jd) => {hy, hm, hd}
+	dateToHijri, // (Date) => {hy, hm, hd}
 } from "./hijriUtils";
 export {
 	gregorianDashToJalaliDash, // ("gy-gm-gd"|"gygmgd") => String((jalali)dayFormat)
