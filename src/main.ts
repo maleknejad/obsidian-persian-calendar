@@ -199,7 +199,7 @@ export default class PersianCalendarPlugin extends Plugin {
 		this.addCommand({
 			id: "convert-to-date",
 			name: "Link Text to Periodic Note - ارجاع متن به یادداشت‌های دوره‌ای",
-			editorCallback: (editor, view) => {
+			editorCallback: (editor) => {
 				this.dateSuggester?.convertTextToDate(editor);
 			},
 		});

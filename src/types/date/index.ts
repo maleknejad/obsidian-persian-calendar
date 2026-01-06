@@ -1,3 +1,5 @@
+import type { IRAN_HIJRI_MONTHS_LENGTH } from "src/constants";
+
 // jalali = هجری شمسی/خورشیدی
 export type TJalali = {
 	jy: number;
@@ -24,3 +26,5 @@ export type TWeekStart = "sat" | "sun" | "mon";
 export type TNumberOfMonths = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
 export type TGetDayOfWeek = { jYear: number; jWeekNumber: number };
+
+export type SupportedHijriYearType = keyof typeof IRAN_HIJRI_MONTHS_LENGTH;

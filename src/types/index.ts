@@ -5,5 +5,6 @@ export type {
 	TWeekStart,
 	TNumberOfMonths,
 	TGetDayOfWeek,
+	SupportedHijriYearType,
 } from "./date";
 export type { TPluginSetting, THolidayEvent, TBaseDate, TLocal, TBuildContext } from "./general";
