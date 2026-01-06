@@ -1,5 +1,5 @@
-import type { THijri, TGregorian, TJalali } from "src/types";
 import { gregorianToJalali, jalaliToGregorian } from "..";
+import type { THijri, TGregorian, TJalali } from "src/types";
 
 const hijriToJulian = (year: number, month: number, day: number): number =>
 	Math.floor((11 * year + 3) / 30) +
@@ -70,22 +70,22 @@ const julianToGregorian = (julianDay: number): TGregorian => {
 	return { gy, gm, gd };
 };
 
-export const gregorianToHijri = ({ gy, gm, gd }: TGregorian): THijri => {
+export const gregorianToHijri = (gy: number, gm: number, gd: number): THijri => {
 	const julday = gregorianToJulian(gy, gm, gd);
 	return julianToHijri(julday);
 };
 
-export const hijriToGregorian = ({ hy, hm, hd }: THijri): TGregorian => {
+export const hijriToGregorian = (hy: number, hm: number, hd: number): TGregorian => {
 	const julday = hijriToJulian(hy, hm, hd);
 	return julianToGregorian(julday);
 };
 
-export function jalaliToHijri({ jy, jm, jd }: TJalali): THijri {
+export function jalaliToHijri(jy: number, jm: number, jd: number): THijri {
 	const { gy, gm, gd } = jalaliToGregorian(jy, jm, jd);
-	return gregorianToHijri({ gy, gm, gd });
+	return gregorianToHijri(gy, gm, gd);
 }
 
-export function hijriToJalali({ hy, hm, hd }: THijri): TJalali {
-	const { gy, gm, gd } = hijriToGregorian({ hy, hm, hd });
+export function hijriToJalali(hy: number, hm: number, hd: number): TJalali {
+	const { gy, gm, gd } = hijriToGregorian(hy, hm, hd);
 	return gregorianToJalali(gy, gm, gd);
 }

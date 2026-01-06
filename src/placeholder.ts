@@ -4,14 +4,20 @@ import PersianCalendarPlugin from "src/main";
 import { JALALI_HOLIDAYS, HIJRI_HOLIDAYS, GLOBAL_HOLIDAYS } from "src/constants";
 import {
 	dateToJWeekDash,
-	dateToJalaliDash,
+	dateToJDayDash,
 	dateToJMonthDash,
 	dateToJQuarterDash,
 	dateToJYearDash,
 	dateToWeekdayName,
+	dashToDate,
+	dateToDaysPassedJYear,
+	dateToDaysRemainingJYear,
+	dateToStartDayOfWeekDash,
+	dateToEndDayOfWeekDash,
+	dateToJalali,
+	dateToGregorian,
 } from "src/utils/dateConverter";
 import type { THolidayEvent } from "src/types";
-import moment from "moment-jalaali";
 import hijriMoment from "moment-hijri";
 import { iranianHijriAdjustments, basePersianDate, baseHijriDate } from "./constants/irHijri";
 
@@ -34,43 +40,40 @@ export default class PersianPlaceholders {
 			const fileContent = await this.plugin.app.vault.read(file);
 			let updatedContent = fileContent;
 
-			const basename = file.basename;
-			const dateFormat = this.plugin.settings.dateFormat;
-			const isWeekly = this.isWeeklyFile(basename);
-			const isMonthly = this.isMonthlyFile(basename);
-
+			//! base=now
 			const currentDate = new Date();
-			const currentJalali = dateToJalaliDash(currentDate);
-			const currentWeek = dateToJWeekDash(currentDate);
-			const currentMonth = dateToJMonthDash(currentDate);
-			const currentQuarter = dateToJQuarterDash(currentDate);
-			const currentYear = dateToJYearDash(currentDate);
-			const currentWeekName = dateToWeekdayName(currentDate);
 
-			const [year, week] = basename.split("-W").map(Number);
+			//! base=fileName
+			const fileName = file.basename;
+			const baseDate = this.plugin.settings.dateFormat;
+			const fileDate = dashToDate(fileName, baseDate);
+			if (!fileDate) return null;
+
+			const isWeekly = this.isWeeklyFile(fileName);
+			const isMonthly = this.isMonthlyFile(fileName);
 
 			const placeholders: Record<string, any> = {
-				"{{امروز}}": currentJalali,
-				"{{این روز}}": this.getFormattedDateFromFileTitle(basename, dateFormat),
-				"{{روز هفته}}": currentWeekName,
-				"{{این روز هفته}}": this.getWeekdayFromFileTitle(basename, dateFormat),
-				"{{هفته}}": currentWeek,
-				"{{این هفته}}": this.getWeekNumberFromFileTitle(basename, dateFormat),
-				"{{ماه}}": currentMonth,
-				"{{این ماه}}": this.getMonthNumberFromFileTitle(basename, dateFormat),
-				"{{فصل}}": currentQuarter,
-				"{{این فصل}}": this.getQuarterNumberFromFileTitle(basename, dateFormat),
-				"{{سال}}": currentYear,
-				"{{این سال}}": this.getYearNumberFromFileTitle(basename, dateFormat),
-				"{{روزهای گذشته}}": this.getDaysPassedFromFileTitle(basename, dateFormat),
-				"{{روزهای باقیمانده}}": this.getDaysUntilEndOfYear(basename, dateFormat),
-				"{{اول هفته}}": isWeekly ? this.getWeekStartDate(year, week, dateFormat) : null,
-				"{{آخر هفته}}": isWeekly ? this.getWeekEndDate(year, week, dateFormat) : null,
-				"{{اول ماه}}": isMonthly ? this.getMonthStartDate(basename, dateFormat) : null,
-				"{{آخر ماه}}": isMonthly ? this.getMonthEndDate(basename, dateFormat) : null,
-				"{{اول سال}}": this.getFirstDayOfYear(basename, dateFormat),
-				"{{آخر سال}}": this.getLastDayOfYear(basename, dateFormat),
-				"{{مناسبت}}": () => this.getEvents(basename),
+				"{{امروز}}": dateToJDayDash(currentDate),
+				"{{این روز}}": dateToJDayDash(fileDate),
+				"{{روز هفته}}": dateToWeekdayName(currentDate),
+				"{{این روز هفته}}": dateToWeekdayName(fileDate),
+				"{{هفته}}": dateToJWeekDash(currentDate),
+				"{{این هفته}}": dateToJWeekDash(fileDate),
+				"{{ماه}}": dateToJMonthDash(currentDate),
+				"{{این ماه}}": dateToJMonthDash(fileDate),
+				"{{فصل}}": dateToJQuarterDash(currentDate),
+				"{{این فصل}}": dateToJQuarterDash(fileDate),
+				"{{سال}}": dateToJYearDash(currentDate),
+				"{{این سال}}": dateToJYearDash(fileDate),
+				"{{روزهای گذشته}}": dateToDaysPassedJYear(currentDate),
+				"{{روزهای باقیمانده}}": dateToDaysRemainingJYear(currentDate),
+				"{{اول هفته}}": isWeekly ? dateToStartDayOfWeekDash(fileDate, { baseDate }) : null,
+				"{{آخر هفته}}": isWeekly ? dateToEndDayOfWeekDash(fileDate, { baseDate }) : null,
+				"{{اول ماه}}": isMonthly ? this.getMonthStartDate(fileName, baseDate) : null,
+				"{{آخر ماه}}": isMonthly ? this.getMonthEndDate(fileName, baseDate) : null,
+				"{{اول سال}}": this.getFirstDayOfYear(fileName, baseDate),
+				"{{آخر سال}}": this.getLastDayOfYear(fileName, baseDate),
+				"{{مناسبت}}": () => this.getEvents(fileName),
 			};
 
 			for (const [placeholder, value] of Object.entries(placeholders)) {
@@ -86,116 +89,6 @@ export default class PersianPlaceholders {
 				await this.plugin.app.vault.modify(file, updatedContent);
 			}
 		}, timeoutDuration);
-	}
-
-	private parseDateFromTitle(title: string, dateFormat: any): moment.Moment | null {
-		let parsedDate: moment.Moment;
-
-		if (dateFormat === "persian") {
-			// Parse Persian date
-			parsedDate = moment(title, "jYYYY-jMM-jDD");
-		} else {
-			// Parse Gregorian date and convert to Jalaali
-			parsedDate = moment(title, "YYYY-MM-DD");
-			if (parsedDate.isValid()) {
-				// convert to Jalaali
-				const jalaaliStr = parsedDate.format("jYYYY-jMM-jDD");
-				parsedDate = moment(jalaaliStr, "jYYYY-jMM-jDD");
-			}
-		}
-
-		return parsedDate.isValid() ? parsedDate : null;
-	}
-
-	private getFormattedDateFromFileTitle(title: string, dateFormat: string): string | null {
-		const parsedDate = this.parseDateFromTitle(title, dateFormat);
-		if (parsedDate) {
-			return parsedDate.format("jYYYY-jMM-jDD");
-		}
-		return null;
-	}
-
-	private getWeekdayFromFileTitle(title: string, dateFormat: string): string | null {
-		const parsedDate = this.parseDateFromTitle(title, dateFormat);
-		if (parsedDate) {
-			return parsedDate.format("dddd");
-		}
-		return null;
-	}
-
-	private getWeekNumberFromFileTitle(title: string, dateFormat: string): string | null {
-		const parsedDate = this.parseDateFromTitle(title, dateFormat);
-		if (parsedDate) {
-			const jWeek = parsedDate.jWeek();
-			const jYear = parsedDate.jYear();
-			return `${jYear}-W${jWeek}`;
-		}
-		return null;
-	}
-
-	private getMonthNumberFromFileTitle(title: string, dateFormat: string): string | null {
-		const parsedDate = this.parseDateFromTitle(title, dateFormat);
-		if (parsedDate) {
-			const jMonth = parsedDate.jMonth() + 1;
-			const jYear = parsedDate.jYear();
-			return `${jYear}-${jMonth}`;
-		}
-		return null;
-	}
-
-	private getYearNumberFromFileTitle(title: string, dateFormat: string): string | null {
-		const parsedDate = this.parseDateFromTitle(title, dateFormat);
-		if (parsedDate) {
-			return `${parsedDate.jYear()}`;
-		}
-		return null;
-	}
-
-	private getQuarterNumberFromFileTitle(title: string, dateFormat: string): string | null {
-		const parsedDate = this.parseDateFromTitle(title, dateFormat);
-		if (parsedDate) {
-			const jMonth = parsedDate.jMonth() + 1;
-			const quarter = Math.ceil(jMonth / 3);
-			const jYear = parsedDate.jYear();
-			return `${jYear}-Q${quarter}`;
-		}
-		return null;
-	}
-
-	private getDaysPassedFromFileTitle(title: string, dateFormat: string): string | null {
-		try {
-			let parsedDate;
-			if (dateFormat === "georgian") {
-				parsedDate = moment(title, "YYYY-MM-DD");
-				if (parsedDate.isValid()) {
-					parsedDate = parsedDate.locale("fa");
-				}
-			} else {
-				parsedDate = moment(title, "jYYYY/jMM/jDD");
-			}
-
-			if (!parsedDate.isValid()) {
-				console.error("Invalid date in file title");
-				return null;
-			}
-
-			const startOfYear = moment(`${parsedDate.jYear()}/1/1`, "jYYYY/jM/jD").locale("fa");
-			const daysPassed = parsedDate.diff(startOfYear, "days") + 1;
-			return daysPassed.toString();
-		} catch (error) {
-			console.error("Error calculating days passed: ", error);
-			return null;
-		}
-	}
-
-	private getDaysUntilEndOfYear(dateStr: string, dateFormat: string): string | null {
-		const parsedDate = this.parseDateFromTitle(dateStr, dateFormat);
-		if (parsedDate) {
-			const endOfYear = moment(`${parsedDate.jYear()}/12/29`, "jYYYY/jMM/jDD").locale("fa");
-			const daysUntilEnd = endOfYear.diff(parsedDate, "days");
-			return daysUntilEnd.toString();
-		}
-		return null;
 	}
 
 	private isWeeklyFile(title: string): boolean {
@@ -215,73 +108,6 @@ export default class PersianPlaceholders {
 			firstSaturday.getMonth() + 1,
 			firstSaturday.getDate(),
 		);
-	}
-
-	getWeekStartDate(year: number, week: number, dateFormat: string): string {
-		try {
-			const firstDayOfYearGregorian = jalaali.toGregorian(year, 1, 1);
-			const firstDayOfYear = new Date(
-				firstDayOfYearGregorian.gy,
-				firstDayOfYearGregorian.gm - 1,
-				firstDayOfYearGregorian.gd,
-			);
-			const firstDayWeekday = firstDayOfYear.getDay();
-			const adjustedWeek = firstDayWeekday === 6 ? week : week - 1;
-
-			const firstSaturday = this.getFirstSaturday(year);
-			const startDate = jalaali.toGregorian(firstSaturday.jy, firstSaturday.jm, firstSaturday.jd);
-			const start = new Date(startDate.gy, startDate.gm - 1, startDate.gd);
-			start.setDate(start.getDate() + (adjustedWeek - 1) * 7);
-
-			while (start.getDay() !== 6) {
-				start.setDate(start.getDate() - 1);
-			}
-			const weekStartJalaali = jalaali.toJalaali(
-				start.getFullYear(),
-				start.getMonth() + 1,
-				start.getDate(),
-			);
-			return this.formatDate(weekStartJalaali, dateFormat);
-		} catch (error) {
-			console.error("Error in getWeekStartDate:", error);
-			throw error;
-		}
-	}
-
-	getWeekEndDate(year: number, week: number, dateFormat: string): string {
-		try {
-			const weekStart = this.getWeekStartDate(year, week, "persian");
-			const [jy, jm, jd] = weekStart.split("-").map(Number);
-			const startDateGregorian = jalaali.toGregorian(jy, jm, jd);
-			const startDate = new Date(
-				startDateGregorian.gy,
-				startDateGregorian.gm - 1,
-				startDateGregorian.gd,
-			);
-			startDate.setDate(startDate.getDate() + 6);
-			const weekEndJalaali = jalaali.toJalaali(
-				startDate.getFullYear(),
-				startDate.getMonth() + 1,
-				startDate.getDate(),
-			);
-			return this.formatDate(weekEndJalaali, dateFormat);
-		} catch (error) {
-			console.error("Error in getWeekEndDate:", error);
-			throw error;
-		}
-	}
-
-	formatDate(date: { jy: number; jm: number; jd: number }, dateFormat: string): string {
-		if (dateFormat === "persian") {
-			return `${date.jy}-${date.jm.toString().padStart(2, "0")}-${date.jd
-				.toString()
-				.padStart(2, "0")}`;
-		} else {
-			const gregorian = jalaali.toGregorian(date.jy, date.jm, date.jd);
-			return `${gregorian.gy}-${gregorian.gm.toString().padStart(2, "0")}-${gregorian.gd
-				.toString()
-				.padStart(2, "0")}`;
-		}
 	}
 
 	private isMonthlyFile(title: string): boolean {
@@ -350,18 +176,19 @@ export default class PersianPlaceholders {
 		}
 	}
 
-	private async getEvents(title: string): Promise<string> {
-		const date = this.parseDateFromTitle(title, this.plugin.settings.dateFormat);
-		if (!date) {
-			return "تاریخ نامعتبر";
-		}
+	private async getEvents(title: string): Promise<string | null> {
+		const date = dashToDate(title, this.plugin.settings.dateFormat);
+		if (!date) return null;
+
+		const { jy, jm, jd } = dateToJalali(date);
+		const { gy, gm, gd } = dateToGregorian(date);
 
 		const events = [];
 		const settings = this.plugin.settings;
 
 		// Persian (Jalaali) events
 		if (settings.showOfficialIranianCalendar || settings.showAncientIranianCalendar) {
-			const persianEvents = this.getEventsForDate(JALALI_HOLIDAYS, date.jMonth() + 1, date.jDate());
+			const persianEvents = this.getEventsForDate(JALALI_HOLIDAYS, jm, jd);
 			events.push(
 				...persianEvents.filter(
 					(event) =>
@@ -372,11 +199,11 @@ export default class PersianPlaceholders {
 		}
 
 		// Gregorian events
-		events.push(...this.getEventsForDate(GLOBAL_HOLIDAYS, date.month() + 1, date.date()));
+		events.push(...this.getEventsForDate(GLOBAL_HOLIDAYS, gm, gd));
 
 		// Hijri events
 		if (settings.showShiaCalendar) {
-			const persianDate = { jy: date.jYear(), jm: date.jMonth() + 1, jd: date.jDate() };
+			const persianDate = { jy, jm, jd };
 
 			const hijriDate = this.getHijriDate(persianDate, settings.hijriCalendarType);
 

@@ -1,16 +1,18 @@
+import {
+	dateToJalali,
+	gregorianToJalali,
+	jalaliToGregorian,
+	isValidJalali,
+	gregorianToDate,
+	jalaliMonthLength,
+	getDaysInJalaliYear,
+	dateToJWeekNumber,
+	jalaliToStartDayOfWeek,
+	jalaliToEndDayOfWeek,
+} from "..";
 import { dayFormat, monthFormat, quarterFormat, weekFormat, yearFormat } from "src/utils/format";
-import { dateToJalali, jalaliToJWeekNumber, gregorianToJalali, jalaliToGregorian } from "..";
-import type { TJalali, TWeekStart } from "src/types";
+import type { TBaseDate, TGregorian, TJalali, TWeekStart } from "src/types";
 
-// Date => (jalali)dayFormat
-export function dateToJalaliDash(date: Date, option?: { separator?: string }) {
-	const separator = option?.separator ?? "-";
-
-	const { jy, jm, jd } = dateToJalali(date);
-	return dayFormat(jy, jm, jd, { separator });
-}
-
-// ("gy-gm-gd"|"gygmgd") => (jalali)dayFormat
 export function gregorianDashToJalaliDash(
 	dashDate: string,
 	option?: { separator?: string },
@@ -24,32 +26,15 @@ export function gregorianDashToJalaliDash(
 	const gm = +match[2];
 	const gd = +match[3];
 
-	const date = new Date(gy, gm - 1, gd);
-	if (date.getFullYear() !== gy || date.getMonth() !== gm - 1 || date.getDate() !== gd) {
-		return null;
-	}
+	const date = gregorianToDate(gy, gm, gd);
 
-	const { jy, jm, jd } = gregorianToJalali(gy, gm, gd);
+	if (!date) return null;
+
+	const { jy, jm, jd } = dateToJalali(date);
+
 	return dayFormat(jy, jm, jd, { separator });
 }
 
-// ("jy-jm-jd"|"jyjmjd") => {jy,jm,jd}
-export function jalaliDashTojalali(dateStr: string): TJalali | null {
-	const match = dateStr.match(/^(\d{4})-?(\d{1,2})-?(\d{1,2})$/);
-	if (!match) return null;
-
-	const jy = +match[1];
-	const jm = +match[2];
-	const jd = +match[3];
-
-	if (jy < 1000 || jy > 2000 || jm < 1 || jm > 12 || jd < 1 || jd > 31) {
-		return null;
-	}
-
-	return { jy, jm, jd };
-}
-
-// ("jy-jm-jd"|"jyjmjd") => (gregorian)dayFormat
 export function jalaliDashToGregorianDash(
 	dashDate: string,
 	option?: { separator?: string },
@@ -71,49 +56,69 @@ export function jalaliDashToGregorianDash(
 	}
 }
 
-// ("gy-gm-gd") => {jy, jm, jd}
+export function jalaliDashToJalali(dashDate: string): TJalali | null {
+	const match = dashDate.match(/^(\d{4})-?(\d{1,2})-?(\d{1,2})$/);
+	if (!match) return null;
+
+	const jy = +match[1];
+	const jm = +match[2];
+	const jd = +match[3];
+
+	if (!isValidJalali(jy, jm, jd)) return null;
+
+	return { jy, jm, jd };
+}
+
 export function gregorianDashToJalali(dashDate: string): TJalali | null {
-	const match = dashDate.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+	const match = dashDate.match(/^(\d{4})-?(\d{1,2})-?(\d{1,2})$/);
 	if (!match) return null;
 
 	const gy = +match[1];
 	const gm = +match[2];
 	const gd = +match[3];
 
-	// Validate actual Gregorian date
-	const date = new Date(gy, gm - 1, gd);
-
-	if (date.getFullYear() !== gy || date.getMonth() !== gm - 1 || date.getDate() !== gd) {
-		return null;
-	}
+	if (!gregorianToDate(gy, gm, gd)) return null;
 
 	return gregorianToJalali(gy, gm, gd);
 }
 
-// (Date) => (jalali)weekFormat
-export function dateToJWeekDash(
-	date: Date,
-	weekStart: TWeekStart = "sat",
-	option?: { separator?: string },
-) {
-	const separator = option?.separator ?? "-";
+export function gregorianDashToDate(dashDate: string): Date | null {
+	const match = dashDate.match(/^(\d{4})-?(\d{1,2})-?(\d{1,2})$/);
+	if (!match) return null;
 
-	const { jy, jm, jd } = dateToJalali(date);
-	const jWeekNumber = jalaliToJWeekNumber(jy, jm, jd, weekStart);
+	const gy = +match[1];
+	const gm = +match[2];
+	const gd = +match[3];
 
-	return weekFormat(jy, jWeekNumber, { separator });
+	const date = gregorianToDate(gy, gm, gd);
+
+	if (!date) return null;
+
+	return date;
 }
 
-// (Date) => (jalali)monthFormat
-export function dateToJMonthDash(date: Date, option?: { separator?: string }) {
-	const separator = option?.separator ?? "-";
+export function jalaliDashToDate(dashDate: string): Date | null {
+	const jalali = jalaliDashToJalali(dashDate);
+	if (!jalali) return null;
 
-	const { jy, jm } = dateToJalali(date);
+	const { gy, gm, gd } = jalaliToGregorian(jalali.jy, jalali.jm, jalali.jd);
 
-	return monthFormat(jy, jm, { separator });
+	return new Date(gy, gm - 1, gd);
 }
 
-// (Date) => (jalali)quarterFormat
+export function dashToDate(dashDate: string, baseDate: string): Date | null {
+	if (baseDate === "persian") {
+		return jalaliDashToDate(dashDate);
+	}
+
+	return gregorianDashToDate(dashDate);
+}
+
+export function dateToJYearDash(date: Date) {
+	const { jy } = dateToJalali(date);
+	return yearFormat(jy);
+}
+
 export function dateToJQuarterDash(date: Date, option?: { separator?: string }) {
 	const separator = option?.separator ?? "-";
 
@@ -123,8 +128,94 @@ export function dateToJQuarterDash(date: Date, option?: { separator?: string }) 
 	return quarterFormat(jm, jQuarter, { separator });
 }
 
-// (Date) => (jalali)yearFormat
-export function dateToJYearDash(date: Date) {
+export function dateToJMonthDash(date: Date, option?: { separator?: string }) {
+	const separator = option?.separator ?? "-";
+
+	const { jy, jm } = dateToJalali(date);
+
+	return monthFormat(jy, jm, { separator });
+}
+
+export function dateToJWeekDash(
+	date: Date,
+	weekStart: TWeekStart = "sat",
+	option?: { separator?: string },
+) {
+	const separator = option?.separator ?? "-";
+
 	const { jy } = dateToJalali(date);
-	return yearFormat(jy);
+	const jWeekNumber = dateToJWeekNumber(date, weekStart);
+
+	return weekFormat(jy, jWeekNumber, { separator });
+}
+
+export function dateToJDayDash(date: Date, option?: { separator?: string }) {
+	const separator = option?.separator ?? "-";
+
+	const { jy, jm, jd } = dateToJalali(date);
+	return dayFormat(jy, jm, jd, { separator });
+}
+
+export function dateToDaysPassedJYear(date: Date): number {
+	const { jy, jm, jd } = dateToJalali(date);
+
+	let daysPassed = 0;
+
+	for (let month = 1; month < jm; month++) {
+		daysPassed += jalaliMonthLength(jy, month);
+	}
+
+	return daysPassed + jd;
+}
+
+export function dateToDaysRemainingJYear(date: Date): number {
+	const { jy, jm, jd } = dateToJalali(date);
+
+	let daysPassed = 0;
+
+	for (let month = 1; month < jm; month++) {
+		daysPassed += jalaliMonthLength(jy, month);
+	}
+
+	daysPassed += jd;
+
+	return getDaysInJalaliYear(jy) - daysPassed;
+}
+
+export function dateToStartDayOfWeekDash(
+	date: Date,
+	option?: { separator?: string; baseDate?: TBaseDate },
+) {
+	const baseDate = option?.baseDate ?? "persian";
+	const separator = option?.separator ?? "-";
+
+	const { jy: jYear } = dateToJalali(date);
+	const jWeekNumber = dateToJWeekNumber(date);
+
+	if (baseDate === "persian") {
+		const { jy, jm, jd } = jalaliToStartDayOfWeek({ jYear, jWeekNumber }, "persian") as TJalali;
+		return dayFormat(jy, jm, jd, { separator });
+	}
+
+	const { gy, gm, gd } = jalaliToStartDayOfWeek({ jYear, jWeekNumber }, "gregorian") as TGregorian;
+	return dayFormat(gy, gm, gd);
+}
+
+export function dateToEndDayOfWeekDash(
+	date: Date,
+	option?: { separator?: string; baseDate?: TBaseDate },
+) {
+	const baseDate = option?.baseDate ?? "persian";
+	const separator = option?.separator ?? "-";
+
+	const { jy: jYear } = dateToJalali(date);
+	const jWeekNumber = dateToJWeekNumber(date);
+
+	if (baseDate === "persian") {
+		const { jy, jm, jd } = jalaliToEndDayOfWeek({ jYear, jWeekNumber }, "persian") as TJalali;
+		return dayFormat(jy, jm, jd);
+	}
+
+	const { gy, gm, gd } = jalaliToEndDayOfWeek({ jYear, jWeekNumber }, "gregorian") as TGregorian;
+	return dayFormat(gy, gm, gd, { separator });
 }

@@ -1,11 +1,11 @@
-export type { TLocal } from "./local";
+export type { TLocal, TBaseDate } from "./local";
 export type {
 	TGregorian,
 	TJalali,
 	THijri,
 	TWeekStart,
 	TNumberOfMonths,
-	TGetWeekStartDatePraps,
+	TGetDayOfWeek,
 	THolidayEvent,
 	HijriAdjustments, //todo: remove in the end
 } from "./date";

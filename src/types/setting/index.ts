@@ -1,3 +1,5 @@
+import type { TBaseDate } from "../local";
+
 export type TPluginSetting = {
 	dailyNotesFolderPath: string;
 	weeklyNotesFolderPath: string;
@@ -5,7 +7,7 @@ export type TPluginSetting = {
 	yearlyNotesFolderPath: string;
 	enableQuarterlyNotes: boolean;
 	quarterlyNotesFolderPath: string;
-	dateFormat: string;
+	dateFormat: TBaseDate;
 	version: string;
 	announceUpdates: boolean;
 	showGeorgianDates: boolean;

@@ -1,5 +1,15 @@
-import type { TGregorian, TNumberOfMonths, TLocal, TWeekStart, TJalali } from "src/types";
 import { JALALI_MONTHS } from "src/constants";
+import type { TGregorian, TNumberOfMonths, TLocal, TWeekStart } from "src/types";
+
+export function gregorianToDate(gy: number, gm: number, gd: number) {
+	const date = new Date(gy, gm - 1, gd);
+
+	if (date.getFullYear() !== gy || date.getMonth() !== gm - 1 || date.getDate() !== gd) {
+		return null;
+	}
+
+	return date;
+}
 
 export const weekStartNumber = (weekStart: TWeekStart): number =>
 	({
