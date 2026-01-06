@@ -9,8 +9,13 @@ import {
 	type EditorSuggestContext,
 } from "obsidian";
 import PersianCalendarPlugin from "src/main";
-import { getJalaliWeekNumberFromDate, dateToJalali, getQuarter } from "src/utils/dateConverter";
-import { dayFormat, monthFormat, quarterFormat, weekFormat, yearFormat } from "src/utils/format";
+import {
+	dateToJMonthDash,
+	dateToJQuarterDash,
+	dateToJWeekDash,
+	dateToJYearDash,
+	dateToJalaliDash,
+} from "src/utils/dateConverter";
 
 export default class DateSuggester extends EditorSuggest<string> {
 	plugin: PersianCalendarPlugin;
@@ -90,37 +95,6 @@ export default class DateSuggester extends EditorSuggest<string> {
 	getFormattedDateLink(keyword: string, date: Date) {
 		const now = new Date();
 		let dateText = "";
-		const formatDate = (date: Date) => {
-			if (this.plugin.settings.dateFormat === "georgian") {
-				return dayFormat(date.getFullYear(), date.getMonth() + 1, date.getDate());
-			}
-
-			const { jy, jm, jd } = dateToJalali(date);
-			return dayFormat(jy, jm, jd);
-		};
-
-		const formatWeek = (date: Date) => {
-			const { jy } = dateToJalali(date);
-			const currentWeekNumber = getJalaliWeekNumberFromDate(date);
-
-			return weekFormat(jy, currentWeekNumber);
-		};
-
-		const formatMonth = (date: Date) => {
-			const { jy, jm } = dateToJalali(date);
-			return monthFormat(jy, jm);
-		};
-
-		const formatQuarter = (date: Date) => {
-			const { jm } = dateToJalali(date);
-			const quarter = getQuarter(jm);
-			return quarterFormat(jm, quarter);
-		};
-
-		const formatYear = (date: Date) => {
-			const { jy } = dateToJalali(date);
-			return yearFormat(jy);
-		};
 
 		const weekdayNames = ["شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنج‌شنبه", "جمعه"];
 		const regex = /(دوشنبه|یکشنبه|سه‌شنبه|چهارشنبه|پنج‌شنبه|شنبه|جمعه)( بعد| قبل)?/;
@@ -140,7 +114,7 @@ export default class DateSuggester extends EditorSuggest<string> {
 			} else {
 				now.setDate(now.getDate() + daysFromNowToWeekday);
 			}
-			dateText = formatDate(now);
+			dateText = dateToJalaliDash(now);
 			const formatSpecifier = specifier ? ` ${specifier.trim()}` : "";
 			return `[[${dateText}|${weekdayName}${formatSpecifier}]]`;
 		} else {
@@ -162,57 +136,57 @@ export default class DateSuggester extends EditorSuggest<string> {
         	}[keyword];
 
 					date.setDate(date.getDate() + dateAdjustment);
-					return `[[${formatDate(date)}|${keyword}]]`;
+					return `[[${dateToJalaliDash(date)}|${keyword}]]`;
 
 				case "این هفته":
-					return `[[${formatWeek(new Date())}|${keyword}]]`;
+					return `[[${dateToJWeekDash(new Date())}|${keyword}]]`;
 
 				case "هفته قبل":
-					return `[[${formatWeek(
+					return `[[${dateToJWeekDash(
 						new Date(new Date().setDate(new Date().getDate() - 7)),
 					)}|${keyword}]]`;
 
 				case "هفته بعد":
-					return `[[${formatWeek(
+					return `[[${dateToJWeekDash(
 						new Date(new Date().setDate(new Date().getDate() + 7)),
 					)}|${keyword}]]`;
 
 				case "این ماه":
-					return `[[${formatMonth(new Date())}|${keyword}]]`;
+					return `[[${dateToJMonthDash(new Date())}|${keyword}]]`;
 
 				case "ماه قبل":
-					return `[[${formatMonth(
+					return `[[${dateToJMonthDash(
 						new Date(new Date().setMonth(new Date().getMonth() - 1)),
 					)}|${keyword}]]`;
 
 				case "ماه بعد":
-					return `[[${formatMonth(
+					return `[[${dateToJMonthDash(
 						new Date(new Date().setMonth(new Date().getMonth() + 1)),
 					)}|${keyword}]]`;
 
 				case "این فصل":
-					return `[[${formatQuarter(new Date())}|${keyword}]]`;
+					return `[[${dateToJQuarterDash(new Date())}|${keyword}]]`;
 
 				case "فصل قبل":
-					return `[[${formatQuarter(
+					return `[[${dateToJQuarterDash(
 						new Date(new Date().setMonth(new Date().getMonth() - 3)),
 					)}|${keyword}]]`;
 
 				case "فصل بعد":
-					return `[[${formatQuarter(
+					return `[[${dateToJQuarterDash(
 						new Date(new Date().setMonth(new Date().getMonth() + 3)),
 					)}|${keyword}]]`;
 
 				case "امسال":
-					return `[[${formatYear(new Date())}|${keyword}]]`;
+					return `[[${dateToJYearDash(new Date())}|${keyword}]]`;
 
 				case "سال قبل":
-					return `[[${formatYear(
+					return `[[${dateToJYearDash(
 						new Date(new Date().setFullYear(new Date().getFullYear() - 1)),
 					)}|${keyword}]]`;
 
 				case "سال بعد":
-					return `[[${formatYear(
+					return `[[${dateToJYearDash(
 						new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
 					)}|${keyword}]]`;
 			}

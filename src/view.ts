@@ -1,5 +1,5 @@
 import { WorkspaceLeaf, Notice, App, View, TFile, MarkdownView } from "obsidian";
-import { getJalaliNow } from "src/utils/dateConverter";
+import { dateToJalali } from "src/utils/dateConverter";
 import { toJalaali, jalaaliMonthLength, toGregorian } from "jalaali-js";
 import PersianCalendarPlugin from "./main";
 import { JALALI_HOLIDAYS, HIJRI_HOLIDAYS, GLOBAL_HOLIDAYS } from "src/constants";
@@ -621,7 +621,7 @@ export default class PersianCalendarView extends View {
 	}
 
 	private async loadCurrentMonth() {
-		const { jy, jm } = getJalaliNow();
+		const { jy, jm } = dateToJalali(new Date());
 		this.currentJalaaliYear = jy;
 		this.currentJalaaliMonth = jm;
 	}
@@ -843,7 +843,7 @@ export default class PersianCalendarView extends View {
 	}
 
 	private async goToToday() {
-		const { jy, jm, jd } = getJalaliNow();
+		const { jy, jm, jd } = dateToJalali(new Date());
 		this.currentJalaaliYear = jy;
 		this.currentJalaaliMonth = jm;
 		this.render();

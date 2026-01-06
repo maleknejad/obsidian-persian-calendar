@@ -8,8 +8,7 @@ import {
 	TAbstractFile,
 } from "obsidian";
 import {
-	getJalaliWeekNumberFromDate,
-	getJalaliNow,
+	dateToJWeekNumber,
 	addDayDate,
 	dateToJalali,
 	gregorianDashToJalaliDash,
@@ -45,7 +44,7 @@ export default class PersianCalendarPlugin extends Plugin {
 		}
 
 		this.addRibbonIcon("calendar", "روزنوشت امروز", async () => {
-			const { jd } = getJalaliNow();
+			const { jd } = dateToJalali(new Date());
 			openNoteForDate(jd);
 		});
 
@@ -96,7 +95,7 @@ export default class PersianCalendarPlugin extends Plugin {
 			id: "open-todays-daily-note",
 			name: "Today - باز کردن روزنوشت امروز",
 			callback: async () => {
-				const { jd } = getJalaliNow();
+				const { jd } = dateToJalali(new Date());
 				openNoteForDate(jd);
 			},
 		});
@@ -131,8 +130,8 @@ export default class PersianCalendarPlugin extends Plugin {
 			id: "open-this-weeks-note",
 			name: "Weekly - باز کردن هفته‌نوشت این هفته",
 			callback: async () => {
-				const { jy } = getJalaliNow();
-				const currentWeekNumber = getJalaliWeekNumberFromDate(new Date());
+				const { jy } = dateToJalali(new Date());
+				const currentWeekNumber = dateToJWeekNumber(new Date());
 				const leaf = this.app.workspace.getLeavesOfType("persian-calendar")[0];
 				if (leaf) {
 					const view = leaf.view;
@@ -163,7 +162,7 @@ export default class PersianCalendarPlugin extends Plugin {
 			id: "open-current-months-note",
 			name: "Monthly - بازکردن ماه‌نوشت این ماه",
 			callback: async () => {
-				const { jy, jm } = getJalaliNow();
+				const { jy, jm } = dateToJalali(new Date());
 				const leaf = this.app.workspace.getLeavesOfType("persian-calendar")[0];
 				if (leaf) {
 					const view = leaf.view;
@@ -182,7 +181,7 @@ export default class PersianCalendarPlugin extends Plugin {
 			id: "open-current-years-note",
 			name: "Yearly - باز کردن سال‌نوشت امسال",
 			callback: async () => {
-				const { jy } = getJalaliNow();
+				const { jy } = dateToJalali(new Date());
 				const leaf = this.app.workspace.getLeavesOfType("persian-calendar")[0];
 				if (leaf) {
 					const view = leaf.view;

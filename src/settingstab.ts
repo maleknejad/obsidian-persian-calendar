@@ -73,19 +73,6 @@ export default class PersianCalendarSettingTab extends PluginSettingTab {
 				}),
 			);
 
-		// new Setting(containerEl)
-		//     .setName('تقویم هجری قمری')
-		//     .setDesc('انتخاب تنظیمات تقویم هجری قمری بین ایران و تقویم رسمی عربستان.')
-		//     .addDropdown(dropdown => dropdown
-		//         .addOption('iran', 'ایران')
-		//         .addOption('ummalqura', 'ام‌القرى')
-		//         .setValue(this.plugin.settings.hijriCalendarType)
-		//         .onChange(async (value) => {
-		//             this.plugin.settings.hijriCalendarType = value;
-		//             await this.plugin.saveSettings();
-		//             this.plugin.refreshViews();
-		//         }));
-
 		new Setting(containerEl)
 			.setName("نمایش روزهای تعطیل رسمی در تقویم")
 			.setDesc(
