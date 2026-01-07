@@ -51,9 +51,10 @@ function getPreviousMonth(hy: number, hm: number) {
 }
 
 function getMonthLength(hy: number, hm: number): number {
-	if (IRAN_HIJRI_MONTHS_LENGTH[hy as SupportedHijriYearType]) {
-		// cast to number to satisfy TS
-		return Number(IRAN_HIJRI_MONTHS_LENGTH[hy as SupportedHijriYearType][hm - 1]);
+	const yearData = IRAN_HIJRI_MONTHS_LENGTH[hy as SupportedHijriYearType];
+
+	if (yearData && hm <= yearData.length) {
+		return Number(yearData[hm - 1]);
 	}
 
 	const prev = getPreviousMonth(hy, hm);

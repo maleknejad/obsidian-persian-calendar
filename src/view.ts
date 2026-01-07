@@ -5,8 +5,9 @@ import {
 	jalaliToHijri,
 	jalaliToDate,
 	dateToJWeekNumber,
+	gregorianToJalali,
 } from "src/utils/dateConverter";
-import { toJalaali, jalaaliMonthLength, toGregorian } from "jalaali-js";
+import { jalaaliMonthLength, toGregorian } from "jalaali-js";
 import PersianCalendarPlugin from "./main";
 import { JALALI_HOLIDAYS, HIJRI_HOLIDAYS, GLOBAL_HOLIDAYS } from "src/constants";
 import type { TPluginSetting, TJalali, THolidayEvent } from "src/types";
@@ -30,9 +31,11 @@ export default class PersianCalendarView extends View {
 		this.currentJalaaliYear = 0;
 		this.currentJalaaliMonth = 0;
 		this.loadCurrentMonth();
-		const todayJalaali = toJalaali(new Date());
-		this.currentJalaaliYear = todayJalaali.jy;
-		this.currentJalaaliMonth = todayJalaali.jm;
+
+		const { jy, jm } = dateToJalali(new Date());
+
+		this.currentJalaaliYear = jy;
+		this.currentJalaaliMonth = jm;
 		this.startDailyCheckInterval();
 		this.noteDays = [];
 		this.plugin = plugin;
@@ -215,16 +218,16 @@ export default class PersianCalendarView extends View {
 		const hijriMonthNames = [
 			"محرم",
 			"صفر",
-			"ربيع۱",
-			"ربيع۲",
-			"جما۱",
-			"جما۲",
+			"ربیع‌الاول",
+			"ربیع‌الثانی",
+			"جمادی‌الاول",
+			"جمادی‌الثانی",
 			"رجب",
 			"شعبان",
 			"رمضان",
 			"شوال",
-			"ذو.ق",
-			"ذو.ح",
+			"ذی‌القعده",
+			"ذی‌الحجّه ",
 		];
 		return hijriMonthNames[month - 1];
 	}
@@ -526,7 +529,7 @@ export default class PersianCalendarView extends View {
 			const [, year, month, day] = match.map(Number);
 
 			if (this.settings.dateFormat === "gregorian") {
-				const { jy: convJy, jm: convJm, jd: convJd } = toJalaali(new Date(year, month - 1, day));
+				const { jy: convJy, jm: convJm, jd: convJd } = dateToJalali(new Date(year, month - 1, day));
 				if (convJy === jy && convJm === parseInt(jm)) {
 					noteDays.push(convJd);
 				}
@@ -627,7 +630,7 @@ export default class PersianCalendarView extends View {
 
 	private getCurrentJalaaliDate(): TJalali {
 		const now = new Date();
-		const todayJalaali = toJalaali(now.getFullYear(), now.getMonth() + 1, now.getDate());
+		const todayJalaali = gregorianToJalali(now.getFullYear(), now.getMonth() + 1, now.getDate());
 		return {
 			jy: this.currentJalaaliYear || todayJalaali.jy,
 			jm: this.currentJalaaliMonth || todayJalaali.jm,
