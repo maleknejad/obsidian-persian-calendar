@@ -9,7 +9,13 @@ import {
 } from "src/utils/dateConverter";
 import { jalaaliMonthLength, toGregorian } from "jalaali-js";
 import PersianCalendarPlugin from "./main";
-import { JALALI_HOLIDAYS, HIJRI_HOLIDAYS, GLOBAL_HOLIDAYS } from "src/constants";
+import {
+	JALALI_HOLIDAYS,
+	HIJRI_HOLIDAYS,
+	GLOBAL_HOLIDAYS,
+	GREGORIAN_MONTHS,
+	HIJRI_MONTHS,
+} from "src/constants";
 import type { TPluginSetting, TJalali, THolidayEvent } from "src/types";
 import * as jalaali from "jalaali-js";
 
@@ -157,13 +163,17 @@ export default class PersianCalendarView extends View {
 		const lastDayOfMonthJalaali = jalaali.jalaaliMonthLength(jy, jm);
 		const lastDayOfMonthGeorgian = jalaali.toGregorian(jy, jm, lastDayOfMonthJalaali);
 
-		const startMonthName = this.getGeorgianMonthName(firstDayOfMonthGeorgian.gm);
-		const endMonthName = this.getGeorgianMonthName(lastDayOfMonthGeorgian.gm);
+		const startMonthName =
+			GREGORIAN_MONTHS["en"][firstDayOfMonthGeorgian.gm as keyof (typeof GREGORIAN_MONTHS)["en"]];
+		const endMonthName =
+			GREGORIAN_MONTHS["en"][lastDayOfMonthGeorgian.gm as keyof (typeof GREGORIAN_MONTHS)["en"]];
 
 		if (firstDayOfMonthGeorgian.gm === lastDayOfMonthGeorgian.gm) {
-			return `${startMonthName} ${firstDayOfMonthGeorgian.gy}`;
+			return `${startMonthName.slice(0, 3)} ${firstDayOfMonthGeorgian.gy}`;
 		} else {
-			return `${startMonthName}-${endMonthName} ${lastDayOfMonthGeorgian.gy}`;
+			return `${startMonthName.slice(0, 3)}-${endMonthName.slice(0, 3)} ${
+				lastDayOfMonthGeorgian.gy
+			}`;
 		}
 	}
 
@@ -184,9 +194,10 @@ export default class PersianCalendarView extends View {
 			lastDayOfMonthGeorgian.gd,
 		);
 
-		const startHijriMonth = this.getHijriMonthName(startHijriDate.hm);
+		const startHijriMonth =
+			HIJRI_MONTHS["fa"][startHijriDate.hm as keyof (typeof HIJRI_MONTHS)["fa"]];
 		const startHijriYear = this.toFarsiDigits(startHijriDate.hy);
-		const endHijriMonth = this.getHijriMonthName(endHijriDate.hm);
+		const endHijriMonth = HIJRI_MONTHS["fa"][endHijriDate.hm as keyof (typeof HIJRI_MONTHS)["fa"]];
 		const endHijriYear = this.toFarsiDigits(endHijriDate.hy);
 
 		if (startHijriDate.hm === endHijriDate.hm) {
@@ -194,42 +205,6 @@ export default class PersianCalendarView extends View {
 		} else {
 			return `${startHijriMonth}-${endHijriMonth} ${endHijriYear}`;
 		}
-	}
-
-	private getGeorgianMonthName(month: number): string {
-		const georgianMonthNames = [
-			"Jan",
-			"Feb",
-			"Mar",
-			"Apr",
-			"May",
-			"Jun",
-			"Jul",
-			"Aug",
-			"Sep",
-			"Oct",
-			"Nov",
-			"Dec",
-		];
-		return georgianMonthNames[month - 1];
-	}
-
-	private getHijriMonthName(month: number): string {
-		const hijriMonthNames = [
-			"محرم",
-			"صفر",
-			"ربیع‌الاول",
-			"ربیع‌الثانی",
-			"جمادی‌الاول",
-			"جمادی‌الثانی",
-			"رجب",
-			"شعبان",
-			"رمضان",
-			"شوال",
-			"ذی‌القعده",
-			"ذی‌الحجّه ",
-		];
-		return hijriMonthNames[month - 1];
 	}
 
 	private async renderWeekNumbers(contentEl: HTMLElement, jalaaliDate: { jy: number; jm: number }) {

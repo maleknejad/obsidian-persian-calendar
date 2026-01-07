@@ -29,11 +29,6 @@ export default class PersianPlaceholders {
 	}
 
 	public async insertPersianDate(file: TFile): Promise<void> {
-		if (!file) {
-			console.error("File object is undefined.");
-			return;
-		}
-
 		const fileContent = await this.plugin.app.vault.read(file);
 		const updatedContent = await this.processPlaceholders(file, fileContent);
 
@@ -63,12 +58,10 @@ export default class PersianPlaceholders {
 		return result;
 	}
 
-	private buildContext(file: TFile): TBuildContext | null {
+	private buildContext(file: TFile): TBuildContext {
 		const fileName = file.basename;
 		const baseDate = this.plugin.settings.dateFormat;
-		const fileDate = dashToDate(fileName, baseDate);
-
-		if (!fileDate) return null;
+		const fileDate = dashToDate(fileName, baseDate) as Date;
 
 		return {
 			currentDate: new Date(),

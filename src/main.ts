@@ -25,10 +25,16 @@ import type { TPluginSetting } from "src/types";
 export default class PersianCalendarPlugin extends Plugin {
 	settings: TPluginSetting = DEFAULT_SETTING;
 	dateSuggester: DateSuggester | undefined;
-	placeholder: PersianPlaceholders | undefined;
+	placeholder: PersianPlaceholders;
 	pluginsettingstab: PersianCalendarSettingTab | undefined;
 	plugin: PersianCalendarPlugin = this;
 	view: PersianCalendarView | undefined;
+	private processingFiles: Set<string> = new Set();
+
+	constructor(app: any, manifest: any) {
+		super(app, manifest);
+		this.placeholder = new PersianPlaceholders(this);
+	}
 
 	async onload() {
 		await this.loadSettings();
@@ -56,9 +62,20 @@ export default class PersianCalendarPlugin extends Plugin {
 
 		this.pluginsettingstab = new PersianCalendarSettingTab(this.app, this);
 
-		this.placeholder = new PersianPlaceholders(this);
-
 		this.announceUpdate();
+
+		this.registerEvent(
+			this.app.vault.on("modify", async (file) => {
+				if (!(file instanceof TFile)) return;
+				if (file.extension !== "md") return;
+
+				const content = await this.app.vault.read(file);
+
+				if (content.includes("{{tp_")) return;
+
+				await this.placeholder.insertPersianDate(file);
+			}),
+		);
 
 		this.registerEvent(
 			this.app.vault.on("create", (file: TAbstractFile) => {
@@ -68,14 +85,10 @@ export default class PersianCalendarPlugin extends Plugin {
 					const now = Date.now();
 					const timeDiff = now - fileCreationTime;
 
-					if (timeDiff < 10000) {
+					if (timeDiff < 2000) {
 						if (this.placeholder) {
 							this.placeholder.insertPersianDate(file);
-						} else {
-							console.error("Placeholder is not initialized");
 						}
-					} else {
-						console.log("File is not newly created or too old for processing:", file.path);
 					}
 				}
 			}),
@@ -90,6 +103,17 @@ export default class PersianCalendarPlugin extends Plugin {
 		);
 
 		this.addSettingTab(new PersianCalendarSettingTab(this.app, this));
+
+		this.addCommand({
+			id: "replace-persian-placeholders",
+			name: "Replace Placeholders - جایگزینی عبارات معنادار در این یادداشت",
+			editorCallback: async (editor, view) => {
+				if (view.file) {
+					await this.placeholder?.insertPersianDate(view.file);
+					new Notice("جایگزینی با موفقیت انجام شد");
+				}
+			},
+		});
 
 		this.addCommand({
 			id: "open-todays-daily-note",
@@ -146,7 +170,7 @@ export default class PersianCalendarPlugin extends Plugin {
 
 		this.addCommand({
 			id: "open-current-quarterly-note",
-			name: "ْQuarterly - باز کردن فصل نوشت این فصل",
+			name: "Quarterly - باز کردن فصل نوشت این فصل",
 			callback: async () => {
 				const leaf = this.app.workspace.getLeavesOfType("persian-calendar")[0];
 				if (leaf && leaf.view instanceof PersianCalendarView) {
@@ -217,7 +241,7 @@ export default class PersianCalendarPlugin extends Plugin {
 		};
 
 		this.addCommand({
-			id: "convert-date", // For my friend, Amir Napster.
+			id: "convert-date",
 			name: "Convert Date Format - تبدیل تاریخ بین شمسی و میلادی",
 			checkCallback: (checking: boolean) => {
 				const editor = this.app.workspace.getActiveViewOfType(MarkdownView)?.editor;
