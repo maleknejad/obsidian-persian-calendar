@@ -1,22 +1,24 @@
 import type { TPluginSetting } from "src/types";
 
 export const DEFAULT_SETTING: TPluginSetting = {
-	dailyNotesFolderPath: "/",
-	weeklyNotesFolderPath: "/",
-	monthlyNotesFolderPath: "/",
-	yearlyNotesFolderPath: "/",
-	enableQuarterlyNotes: true,
-	quarterlyNotesFolderPath: "/",
+	showSeasonalNotes: true,
 	dateFormat: "jalali",
 	version: `4.0.0`,
 	announceUpdates: true,
-	showGeorgianDates: true,
-	hijriDateAdjustment: -1,
-	showHijriDates: true,
 	weekendDays: "friday",
 	showHolidays: true,
-	showOfficialIranianCalendar: true,
-	showAncientIranianCalendar: true,
-	showShiaCalendar: true,
-	hijriCalendarType: "iran",
+	// show dates
+	showGeorgianDates: true,
+	showHijriDates: true,
+	// notes folder path
+	dailyNotesPath: "/",
+	weeklyNotesPath: "/",
+	monthlyNotesPath: "/",
+	seasonalNotesPath: "/",
+	yearlyNotesPath: "/",
+	// show events
+	showIRGovernmentEvents: true,
+	showIRAncientEvents: true,
+	showIRIslamEvents: true,
+	showGlobalEvents: true,
 };

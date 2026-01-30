@@ -1,12 +1,10 @@
 import { TFile } from "obsidian";
-import jalaali from "jalaali-js";
 import PersianCalendarPlugin from "src/main";
-import { JALALI_HOLIDAYS, HIJRI_HOLIDAYS, GLOBAL_HOLIDAYS } from "src/constants";
 import {
 	dateToJWeekDash,
 	dateToJDayDash,
 	dateToJMonthDash,
-	dateToJQuarterDash,
+	dateToSeasonDash,
 	dateToJYearDash,
 	dateToWeekdayName,
 	dashToDate,
@@ -14,11 +12,13 @@ import {
 	dateToDaysRemainingJYear,
 	dateToStartDayOfWeekDash,
 	dateToEndDayOfWeekDash,
-	dateToJalali,
-	dateToGregorian,
-	jalaliToHijri,
-} from "src/utils/dateConverter";
-import type { THolidayEvent, TBuildContext } from "src/types";
+	dashToEvents,
+	eventsToString,
+	jalaliToGregorian,
+	jalaliMonthLength,
+	checkKabiseh,
+} from "src/utils/dateUtils";
+import type { TBuildContext } from "src/types";
 
 export default class PersianPlaceholders {
 	plugin: PersianCalendarPlugin;
@@ -90,8 +90,8 @@ export default class PersianPlaceholders {
 			["{{این هفته}}", dateToJWeekDash(fileDate)],
 			["{{ماه}}", dateToJMonthDash(currentDate)],
 			["{{این ماه}}", dateToJMonthDash(fileDate)],
-			["{{فصل}}", dateToJQuarterDash(currentDate)],
-			["{{این فصل}}", dateToJQuarterDash(fileDate)],
+			["{{فصل}}", dateToSeasonDash(currentDate)],
+			["{{این فصل}}", dateToSeasonDash(fileDate)],
 			["{{سال}}", dateToJYearDash(currentDate)],
 			["{{این سال}}", dateToJYearDash(fileDate)],
 			["{{روزهای گذشته}}", dateToDaysPassedJYear(currentDate)],
@@ -102,7 +102,7 @@ export default class PersianPlaceholders {
 			["{{آخر ماه}}", isMonthly ? this.getMonthEndDate(fileName, baseDate) : null],
 			["{{اول سال}}", this.getFirstDayOfYear(fileName)],
 			["{{آخر سال}}", this.getLastDayOfYear(fileName)],
-			["{{مناسبت}}", () => this.getEvents(fileName)],
+			["{{مناسبت}}", eventsToString(dashToEvents(fileName, baseDate, this.plugin.settings))],
 		]);
 	}
 
@@ -114,14 +114,17 @@ export default class PersianPlaceholders {
 		return this.placeholderPatterns.get(placeholder)!;
 	}
 
+	//todo: move to utils
 	private isWeeklyFile(title: string): boolean {
 		return /^\d{4}-W\d{1,2}$/.test(title);
 	}
 
+	//todo: move to utils
 	private isMonthlyFile(title: string): boolean {
 		return /^\d{4}-\d{1,2}$/.test(title);
 	}
 
+	//todo: move to utils
 	private getMonthStartDate(title: string, dateFormat: string): string | null {
 		const [year, month] = title.split("-").map(Number);
 		if (!year || !month) return null;
@@ -130,36 +133,38 @@ export default class PersianPlaceholders {
 			return `${year}-${month.toString().padStart(2, "0")}-01`;
 		}
 
-		const gregorianStart = jalaali.toGregorian(year, month, 1);
+		const gregorianStart = jalaliToGregorian(year, month, 1);
 		return `${gregorianStart.gy}-${gregorianStart.gm
 			.toString()
 			.padStart(2, "0")}-${gregorianStart.gd.toString().padStart(2, "0")}`;
 	}
 
+	//todo: move to utils
 	private getMonthEndDate(title: string, dateFormat: string): string | null {
 		const [year, month] = title.split("-").map(Number);
 		if (!year || !month) return null;
 
-		const jalaaliEndDay = jalaali.jalaaliMonthLength(year, month);
+		const jalaliEndDay = jalaliMonthLength(year, month);
 
 		if (dateFormat === "jalali") {
-			return `${year}-${month.toString().padStart(2, "0")}-${jalaaliEndDay
+			return `${year}-${month.toString().padStart(2, "0")}-${jalaliEndDay
 				.toString()
 				.padStart(2, "0")}`;
 		}
 
-		const gregorianEnd = jalaali.toGregorian(year, month, jalaaliEndDay);
+		const gregorianEnd = jalaliToGregorian(year, month, jalaliEndDay);
 		return `${gregorianEnd.gy}-${gregorianEnd.gm.toString().padStart(2, "0")}-${gregorianEnd.gd
 			.toString()
 			.padStart(2, "0")}`;
 	}
 
+	//todo: move to utils
 	private getFirstDayOfYear(fileBasename: string): string {
 		const year = parseInt(fileBasename);
 		if (isNaN(year)) return "";
 
-		if (this.plugin.settings.dateFormat.toLowerCase() === "georgian") {
-			const georgianDate = jalaali.toGregorian(year, 1, 1);
+		if (this.plugin.settings.dateFormat === "gregorian") {
+			const georgianDate = jalaliToGregorian(year, 1, 1);
 			return `${georgianDate.gy}-${georgianDate.gm.toString().padStart(2, "0")}-${georgianDate.gd
 				.toString()
 				.padStart(2, "0")}`;
@@ -168,73 +173,20 @@ export default class PersianPlaceholders {
 		return `${year}-01-01`;
 	}
 
+	//todo: move to utils
 	private getLastDayOfYear(fileBasename: string): string {
 		const year = parseInt(fileBasename);
 		if (isNaN(year)) return "";
 
-		if (this.plugin.settings.dateFormat.toLowerCase() === "georgian") {
-			const nextYear = jalaali.toGregorian(year + 1, 1, 1);
+		if (this.plugin.settings.dateFormat === "gregorian") {
+			const nextYear = jalaliToGregorian(year + 1, 1, 1);
 			const lastDay = new Date(nextYear.gy, nextYear.gm - 1, nextYear.gd - 1);
 			return `${lastDay.getFullYear()}-${String(lastDay.getMonth() + 1).padStart(2, "0")}-${String(
 				lastDay.getDate(),
 			).padStart(2, "0")}`;
 		}
 
-		const isLeapYear = jalaali.isLeapJalaaliYear(year);
+		const isLeapYear = checkKabiseh(year);
 		return isLeapYear ? `${year}-12-30` : `${year}-12-29`;
-	}
-
-	private getGregorianEvents(gm: number, gd: number): THolidayEvent[] {
-		return this.filterByDate(GLOBAL_HOLIDAYS, gm, gd);
-	}
-
-	private filterByDate(
-		events: readonly THolidayEvent[],
-		month: number,
-		day: number,
-	): THolidayEvent[] {
-		return events.filter((e) => e.month === month && e.day === day);
-	}
-
-	private getPersianEvents(jm: number, jd: number): THolidayEvent[] {
-		const { showOfficialIranianCalendar, showAncientIranianCalendar } = this.plugin.settings;
-
-		if (!showOfficialIranianCalendar && !showAncientIranianCalendar) return [];
-
-		return this.filterByDate(JALALI_HOLIDAYS, jm, jd).filter(
-			(event) =>
-				(showOfficialIranianCalendar && event.type === "Iran") ||
-				(showAncientIranianCalendar && event.type === "Ancient Iran"),
-		);
-	}
-
-	private getHijriEvents(jy: number, jm: number, jd: number): THolidayEvent[] {
-		if (!this.plugin.settings.showShiaCalendar) return [];
-
-		const { hm, hd } = jalaliToHijri(jy, jm, jd);
-
-		return HIJRI_HOLIDAYS.filter(
-			(event) => event.month === hm && event.day === hd && event.type === "Islamic Iran",
-		);
-	}
-
-	private async getEvents(title: string): Promise<string | null> {
-		const date = dashToDate(title, this.plugin.settings.dateFormat);
-		if (!date) return null;
-
-		const { jy, jm, jd } = dateToJalali(date);
-		const { gm, gd } = dateToGregorian(date);
-
-		const events: THolidayEvent[] = [
-			...this.getPersianEvents(jm, jd),
-			...this.getGregorianEvents(gm, gd),
-			...this.getHijriEvents(jy, jm, jd),
-		];
-
-		if (events.length === 0) {
-			return "هیچ رویدادی برای این روز ثبت نشده است.";
-		}
-
-		return events.map((e) => `* ${e.title}${e.holiday ? " (تعطیل)" : ""}`).join("\n");
 	}
 }

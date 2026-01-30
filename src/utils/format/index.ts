@@ -24,10 +24,10 @@ export function monthFormat(year: number, month: number, option?: { separator?: 
 	return `${year}${separator}${month.toString().padStart(2, "0")}`;
 }
 
-export function quarterFormat(year: number, quarter: number, option?: { separator?: string }) {
+export function seasonFormat(year: number, season: number, option?: { separator?: string }) {
 	const separator = option?.separator ?? "-";
 
-	return `${year}${separator}${quarter.toString().padStart(2, "0")}`;
+	return `${year}${separator}${season.toString().padStart(2, "0")}`;
 }
 
 export function yearFormat(year: number) {

@@ -1,6 +1,6 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
 import PersianCalendarPlugin from "src/main";
-import type { TBaseDate, TPluginSetting } from "src/types";
+import type { TDateFormat, TPluginSetting } from "src/types";
 
 export default class PersianCalendarSettingTab extends PluginSettingTab {
 	plugin: PersianCalendarPlugin;
@@ -9,6 +9,18 @@ export default class PersianCalendarSettingTab extends PluginSettingTab {
 		super(app, plugin);
 		this.plugin = plugin;
 		this.addPathSetting = this.addPathSetting.bind(this);
+	}
+
+	addPathSetting(containerEl: HTMLElement, name: string, settingKey: keyof TPluginSetting) {
+		new Setting(containerEl).setName(name).addText((text) =>
+			text
+				.setPlaceholder("Path/for/notes")
+				.setValue(this.plugin.settings[settingKey] as string)
+				.onChange(async (value) => {
+					(this.plugin.settings[settingKey] as string) = value;
+					await this.plugin.saveSettings();
+				}),
+		);
 	}
 
 	display() {
@@ -20,7 +32,7 @@ export default class PersianCalendarSettingTab extends PluginSettingTab {
 		containerEl.createEl("h3", { text: "تنظیمات تقویم" });
 		containerEl.createEl("p", { text: "تقویم فارسی ابسیدین را از این طریق می‌توانید تنظیم کنید." });
 
-		this.addPathSetting(containerEl, "مسیر روزنوشت‌ها", "dailyNotesFolderPath");
+		this.addPathSetting(containerEl, "مسیر روزنوشت‌ها", "dailyNotesPath");
 		new Setting(containerEl)
 			.setName("فرمت نام‌گذاری و شناسایی روزنوشت‌ها")
 			.setDesc(
@@ -30,23 +42,23 @@ export default class PersianCalendarSettingTab extends PluginSettingTab {
 				dropdown
 					.addOption("jalali", "خورشیدی")
 					.addOption("gregorian", "میلادی")
-					.setValue(this.plugin.settings.dateFormat || "georgian")
+					.setValue(this.plugin.settings.dateFormat || "gregorian")
 					.onChange(async (value) => {
-						this.plugin.settings.dateFormat = value as TBaseDate;
+						this.plugin.settings.dateFormat = value as TDateFormat;
 						await this.plugin.saveSettings();
 						this.plugin.refreshViews(); // Optionally refresh views if necessary
 					}),
 			);
-		this.addPathSetting(containerEl, "مسیر هفته‌نوشت‌ها", "weeklyNotesFolderPath");
-		this.addPathSetting(containerEl, "مسیر ماه‌نوشت‌ها", "monthlyNotesFolderPath");
-		this.addPathSetting(containerEl, "مسیر فصل‌نوشت‌ها", "quarterlyNotesFolderPath");
-		this.addPathSetting(containerEl, "مسیر سال‌نوشت‌ها", "yearlyNotesFolderPath");
+		this.addPathSetting(containerEl, "مسیر هفته‌نوشت‌ها", "weeklyNotesPath");
+		this.addPathSetting(containerEl, "مسیر ماه‌نوشت‌ها", "monthlyNotesPath");
+		this.addPathSetting(containerEl, "مسیر فصل‌نوشت‌ها", "seasonalNotesPath");
+		this.addPathSetting(containerEl, "مسیر سال‌نوشت‌ها", "yearlyNotesPath");
 		new Setting(containerEl)
 			.setName("فعال‌سازی نمایش فصل‌نوشت‌ها در تقویم")
 			.setDesc("نمایش یا پنهان کردن ردیف فصل‌نوشت‌ها در نمای تقویم")
 			.addToggle((toggle) =>
-				toggle.setValue(this.plugin.settings.enableQuarterlyNotes).onChange(async (value) => {
-					this.plugin.settings.enableQuarterlyNotes = value;
+				toggle.setValue(this.plugin.settings.showSeasonalNotes).onChange(async (value) => {
+					this.plugin.settings.showSeasonalNotes = value;
 					await this.plugin.saveSettings();
 					this.plugin.refreshViews();
 				}),
@@ -104,37 +116,47 @@ export default class PersianCalendarSettingTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName("نمایش تعطیلات رسمی تقویم ایران")
 			.setDesc(
-				"مشخص کنید آیا مایلید رویدادهای تقویم رسمی ایران در تولتیپ و {{مناسبت}} نمایش داده شود یا خیر",
+				"مشخص کنید آیا مایلید مناسبت‌های تقویم رسمی ایران در تولتیپ و {{مناسبت}} نمایش داده شود یا خیر",
 			)
 			.addToggle((toggle) =>
-				toggle
-					.setValue(this.plugin.settings.showOfficialIranianCalendar)
-					.onChange(async (value) => {
-						this.plugin.settings.showOfficialIranianCalendar = value;
-						await this.plugin.saveSettings();
-					}),
-			);
-
-		new Setting(containerEl)
-			.setName("نمایش رویدادهای تقویم ایران باستان")
-			.setDesc(
-				"مشخص کنید آیا مایلید رویدادهای تقویم ایران باستان در تولتیپ و {{مناسبت}} نمایش داده شود یا خیر.",
-			)
-			.addToggle((toggle) =>
-				toggle.setValue(this.plugin.settings.showAncientIranianCalendar).onChange(async (value) => {
-					this.plugin.settings.showAncientIranianCalendar = value;
+				toggle.setValue(this.plugin.settings.showIRGovernmentEvents).onChange(async (value) => {
+					this.plugin.settings.showIRGovernmentEvents = value;
 					await this.plugin.saveSettings();
 				}),
 			);
 
 		new Setting(containerEl)
-			.setName("نمایش رویدادهای تقویم شیعی")
+			.setName("نمایش مناسبت‌های تقویم ایران باستان")
 			.setDesc(
-				"مشخص کنید آیا مایلید رویدادهای تقویم شیعی در تولتیپ و {{مناسبت}} نمایش داده شود یا خیر.",
+				"مشخص کنید آیا مایلید مناسبت‌های تقویم ایران باستان در تولتیپ و {{مناسبت}} نمایش داده شود یا خیر.",
 			)
 			.addToggle((toggle) =>
-				toggle.setValue(this.plugin.settings.showShiaCalendar).onChange(async (value) => {
-					this.plugin.settings.showShiaCalendar = value;
+				toggle.setValue(this.plugin.settings.showIRAncientEvents).onChange(async (value) => {
+					this.plugin.settings.showIRAncientEvents = value;
+					await this.plugin.saveSettings();
+				}),
+			);
+
+		new Setting(containerEl)
+			.setName("نمایش مناسبت‌های تقویم شیعی")
+			.setDesc(
+				"مشخص کنید آیا مایلید مناسبت‌های تقویم شیعی در تولتیپ و {{مناسبت}} نمایش داده شود یا خیر.",
+			)
+			.addToggle((toggle) =>
+				toggle.setValue(this.plugin.settings.showIRIslamEvents).onChange(async (value) => {
+					this.plugin.settings.showIRIslamEvents = value;
+					await this.plugin.saveSettings();
+				}),
+			);
+
+		new Setting(containerEl)
+			.setName("نمایش مناسبت‌های جهانی")
+			.setDesc(
+				"مشخص کنید آیا مایلید مناسبت‌های جهانی در تولتیپ و {{مناسبت}} نمایش داده شود یا خیر.",
+			)
+			.addToggle((toggle) =>
+				toggle.setValue(this.plugin.settings.showGlobalEvents).onChange(async (value) => {
+					this.plugin.settings.showGlobalEvents = value;
 					await this.plugin.saveSettings();
 				}),
 			);
@@ -156,7 +178,7 @@ export default class PersianCalendarSettingTab extends PluginSettingTab {
 		});
 		const templaterparagraph = containerEl.createEl("p");
 		templaterparagraph.appendText("برای تنظیم کردن قالب برای نوشته‌ها می‌توانید از افزونه ");
-		templaterparagraph.createEl("a", {
+		(templaterparagraph.createEl("a", {
 			text: "Templater",
 			href: "https://github.com/SilentVoid13/Templater",
 		}),
@@ -165,10 +187,10 @@ export default class PersianCalendarSettingTab extends PluginSettingTab {
 				text: "گیت‌هاب",
 				href: "https://github.com/maleknejad/obsidian-persian-calendar/",
 			}),
-			templaterparagraph.appendText(" نوشته شده است. حتما راهنمای افزونه را مطالعه کنید.");
+			templaterparagraph.appendText(" نوشته شده است. حتما راهنمای افزونه را مطالعه کنید."));
 		const paragraph = containerEl.createEl("p");
 		paragraph.appendText("در صورت مشاهده باگ و یا ارائه پیشنهاد و یا درخواست راهنمایی لطفا در ");
-		paragraph.createEl("a", {
+		(paragraph.createEl("a", {
 			text: "گیت‌هاب",
 			href: "https://github.com/maleknejad/obsidian-persian-calendar/",
 		}),
@@ -182,18 +204,6 @@ export default class PersianCalendarSettingTab extends PluginSettingTab {
 			paragraph.createEl("a", { text: "کارفکر", href: "https://t.me/karfekr" }),
 			paragraph.appendText(" را دنبال کنید."),
 			paragraph.createEl("br"),
-			paragraph.appendText(" نسخه 4.0.0");
-	}
-
-	addPathSetting(containerEl: HTMLElement, name: string, settingKey: keyof TPluginSetting) {
-		new Setting(containerEl).setName(name).addText((text) =>
-			text
-				.setPlaceholder("Path/for/notes")
-				.setValue(this.plugin.settings[settingKey] as string)
-				.onChange(async (value) => {
-					(this.plugin.settings[settingKey] as string) = value;
-					await this.plugin.saveSettings();
-				}),
-		);
+			paragraph.appendText(" نسخه 4.0.0"));
 	}
 }

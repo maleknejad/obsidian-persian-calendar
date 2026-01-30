@@ -6,6 +6,8 @@ import {
 	WorkspaceLeaf,
 	TFile,
 	TAbstractFile,
+	App,
+	type PluginManifest,
 } from "obsidian";
 import {
 	dateToJWeekNumber,
@@ -13,14 +15,16 @@ import {
 	dateToJalali,
 	gregorianDashToJalaliDash,
 	jalaliDashToGregorianDash,
-} from "src/utils/dateConverter";
-import { DEFAULT_SETTING } from "src/constants";
-import PersianCalendarView from "./view";
-import DateSuggester from "./suggester";
-import PersianPlaceholders from "./placeholder";
-import UpdateModal from "./updatemodal";
-import PersianCalendarSettingTab from "./settingstab";
+	jalaliToSeason,
+} from "src/utils/dateUtils";
 import type { TPluginSetting } from "src/types";
+import { DEFAULT_SETTING } from "src/constants";
+import DateSuggester from "src/suggester";
+import PersianPlaceholders from "src/placeholder";
+import UpdateModal from "./updatemodal";
+import PersianCalendarSettingTab from "src/settingstab";
+import { NoteService } from "src/services";
+import PersianCalendarView from "src/view";
 
 export default class PersianCalendarPlugin extends Plugin {
 	settings: TPluginSetting = DEFAULT_SETTING;
@@ -29,11 +33,12 @@ export default class PersianCalendarPlugin extends Plugin {
 	pluginsettingstab: PersianCalendarSettingTab | undefined;
 	plugin: PersianCalendarPlugin = this;
 	view: PersianCalendarView | undefined;
-	private processingFiles: Set<string> = new Set();
+	private noteService: NoteService;
 
-	constructor(app: any, manifest: any) {
+	constructor(app: App, manifest: PluginManifest) {
 		super(app, manifest);
 		this.placeholder = new PersianPlaceholders(this);
+		this.noteService = new NoteService(this.app, this.settings);
 	}
 
 	async onload() {
@@ -48,11 +53,6 @@ export default class PersianCalendarPlugin extends Plugin {
 		if (this.app.workspace.getLeavesOfType("persian-calendar").length === 0) {
 			this.activateView();
 		}
-
-		this.addRibbonIcon("calendar", "روزنوشت امروز", async () => {
-			const { jd } = dateToJalali(new Date());
-			openNoteForDate(jd);
-		});
 
 		super.onload();
 
@@ -80,7 +80,7 @@ export default class PersianCalendarPlugin extends Plugin {
 		this.registerEvent(
 			this.app.vault.on("create", (file: TAbstractFile) => {
 				if (file instanceof TFile && file.path.endsWith(".md")) {
-					this.handleFileUpdate(file, true);
+					this.handleFileUpdate();
 					const fileCreationTime = file.stat.ctime;
 					const now = Date.now();
 					const timeDiff = now - fileCreationTime;
@@ -97,7 +97,7 @@ export default class PersianCalendarPlugin extends Plugin {
 		this.registerEvent(
 			this.app.vault.on("delete", (file) => {
 				if (file instanceof TFile && file.path.endsWith(".md")) {
-					this.handleFileUpdate(file, false);
+					this.handleFileUpdate();
 				}
 			}),
 		);
@@ -119,8 +119,7 @@ export default class PersianCalendarPlugin extends Plugin {
 			id: "open-todays-daily-note",
 			name: "Today - باز کردن روزنوشت امروز",
 			callback: async () => {
-				const { jd } = dateToJalali(new Date());
-				openNoteForDate(jd);
+				openNoteForDate(new Date());
 			},
 		});
 
@@ -128,8 +127,7 @@ export default class PersianCalendarPlugin extends Plugin {
 			id: "open-tomorrow-daily-note",
 			name: "Tomorrow - باز کردن روزنوشت فردا",
 			callback: async () => {
-				const { jd } = dateToJalali(addDayDate(new Date(), 1));
-				openNoteForDate(jd);
+				openNoteForDate(addDayDate(new Date(), 1));
 			},
 		});
 
@@ -137,8 +135,7 @@ export default class PersianCalendarPlugin extends Plugin {
 			id: "open-yesterday-daily-note",
 			name: "Yesterday - باز کردن روزنوشت دیروز",
 			callback: async () => {
-				const { jd } = dateToJalali(addDayDate(new Date(), -1));
-				openNoteForDate(jd);
+				openNoteForDate(addDayDate(new Date(), -1));
 			},
 		});
 
@@ -154,31 +151,23 @@ export default class PersianCalendarPlugin extends Plugin {
 			id: "open-this-weeks-note",
 			name: "Weekly - باز کردن هفته‌نوشت این هفته",
 			callback: async () => {
-				const { jy } = dateToJalali(new Date());
-				const currentWeekNumber = dateToJWeekNumber(new Date());
-				const leaf = this.app.workspace.getLeavesOfType("persian-calendar")[0];
-				if (leaf) {
-					const view = leaf.view;
-					if (view instanceof PersianCalendarView) {
-						view.openOrCreateWeeklyNote(currentWeekNumber, jy);
-					}
-				} else {
-					console.error("Persian Calendar view is not open.");
-				}
+				const now = new Date();
+				const { jy } = dateToJalali(now);
+				const currentWeekNumber = dateToJWeekNumber(now);
+
+				await this.noteService.openOrCreateWeeklyNote(currentWeekNumber, jy);
 			},
 		});
 
 		this.addCommand({
-			id: "open-current-quarterly-note",
-			name: "Quarterly - باز کردن فصل نوشت این فصل",
+			id: "open-current-seasonal-note",
+			name: "seasonal - باز کردن فصل نوشت این فصل",
 			callback: async () => {
-				const leaf = this.app.workspace.getLeavesOfType("persian-calendar")[0];
-				if (leaf && leaf.view instanceof PersianCalendarView) {
-					const { quarter, jy } = leaf.view.getCurrentQuarter();
-					await leaf.view.openOrCreateQuarterlyNote(quarter, jy);
-				} else {
-					new Notice("Persian Calendar view is not open. Please open the Persian Calendar first.");
-				}
+				const now = new Date();
+				const { jy, jm } = dateToJalali(now);
+				const season = jalaliToSeason(jm);
+
+				await this.noteService.openOrCreateSeasonalNote(season, jy);
 			},
 		});
 
@@ -187,17 +176,7 @@ export default class PersianCalendarPlugin extends Plugin {
 			name: "Monthly - بازکردن ماه‌نوشت این ماه",
 			callback: async () => {
 				const { jy, jm } = dateToJalali(new Date());
-				const leaf = this.app.workspace.getLeavesOfType("persian-calendar")[0];
-				if (leaf) {
-					const view = leaf.view;
-					if (view instanceof PersianCalendarView) {
-						await view.openOrCreateMonthlyNote(jm, jy);
-					}
-				} else {
-					console.error(
-						"Persian Calendar view is not open. Please open the Persian Calendar first.",
-					);
-				}
+				await this.noteService.openOrCreateMonthlyNote(jm, jy);
 			},
 		});
 
@@ -206,17 +185,7 @@ export default class PersianCalendarPlugin extends Plugin {
 			name: "Yearly - باز کردن سال‌نوشت امسال",
 			callback: async () => {
 				const { jy } = dateToJalali(new Date());
-				const leaf = this.app.workspace.getLeavesOfType("persian-calendar")[0];
-				if (leaf) {
-					const view = leaf.view;
-					if (view instanceof PersianCalendarView) {
-						await view.openOrCreateYearlyNote(jy);
-					}
-				} else {
-					console.error(
-						"Persian Calendar view is not open. Please open the Persian Calendar first.",
-					);
-				}
+				await this.noteService.openOrCreateYearlyNote(jy);
 			},
 		});
 
@@ -228,16 +197,9 @@ export default class PersianCalendarPlugin extends Plugin {
 			},
 		});
 
-		const openNoteForDate = (dayNumber: number) => {
-			const leaf = this.app.workspace.getLeavesOfType("persian-calendar")[0];
-			if (leaf) {
-				const view = leaf.view;
-				if (view instanceof PersianCalendarView) {
-					view.openOrCreateDailyNote(dayNumber);
-				}
-			} else {
-				console.error("Persian Calendar view is not open.");
-			}
+		const openNoteForDate = async (date: Date) => {
+			const { jy, jm, jd } = dateToJalali(date);
+			await this.noteService.openOrCreateDailyNote(jy, jm, jd);
 		};
 
 		this.addCommand({
@@ -261,6 +223,7 @@ export default class PersianCalendarPlugin extends Plugin {
 		});
 	}
 
+	// todo: change this
 	public convertDate(editor: Editor, lineIndex: number, textLine: string) {
 		const dateRegex = /\b(\d{4})-?(\d{2})-?(\d{2})\b/g;
 
@@ -299,10 +262,10 @@ export default class PersianCalendarPlugin extends Plugin {
 		await this.saveData(this.settings);
 	}
 
-	private async handleFileUpdate(file: TFile, isCreation: boolean): Promise<void> {
+	private async handleFileUpdate(): Promise<void> {
 		const view = this.app.workspace.getLeavesOfType("persian-calendar")[0]?.view;
 		if (view instanceof PersianCalendarView) {
-			view.refreshCalendarDots(file, isCreation);
+			view.refreshCalendar();
 		}
 	}
 

@@ -34,6 +34,10 @@
 	font-weight: bold;
 }
 
+.calendar-change-month-arrow:hover {
+	opacity: 0.6;
+}
+
 .calendar-month-year {
 	display: flex;
 	flex-direction: row-reverse;
@@ -60,7 +64,7 @@
 	font-weight: bold;
 }
 
-.calendar-georgian-month-year,
+.calendar-gregorian-month-year,
 .calendar-hijri-month-year {
 	font-size: small;
 	color: gray;
@@ -156,7 +160,7 @@
 	font-size: 1rem;
 }
 
-.georgian-date {
+.gregorian-date {
 	font-size: 0.7rem;
 	color: inherit;
 	position: absolute;
@@ -174,7 +178,7 @@
 	transform: translateX(50%);
 }
 
-.georgian-date-corner {
+.gregorian-date-corner {
 	font-size: 0.55rem;
 	color: inherit;
 	position: absolute;
@@ -194,10 +198,6 @@
 
 .calendar-day.dim {
 	opacity: 0.2;
-}
-
-.calendar-day.no-notes {
-	opacity: 0.4;
 }
 
 .calendar-day:hover {
@@ -225,16 +225,19 @@
 }
 
 .calendar-week-header {
-	font-weight: bold;
-	text-align: center;
-	height: 2rem;
+	height: 2.4rem;
+	display: flex;
 	justify-content: center;
 	align-items: center;
-	display: flex;
 }
 
-.calendar-week-number.no-notes {
-	opacity: 0.3;
+.calendar-week-header svg:hover {
+	opacity: 0.6;
+	cursor: pointer;
+}
+
+.no-notes {
+	opacity: 0.4;
 }
 
 .calendar-week-number .has-note {
@@ -254,7 +257,7 @@
 	grid-column-start: var(--day-grid-start);
 }
 
-.calendar-quarters-row {
+.calendar-seasons-row {
 	display: grid;
 	grid-template-columns: repeat(4, 1fr);
 	align-items: center;
@@ -263,16 +266,14 @@
 	grid-row: auto;
 }
 
-.calendar-quarter {
+.calendar-season {
 	cursor: pointer;
 	padding: 5px 10px;
-	opacity: 0.25;
 	font-size: 0.9rem;
 }
 
-.calendar-quarter.current-quarter {
-	color: var(--interactive-accent-text);
-	opacity: 1;
+.calendar-season.current-season {
+	color: var(--interactive-accent);
 }
 
 .calendar-tooltip {

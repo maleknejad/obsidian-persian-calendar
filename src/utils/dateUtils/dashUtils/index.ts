@@ -2,16 +2,17 @@ import {
 	dateToJalali,
 	gregorianToJalali,
 	jalaliToGregorian,
-	isValidJalali,
+	checkValidJalali,
 	gregorianToDate,
 	jalaliMonthLength,
 	getDaysInJalaliYear,
 	dateToJWeekNumber,
 	jalaliToStartDayOfWeek,
 	jalaliToEndDayOfWeek,
+	jalaliToSeason,
 } from "..";
-import { dayFormat, monthFormat, quarterFormat, weekFormat, yearFormat } from "src/utils/format";
-import type { TBaseDate, TGregorian, TJalali, TWeekStart } from "src/types";
+import { dayFormat, monthFormat, seasonFormat, weekFormat, yearFormat } from "src/utils/format";
+import type { TDateFormat, TGregorian, TJalali, TWeekStart } from "src/types";
 
 export function gregorianDashToJalaliDash(
 	dashDate: string,
@@ -64,7 +65,7 @@ export function jalaliDashToJalali(dashDate: string): TJalali | null {
 	const jm = +match[2];
 	const jd = +match[3];
 
-	if (!isValidJalali(jy, jm, jd)) return null;
+	if (!checkValidJalali(jy, jm, jd)) return null;
 
 	return { jy, jm, jd };
 }
@@ -106,8 +107,8 @@ export function jalaliDashToDate(dashDate: string): Date | null {
 	return new Date(gy, gm - 1, gd);
 }
 
-export function dashToDate(dashDate: string, baseDate: string): Date | null {
-	if (baseDate === "jalali") {
+export function dashToDate(dashDate: string, dateFormat: TDateFormat): Date | null {
+	if (dateFormat === "jalali") {
 		return jalaliDashToDate(dashDate);
 	}
 
@@ -119,13 +120,13 @@ export function dateToJYearDash(date: Date) {
 	return yearFormat(jy);
 }
 
-export function dateToJQuarterDash(date: Date, option?: { separator?: string }) {
+export function dateToSeasonDash(date: Date, option?: { separator?: string }) {
 	const separator = option?.separator ?? "-";
 
 	const { jm } = dateToJalali(date);
-	const jQuarter = Math.ceil(jm / 3);
+	const season = jalaliToSeason(jm);
 
-	return quarterFormat(jm, jQuarter, { separator });
+	return seasonFormat(jm, season, { separator });
 }
 
 export function dateToJMonthDash(date: Date, option?: { separator?: string }) {
@@ -184,7 +185,7 @@ export function dateToDaysRemainingJYear(date: Date): number {
 
 export function dateToStartDayOfWeekDash(
 	date: Date,
-	option?: { separator?: string; baseDate?: TBaseDate },
+	option?: { separator?: string; baseDate?: TDateFormat },
 ) {
 	const baseDate = option?.baseDate ?? "jalali";
 	const separator = option?.separator ?? "-";
@@ -203,7 +204,7 @@ export function dateToStartDayOfWeekDash(
 
 export function dateToEndDayOfWeekDash(
 	date: Date,
-	option?: { separator?: string; baseDate?: TBaseDate },
+	option?: { separator?: string; baseDate?: TDateFormat },
 ) {
 	const baseDate = option?.baseDate ?? "jalali";
 	const separator = option?.separator ?? "-";

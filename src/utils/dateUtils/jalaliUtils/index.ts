@@ -1,12 +1,12 @@
 import { toJalaali, toGregorian, jalaaliMonthLength, isValidJalaaliDate } from "jalaali-js";
 import { dateToGregorian, weekStartNumber } from "..";
-import type { TJalali, TGregorian, TWeekStart, TGetDayOfWeek, TBaseDate } from "src/types";
+import type { TJalali, TGregorian, TWeekStart, TGetDayOfWeek, TDateFormat } from "src/types";
 
-export function isValidJalali(jy: number, jm: number, jd: number) {
+export function checkValidJalali(jy: number, jm: number, jd: number) {
 	return isValidJalaaliDate(jy, jm, jd);
 }
 
-export function isKabiseh(jy: number): boolean {
+export function checkKabiseh(jy: number): boolean {
 	return jalaaliMonthLength(jy, 12) === 30;
 }
 
@@ -27,7 +27,7 @@ export function gregorianToJalali(
 	gy: number,
 	gm: number,
 	gd: number,
-): { jy: number; jm: number; jd: number } {
+): TJalali {
 	const { jy, jm, jd } = toJalaali(gy, gm, gd);
 	return { jy, jm, jd };
 }
@@ -104,7 +104,7 @@ export function getFirstWeekStartOfJYear(jy: number, weekStart: TWeekStart = "sa
 
 export function jalaliToStartDayOfWeek(
 	{ jYear, jWeekNumber }: TGetDayOfWeek,
-	baseDate: TBaseDate = "jalali",
+	baseDate: TDateFormat = "jalali",
 	weekStart: TWeekStart = "sat",
 ): TJalali | TGregorian {
 	const { gy, gm, gd } = jalaliToGregorian(jYear, 1, 1);
@@ -132,7 +132,7 @@ export function jalaliToStartDayOfWeek(
 
 export function jalaliToEndDayOfWeek(
 	{ jYear, jWeekNumber }: TGetDayOfWeek,
-	baseDate: TBaseDate = "jalali",
+	baseDate: TDateFormat = "jalali",
 	weekStart: TWeekStart = "sat",
 ): TJalali | TGregorian {
 	const startDate = jalaliToStartDayOfWeek({ jYear, jWeekNumber }, baseDate, weekStart);

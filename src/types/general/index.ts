@@ -1,41 +1,42 @@
-export type TBaseDate = "jalali" | "gregorian";
+export type TDateFormat = "jalali" | "gregorian" | "hijri";
+
+export type TShowEvents = {
+	showIRGovernmentEvents?: boolean;
+	showIRAncientEvents?: boolean;
+	showIRIslamEvents?: boolean;
+	showGlobalEvents?: boolean;
+};
 
 export type TPluginSetting = {
-	dailyNotesFolderPath: string;
-	weeklyNotesFolderPath: string;
-	monthlyNotesFolderPath: string;
-	yearlyNotesFolderPath: string;
-	enableQuarterlyNotes: boolean;
-	quarterlyNotesFolderPath: string;
-	dateFormat: TBaseDate;
+	dateFormat: TDateFormat;
 	version: string;
+	showSeasonalNotes: boolean;
 	announceUpdates: boolean;
-	showGeorgianDates: boolean;
-	hijriDateAdjustment: number;
-	showHijriDates: boolean;
 	weekendDays: string;
 	showHolidays: boolean;
-	showOfficialIranianCalendar: boolean;
-	showAncientIranianCalendar: boolean;
-	showShiaCalendar: boolean;
-	hijriCalendarType: string;
+	// show dates
+	showGeorgianDates: boolean;
+	showHijriDates: boolean;
+	// notes folder path
+	dailyNotesPath: string;
+	weeklyNotesPath: string;
+	monthlyNotesPath: string;
+	seasonalNotesPath: string;
+	yearlyNotesPath: string;
+	// show events
+	showIRGovernmentEvents: boolean;
+	showIRAncientEvents: boolean;
+	showIRIslamEvents: boolean;
+	showGlobalEvents: boolean;
 };
 
 export type TLocal = "fa" | "en";
-
-export type THolidayEvent = {
-	holiday: boolean;
-	month: number;
-	day: number;
-	type: string;
-	title: string;
-};
 
 export type TBuildContext = {
 	currentDate: Date;
 	fileDate: Date;
 	fileName: string;
-	baseDate: TBaseDate;
+	baseDate: TDateFormat;
 	isWeekly: boolean;
 	isMonthly: boolean;
 };

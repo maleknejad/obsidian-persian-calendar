@@ -6,5 +6,17 @@ export type {
 	TNumberOfMonths,
 	TGetDayOfWeek,
 	SupportedHijriYearType,
+	TEventBase,
+	TEventObject,
+	TNumberOfSeasons,
+	MonthMap,
+	DayMap,
+	TEventObjectWithoutDate,
 } from "./date";
-export type { TPluginSetting, THolidayEvent, TBaseDate, TLocal, TBuildContext } from "./general";
+export type {
+	TPluginSetting,
+	TDateFormat,
+	TLocal,
+	TBuildContext,
+	TShowEvents,
+} from "./general";

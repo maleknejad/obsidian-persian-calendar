@@ -1,4 +1,21 @@
-export const JALALI_MONTHS = {
+import type { TLocal, TNumberOfMonths, TNumberOfSeasons } from "src/types";
+
+export const SEASONS_NAME: Record<TLocal, Record<TNumberOfSeasons, string>> = {
+	fa: {
+		1: "بهار",
+		2: "تابستان",
+		3: "پاییز",
+		4: "زمستان",
+	},
+	en: {
+		1: "Spring",
+		2: "Summer",
+		3: "Autumn",
+		4: "Winter",
+	},
+} as const;
+
+export const JALALI_MONTHS_NAME: Record<TLocal, Record<TNumberOfMonths, string>> = {
 	fa: {
 		1: "فروردین",
 		2: "اردیبهشت",
@@ -29,7 +46,7 @@ export const JALALI_MONTHS = {
 	},
 } as const;
 
-export const GREGORIAN_MONTHS = {
+export const GREGORIAN_MONTHS_NAME: Record<TLocal, Record<TNumberOfMonths, string>> = {
 	fa: {
 		1: "ژانویه",
 		2: "فوریه",
@@ -57,10 +74,10 @@ export const GREGORIAN_MONTHS = {
 		10: "October",
 		11: "November",
 		12: "December",
-	}
+	},
 } as const;
 
-export const HIJRI_MONTHS = {
+export const HIJRI_MONTHS_NAME: Record<TLocal, Record<TNumberOfMonths, string>> = {
 	fa: {
 		1: "محرم",
 		2: "صفر",
@@ -88,5 +105,26 @@ export const HIJRI_MONTHS = {
 		10: "Shawwal",
 		11: "Dhu al-Qi'dah",
 		12: "Dhu al-Hijjah",
-	}
+	},
+} as const;
+
+export const WEEKDAYS_NAME: Record<TLocal, Record<number, string>> = {
+	fa: {
+		1: "شنبه",
+		2: "یکشنبه",
+		3: "دوشنبه",
+		4: "سه‌شنبه",
+		5: "چهارشنبه",
+		6: "پنج‌شنبه",
+		7: "جمعه",
+	},
+	en: {
+		1: "Saturday",
+		2: "Sunday",
+		3: "Monday",
+		4: "Tuesday",
+		5: "Wednesday",
+		6: "Thursday",
+		7: "Friday",
+	},
 } as const;

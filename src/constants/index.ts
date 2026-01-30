@@ -1,6 +1,12 @@
-export { GLOBAL_HOLIDAYS } from "./holidays/global";
-export { JALALI_HOLIDAYS } from "./holidays/jalali";
-export { HIJRI_HOLIDAYS } from "./holidays/hijri";
-export { IRAN_HIJRI_MONTHS_LENGTH, IRAN_HIJRI_ANCHORS } from "./iran-hijri";
-export { JALALI_MONTHS, GREGORIAN_MONTHS, HIJRI_MONTHS } from "./months";
+export { GREGORIAN_EVENTS } from "./eventDays/gregorian";
+export { JALALI_EVENTS } from "./eventDays/jalali";
+export { HIJRI_EVENTS } from "./eventDays/hijri";
+export { IRAN_HIJRI_MONTHS_LENGTH, IRAN_HIJRI_ANCHORS } from "./iranHijri";
+export {
+	SEASONS_NAME,
+	JALALI_MONTHS_NAME,
+	GREGORIAN_MONTHS_NAME,
+	HIJRI_MONTHS_NAME,
+	WEEKDAYS_NAME,
+} from "./dateNames";
 export { DEFAULT_SETTING } from "./setting";
