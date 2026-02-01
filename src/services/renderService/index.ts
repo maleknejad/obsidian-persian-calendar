@@ -54,7 +54,7 @@ export default class RenderService {
 		const todayButton = navContainerEl.createEl("span", { cls: "calendar-today-button" });
 		todayButton.textContent = "امروز";
 		todayButton.addEventListener("click", () => {
-			void this.goToToday();
+			this.goToToday();
 		});
 
 		const prevMonthArrow = navContainerEl.createEl("span", { cls: "calendar-change-month-arrow" });
@@ -91,19 +91,16 @@ export default class RenderService {
 
 		monthEl.addEventListener("click", (e) => {
 			e.stopPropagation();
-			void this.notesService.openOrCreateMonthlyNote(jMonthState, jYearState);
+			this.notesService.openOrCreateMonthlyNote(jMonthState, jYearState);
 		});
 
 		yearEl.addEventListener("click", (e) => {
 			e.stopPropagation();
-			void this.notesService.openOrCreateYearlyNote(jYearState);
+			this.notesService.openOrCreateYearlyNote(jYearState);
 		});
 	}
 
-	private async renderWeekNumbers(
-		contentEl: HTMLElement,
-		jalaliDate: { jy: number; jm: number },
-	): Promise<void> {
+	private async renderWeekNumbers(contentEl: HTMLElement, jalaliDate: { jy: number; jm: number }) {
 		let weekNumbersEl = contentEl.querySelector(".calendar-week-numbers");
 		if (weekNumbersEl) {
 			weekNumbersEl.remove();
@@ -132,7 +129,7 @@ export default class RenderService {
 			});
 
 			weekEl.addEventListener("click", () => {
-				void this.notesService.openOrCreateWeeklyNote(weekNumber, jalaliDate.jy);
+				this.notesService.openOrCreateWeeklyNote(weekNumber, jalaliDate.jy);
 			});
 		}
 	}
@@ -141,7 +138,7 @@ export default class RenderService {
 		contentEl: HTMLElement,
 		jalaliDate: { jy: number; jm: number },
 		local: TLocal = "fa",
-	): Promise<void> {
+	) {
 		let gridEl = contentEl.querySelector(".calendar-days-grid") as HTMLElement | null;
 		gridEl?.remove();
 		gridEl = contentEl.createEl("div", { cls: "calendar-days-grid" });
@@ -234,7 +231,7 @@ export default class RenderService {
 			(dayEl as any).setAttr?.("data-day", cell.jd.toString());
 
 			dayEl.addEventListener("click", () => {
-				void this.notesService.openOrCreateDailyNote(cell.jy, cell.jm, cell.jd);
+				this.notesService.openOrCreateDailyNote(cell.jy, cell.jm, cell.jd);
 			});
 
 			if (cell.isInCurrentMonth) {
@@ -243,10 +240,7 @@ export default class RenderService {
 		}
 	}
 
-	private async renderSeasonalNotesRow(
-		containerEl: HTMLElement,
-		local: TLocal = "fa",
-	): Promise<void> {
+	private async renderSeasonalNotesRow(containerEl: HTMLElement, local: TLocal = "fa") {
 		const seasonsRow = containerEl.createDiv({ cls: "calendar-seasons-row" });
 		const { jYearState, jMonthState } = this.calendarState.getJState();
 
@@ -267,17 +261,17 @@ export default class RenderService {
 			}
 
 			seasonEl.addEventListener("click", () => {
-				void this.notesService.openOrCreateSeasonalNote(seasonNumber, jYearState);
+				this.notesService.openOrCreateSeasonalNote(seasonNumber, jYearState);
 			});
 		}
 	}
 
-	private changeMonth(direction: "prev" | "next"): void {
+	private changeMonth(direction: "prev" | "next") {
 		this.calendarState.changeJMonthState(direction === "prev" ? -1 : 1);
-		void this.render();
+		this.render();
 	}
 
-	public async goToToday(): Promise<void> {
+	public async goToToday() {
 		const { jy, jm, jd } = dateToJalali(new Date());
 		this.calendarState.setJState(jy, jm);
 

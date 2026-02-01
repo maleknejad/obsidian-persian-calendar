@@ -84,7 +84,7 @@ export default class DateSuggester extends EditorSuggest<string> {
 		return suggestions.filter((suggestion) => suggestion.startsWith(query));
 	}
 
-	renderSuggestion(value: string, el: HTMLElement): void {
+	renderSuggestion(value: string, el: HTMLElement) {
 		const suggestionSpan = el.createSpan();
 		suggestionSpan.textContent = value.charAt(0).toUpperCase() + value.slice(1);
 	}
@@ -202,7 +202,7 @@ export default class DateSuggester extends EditorSuggest<string> {
 		}
 	}
 
-	selectSuggestion(value: string, evt: MouseEvent | KeyboardEvent): void {
+	selectSuggestion(value: string, evt: MouseEvent | KeyboardEvent) {
 		const now = new Date();
 		const linkText = this.getFormattedDateLink(value, now); // Ensures linkText is always a string
 

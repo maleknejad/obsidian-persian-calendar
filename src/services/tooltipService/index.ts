@@ -15,7 +15,7 @@ export default class TooltipService {
 		return tooltip;
 	}
 
-	public showTooltip(e: MouseEvent | TouchEvent, events: TEventObjectWithoutDate[]): void {
+	public showTooltip(e: MouseEvent | TouchEvent, events: TEventObjectWithoutDate[]) {
 		const tooltip = this.getOrCreateTooltip();
 
 		tooltip.innerHTML = events
@@ -46,7 +46,7 @@ export default class TooltipService {
 		}
 	}
 
-	public hideTooltip(): void {
+	public hideTooltip() {
 		const tooltip = document.querySelector(this.tooltipSelector) as HTMLElement | null;
 		if (tooltip) {
 			tooltip.style.display = "none";

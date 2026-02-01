@@ -243,12 +243,12 @@ export default class PersianCalendarPlugin extends Plugin {
 		}
 	}
 
-	private announceUpdate(): void {
+	private announceUpdate() {
 		const currentVersion = this.manifest.version;
 		const knownVersion = this.settings.version;
 		if (currentVersion === knownVersion) return;
 		this.settings.version = currentVersion;
-		void this.saveSettings();
+		this.saveSettings();
 		if (this.settings.announceUpdates === false) return;
 		const updateModal = new UpdateModal(this.app);
 		updateModal.open();
@@ -262,7 +262,7 @@ export default class PersianCalendarPlugin extends Plugin {
 		await this.saveData(this.settings);
 	}
 
-	private async handleFileUpdate(): Promise<void> {
+	private async handleFileUpdate() {
 		const view = this.app.workspace.getLeavesOfType("persian-calendar")[0]?.view;
 		if (view instanceof PersianCalendarView) {
 			view.refreshCalendar();
@@ -300,7 +300,7 @@ export default class PersianCalendarPlugin extends Plugin {
 		}
 	}
 
-	onunload(): void {
+	onunload() {
 		this.app.workspace.getLeavesOfType("persian-calendar").forEach((leaf) => leaf.detach());
 	}
 }

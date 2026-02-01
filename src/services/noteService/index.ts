@@ -73,7 +73,7 @@ export default class NoteService {
 		return result;
 	}
 
-	private async openNoteInWorkspace(noteFile: TFile): Promise<void> {
+	private async openNoteInWorkspace(noteFile: TFile) {
 		const isOpen = this.app.workspace
 			.getLeavesOfType("markdown")
 			.some((leaf) => leaf.view instanceof MarkdownView && leaf.view.file === noteFile);
@@ -91,7 +91,7 @@ export default class NoteService {
 	}
 
 	// todo: change this
-	public async openOrCreateDailyNote(jy: number, jm: number, jd: number): Promise<void> {
+	public async openOrCreateDailyNote(jy: number, jm: number, jd: number) {
 		let dateString = `${jy}-${jm.toString().padStart(2, "0")}-${jd.toString().padStart(2, "0")}`;
 
 		if (this.settings.dateFormat === "gregorian") {
@@ -121,7 +121,7 @@ export default class NoteService {
 	}
 
 	// todo: change this
-	public async openOrCreateWeeklyNote(weekNumber: number, jy: number): Promise<void> {
+	public async openOrCreateWeeklyNote(weekNumber: number, jy: number) {
 		const weekString = `${jy}-W${weekNumber}`;
 		const notesLocation = this.normalizeFolderPath(this.settings.weeklyNotesPath);
 		const filePath = `${notesLocation === "" ? "" : notesLocation + "/"}${weekString}.md`;
@@ -143,7 +143,7 @@ export default class NoteService {
 	}
 
 	// todo: change this
-	public async openOrCreateMonthlyNote(month: number, jy: number): Promise<void> {
+	public async openOrCreateMonthlyNote(month: number, jy: number) {
 		const monthString = `${jy}-${month.toString().padStart(2, "0")}`;
 		const notesLocation = this.normalizeFolderPath(this.settings.monthlyNotesPath);
 		const filePath = `${notesLocation === "" ? "" : notesLocation + "/"}${monthString}.md`;
@@ -165,7 +165,7 @@ export default class NoteService {
 	}
 
 	// todo: change this
-	public async openOrCreateSeasonalNote(seasonNumber: number, jy: number): Promise<void> {
+	public async openOrCreateSeasonalNote(seasonNumber: number, jy: number) {
 		const seasonString = `${jy}-S${seasonNumber}`;
 		const notesLocation = this.normalizeFolderPath(this.settings.seasonalNotesPath);
 		const filePath = `${notesLocation === "" ? "" : notesLocation + "/"}${seasonString}.md`;
@@ -187,7 +187,7 @@ export default class NoteService {
 	}
 
 	// todo: change this
-	public async openOrCreateYearlyNote(jy: number): Promise<void> {
+	public async openOrCreateYearlyNote(jy: number) {
 		const yearString = String(jy);
 		const notesLocation = this.normalizeFolderPath(this.settings.yearlyNotesPath);
 		const filePath = `${notesLocation === "" ? "" : notesLocation + "/"}${yearString}.md`;

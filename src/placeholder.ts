@@ -28,7 +28,7 @@ export default class PersianPlaceholders {
 		this.plugin = plugin;
 	}
 
-	public async insertPersianDate(file: TFile): Promise<void> {
+	public async insertPersianDate(file: TFile) {
 		const fileContent = await this.plugin.app.vault.read(file);
 		const updatedContent = await this.processPlaceholders(file, fileContent);
 

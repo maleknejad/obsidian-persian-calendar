@@ -1,10 +1,10 @@
 README.md
 LICENSE
+node_modules
+.eslintrc
 
 *.min.js
 *.min.css
-
-node_modules
 
 *.png
 *.jpg
