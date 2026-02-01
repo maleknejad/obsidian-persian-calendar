@@ -86,7 +86,6 @@ export default class PersianCalendarView extends View {
 				today.jd !== this.lastCheckedDate.jd
 			) {
 				this.lastCheckedDate = today;
-				this.calendarState.setJState(today.jy, today.jm);
 				void this.render();
 			}
 		}, 60 * 1000);
