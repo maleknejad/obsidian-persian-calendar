@@ -207,7 +207,7 @@
 .persian-calendar-day.today {
 	background: var(--interactive-accent);
 	font-weight: bold;
-	color: var(--interactive-normal) !important;
+	color: var(--interactive-normal);
 }
 
 .persian-calendar-day.has-note::before {
@@ -221,7 +221,7 @@
 }
 
 .holiday {
-	color: var(--text-error) !important;
+	color: var(--text-error);
 }
 
 .persian-calendar-week-header {

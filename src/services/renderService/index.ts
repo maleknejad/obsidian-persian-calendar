@@ -113,8 +113,16 @@ export default class RenderService {
 
 		weekNumbersEl = contentEl.createEl("div", { cls: "persian-calendar-week-numbers" });
 
-		const weekHeader = weekNumbersEl.createEl("div", { cls: "persian-calendar-week-header" });
+		const weekHeader = weekNumbersEl.createEl("div", {
+			cls: "persian-calendar-week-header",
+		});
 		setIcon(weekHeader, "refresh-ccw");
+		const iconEl = weekHeader.querySelector("svg");
+		iconEl?.addEventListener("click", async (e) => {
+			e.stopPropagation();
+			await this.render();
+			RTLNotice("نمایش تقویم بروزرسانی شد.");
+		});
 
 		const weekNumbers = this.calendarState.getWeekNumbersForMonth(jalaliDate.jy, jalaliDate.jm);
 		const weeksWithNotes = await this.notesService.getWeeksWithNotes(jalaliDate.jy);
@@ -132,12 +140,6 @@ export default class RenderService {
 				this.notesService.openOrCreateWeeklyNote(weekNumber, jalaliDate.jy);
 			});
 		}
-
-		weekHeader.addEventListener("click", async (e) => {
-			e.stopPropagation();
-			await this.render();
-			RTLNotice("نمایش تقویم بروزرسانی شد.");
-		});
 	}
 
 	private async renderDaysGrid(

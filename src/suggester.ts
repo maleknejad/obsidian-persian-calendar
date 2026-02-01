@@ -16,7 +16,6 @@ import {
 } from "src/utils/dateUtils";
 import { WEEKDAYS_NAME } from "./constants";
 import type { TLocal } from "./types";
-import { RTLNotice } from "./utils/RTLNotice";
 
 export default class DateSuggester extends EditorSuggest<string> {
 	plugin: PersianCalendarPlugin;
