@@ -1,14 +1,14 @@
 import type { TEventObjectWithoutDate } from "src/types";
 
 export default class TooltipService {
-	private tooltipSelector = ".calendar-tooltip";
+	private tooltipSelector = ".persian-calendar-tooltip";
 
 	private getOrCreateTooltip(): HTMLElement {
 		let tooltip = document.querySelector(this.tooltipSelector) as HTMLElement | null;
 
 		if (!tooltip) {
 			tooltip = document.createElement("div");
-			tooltip.className = "calendar-tooltip";
+			tooltip.className = "persian-calendar-tooltip";
 			document.body.appendChild(tooltip);
 		}
 
