@@ -1,5 +1,5 @@
 // gridService.ts
-import type { TPluginSetting, TNumberOfMonths, MonthGridCell } from "src/types";
+import type { TSetting, TNumberOfMonths, MonthGridCell } from "src/types";
 import {
 	jalaliMonthLength,
 	jalaliToDate,
@@ -12,7 +12,7 @@ import { CalendarState } from "..";
 export default class GridService {
 	constructor(
 		private readonly calendarState: CalendarState,
-		private readonly settings: TPluginSetting,
+		private readonly settings: TSetting,
 	) {}
 
 	private isWeekend(dayOfWeek: number): boolean {
@@ -111,7 +111,7 @@ export default class GridService {
 				const dayOfWeek = (firstDayOfWeekIndex + dayIndex) % 7;
 				isWeekendFlag = this.isWeekend(dayOfWeek);
 
-				if (showHolidays && checkHoliday(date, this.settings)) {
+				if (showHolidays && checkHoliday(date)) {
 					isHoliday = true;
 				}
 			}

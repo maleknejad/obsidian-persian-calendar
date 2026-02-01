@@ -69,7 +69,15 @@ export function dateToEvents(date: Date, option: TShowEvents = {}): TEventObject
 	return events.map(({ month, day, ...rest }: TEventObject) => rest);
 }
 
-export function checkHoliday(date: Date, option: TShowEvents = {}): boolean {
+export function checkHoliday(date: Date): boolean {
+	// برای چک کردن تعطیلی، لازمه همه‌اشون بررسی بشه
+	const option = {
+		showIRGovernmentEvents: true,
+		showIRAncientEvents: true,
+		showIRIslamEvents: true,
+		showGlobalEvents: true,
+	};
+
 	const events = dateToEvents(date, option);
 	return events.some((event) => event.holiday === true);
 }

@@ -1,5 +1,5 @@
 import { SEASONS_NAME, WEEKDAYS_NAME } from "src/constants";
-import type { TPluginSetting, TNumberOfMonths, TLocal, TNumberOfSeasons } from "src/types";
+import type { TSetting, TNumberOfMonths, TLocal, TNumberOfSeasons } from "src/types";
 import {
 	dateToJalali,
 	getJalaliMonthName,
@@ -19,7 +19,7 @@ export default class RenderService {
 		private readonly containerEl: HTMLElement,
 		private readonly calendarState: CalendarState,
 		private readonly notesService: NoteService,
-		private readonly settings: TPluginSetting,
+		private readonly settings: TSetting,
 	) {
 		this.tooltipService = new TooltipService();
 		this.gridService = new GridService(calendarState, settings);

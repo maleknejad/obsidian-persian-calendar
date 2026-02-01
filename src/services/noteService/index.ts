@@ -1,12 +1,12 @@
 import { App, TFile, MarkdownView } from "obsidian";
-import type { TPluginSetting } from "src/types";
+import type { TSetting } from "src/types";
 import { jalaliToGregorian, jalaliMonthLength } from "src/utils/dateUtils";
 import { RTLNotice } from "src/utils/RTLNotice";
 
 export default class NoteService {
 	constructor(
 		private readonly app: App,
-		private readonly settings: TPluginSetting,
+		private readonly settings: TSetting,
 	) {}
 
 	private normalizeFolderPath(path: string): string {

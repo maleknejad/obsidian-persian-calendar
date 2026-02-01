@@ -54,13 +54,26 @@ export type TShowEvents = {
 	showGlobalEvents?: boolean;
 };
 
-export type TPluginSetting = {
-	dateFormat: TDateFormat;
+export type TBoolSettingKeys = Extract<
+	keyof TSetting,
+	| "showSeasonalNotes"
+	| "showGeorgianDates"
+	| "showHijriDates"
+	| "showHolidays"
+	| "showIRGovernmentEvents"
+	| "showIRAncientEvents"
+	| "showIRIslamEvents"
+	| "showGlobalEvents"
+>;
+
+export type TSetting = {
 	version: string;
-	showSeasonalNotes: boolean;
 	announceUpdates: boolean;
-	weekendDays: string;
+	dateFormat: TDateFormat;
+	showSeasonalNotes: boolean;
+	// show holidays
 	showHolidays: boolean;
+	weekendDays: string;
 	// show dates
 	showGeorgianDates: boolean;
 	showHijriDates: boolean;

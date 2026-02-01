@@ -1,25 +1,20 @@
 import { WorkspaceLeaf, App, View } from "obsidian";
 import { dateToJalali } from "src/utils/dateUtils";
 import PersianCalendarPlugin from "src/main";
-import type { TPluginSetting, TJalali } from "src/types";
+import type { TSetting, TJalali } from "src/types";
 import { RenderService, CalendarState, NoteService } from "src/services";
 
 export default class PersianCalendarView extends View {
 	dailyCheckInterval: number | undefined;
 	lastCheckedDate: TJalali = dateToJalali(new Date());
 	plugin: PersianCalendarPlugin;
-	settings: TPluginSetting;
+	settings: TSetting;
 
 	private calendarState: CalendarState;
 	private notesService: NoteService;
 	private renderService: RenderService;
 
-	constructor(
-		leaf: WorkspaceLeaf,
-		app: App,
-		settings: TPluginSetting,
-		plugin: PersianCalendarPlugin,
-	) {
+	constructor(leaf: WorkspaceLeaf, app: App, settings: TSetting, plugin: PersianCalendarPlugin) {
 		super(leaf);
 
 		this.app = app;

@@ -1,12 +1,13 @@
-import type { TPluginSetting } from "src/types";
+import type { TSetting } from "src/types";
 
-export const DEFAULT_SETTING: TPluginSetting = {
-	showSeasonalNotes: true,
-	dateFormat: "jalali",
+export const DEFAULT_SETTING: TSetting = {
 	version: `4.0.0`,
 	announceUpdates: true,
-	weekendDays: "friday",
+	dateFormat: "gregorian",
+	showSeasonalNotes: true,
+	// show holidays
 	showHolidays: true,
+	weekendDays: "friday",
 	// show dates
 	showGeorgianDates: true,
 	showHijriDates: true,

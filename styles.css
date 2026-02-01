@@ -294,3 +294,30 @@
 	text-align: right;
 	unicode-bidi: plaintext;
 }
+
+.pc-settings-header {
+	text-align: center;
+	margin-bottom: 1.5rem;
+	padding: 0.75rem 0;
+	border: 2px dashed var(--interactive-accent);
+}
+
+.pc-settings-links a {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2rem;
+	height: 2rem;
+	border-radius: 999px;
+	opacity: 0.8;
+	transition:
+		transform 0.15s ease,
+		opacity 0.15s ease,
+		box-shadow 0.15s ease;
+}
+
+.pc-settings-links a:hover {
+	opacity: 1;
+	transform: translateY(-1px);
+	box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+}

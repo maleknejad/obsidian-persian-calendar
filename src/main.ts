@@ -16,21 +16,21 @@ import {
 	jalaliDashToGregorianDash,
 	jalaliToSeason,
 } from "src/utils/dateUtils";
-import type { TPluginSetting } from "src/types";
+import type { TSetting } from "src/types";
 import { DEFAULT_SETTING } from "src/constants";
 import DateSuggester from "src/suggester";
 import PersianPlaceholders from "src/placeholder";
 import UpdateModal from "./updatemodal";
-import PersianCalendarSettingTab from "src/settingstab";
+import PersianCalendarSetting from "src/setting";
 import { NoteService } from "src/services";
 import PersianCalendarView from "src/view";
 import { RTLNotice } from "./utils/RTLNotice";
 
 export default class PersianCalendarPlugin extends Plugin {
-	settings: TPluginSetting = DEFAULT_SETTING;
+	settings: TSetting = DEFAULT_SETTING;
 	dateSuggester: DateSuggester | undefined;
 	placeholder: PersianPlaceholders;
-	pluginsettingstab: PersianCalendarSettingTab | undefined;
+	pluginsettingstab: PersianCalendarSetting | undefined;
 	plugin: PersianCalendarPlugin = this;
 	view: PersianCalendarView | undefined;
 	private noteService: NoteService;
@@ -60,7 +60,7 @@ export default class PersianCalendarPlugin extends Plugin {
 
 		this.dateSuggester = new DateSuggester(this);
 
-		this.pluginsettingstab = new PersianCalendarSettingTab(this.app, this);
+		this.pluginsettingstab = new PersianCalendarSetting(this.app, this);
 
 		this.announceUpdate();
 
@@ -102,7 +102,7 @@ export default class PersianCalendarPlugin extends Plugin {
 			}),
 		);
 
-		this.addSettingTab(new PersianCalendarSettingTab(this.app, this));
+		this.addSettingTab(new PersianCalendarSetting(this.app, this));
 
 		this.addCommand({
 			id: "replace-persian-placeholders",
