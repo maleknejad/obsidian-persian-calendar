@@ -2,7 +2,6 @@ import {
 	EditorSuggest,
 	Editor,
 	MarkdownView,
-	Notice,
 	type EditorPosition,
 	type EditorSuggestTriggerInfo,
 	type EditorSuggestContext,
@@ -17,6 +16,7 @@ import {
 } from "src/utils/dateUtils";
 import { WEEKDAYS_NAME } from "./constants";
 import type { TLocal } from "./types";
+import { RTLNotice } from "./utils/RTLNotice";
 
 export default class DateSuggester extends EditorSuggest<string> {
 	plugin: PersianCalendarPlugin;
@@ -214,23 +214,5 @@ export default class DateSuggester extends EditorSuggest<string> {
 			}
 		}
 		this.close();
-	}
-	convertTextToDate(editor: Editor) {
-		const selectedText = editor.getSelection();
-
-		if (!selectedText) {
-			new Notice("متنی انتخاب نشده است.");
-			return;
-		}
-
-		let linkText = "";
-
-		try {
-			linkText = this.getFormattedDateLink(selectedText, new Date());
-
-			editor.replaceSelection(linkText); // Replace the selected text with the formatted date link
-		} catch (error) {
-			new Notice("Failed to convert text to date.");
-		}
 	}
 }

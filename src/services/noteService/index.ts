@@ -1,6 +1,7 @@
-import { App, Notice, TFile, MarkdownView } from "obsidian";
+import { App, TFile, MarkdownView } from "obsidian";
 import type { TPluginSetting } from "src/types";
 import { jalaliToGregorian, jalaliMonthLength } from "src/utils/dateUtils";
+import { RTLNotice } from "src/utils/RTLNotice";
 
 export default class NoteService {
 	constructor(
@@ -116,7 +117,7 @@ export default class NoteService {
 				await this.openNoteInWorkspace(dailyNoteFile);
 			}
 		} catch (error) {
-			new Notice("Error creating/opening daily note");
+			RTLNotice("خطا در بازکردن یادداشت روزنوشت.");
 		}
 	}
 
@@ -138,7 +139,7 @@ export default class NoteService {
 				await this.openNoteInWorkspace(weeklyNoteFile);
 			}
 		} catch (error) {
-			new Notice("Error creating/opening weekly note");
+			RTLNotice("خطا در بازکردن یادداشت هفته‌نوشت.");
 		}
 	}
 
@@ -160,7 +161,7 @@ export default class NoteService {
 				await this.openNoteInWorkspace(monthlyNoteFile);
 			}
 		} catch (error) {
-			new Notice("Error creating/opening monthly note");
+			RTLNotice("خطا در بازکردن یادداشت ماه‌نوشت.");
 		}
 	}
 
@@ -182,7 +183,7 @@ export default class NoteService {
 				await this.openNoteInWorkspace(seasonalNoteFile);
 			}
 		} catch (error) {
-			new Notice("Error creating/opening seasonal note");
+			RTLNotice("خطا در بازکردن یادداشت فصل‌نوشت.");
 		}
 	}
 
@@ -204,7 +205,7 @@ export default class NoteService {
 				await this.openNoteInWorkspace(yearlyNoteFile);
 			}
 		} catch (error) {
-			new Notice("Error creating/opening yearly note");
+			RTLNotice("خطا در بازکردن یادداشت سال‌نوشت.");
 		}
 	}
 }

@@ -5,7 +5,7 @@
 	padding: 20px;
 }
 
-.calendar-header {
+.persian-calendar-header {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
@@ -14,19 +14,19 @@
 	width: 100%;
 }
 
-.calendar-navigation {
+.persian-calendar-navigation {
 	display: flex;
 	align-items: center;
 }
 
-.calendar-today-button {
+.persian-calendar-today-button {
 	cursor: pointer;
 	color: var(--interactive-accent);
 	font-weight: bold;
 	margin: 0 7px;
 }
 
-.calendar-change-month-arrow {
+.persian-calendar-change-month-arrow {
 	cursor: pointer;
 	font-size: 0.8rem;
 	display: flex;
@@ -34,11 +34,11 @@
 	font-weight: bold;
 }
 
-.calendar-change-month-arrow:hover {
+.persian-calendar-change-month-arrow:hover {
 	opacity: 0.6;
 }
 
-.calendar-month-year {
+.persian-calendar-month-year {
 	display: flex;
 	flex-direction: row-reverse;
 	padding-right: 10px;
@@ -47,25 +47,25 @@
 	justify-content: flex-start;
 }
 
-.calendar-month-year-top {
+.persian-calendar-month-year-top {
 	display: flex;
 	align-items: center;
 }
 
-.calendar-month {
+.persian-calendar-month {
 	color: var(--interactive-accent);
 	padding-left: 5px;
 	font-weight: bold;
 	font-size: large;
 }
 
-.calendar-year {
+.persian-calendar-year {
 	font-size: large;
 	font-weight: bold;
 }
 
-.calendar-gregorian-month-year,
-.calendar-hijri-month-year {
+.persian-calendar-gregorian-month-year,
+.persian-calendar-hijri-month-year {
 	font-size: small;
 	color: gray;
 	display: flex;
@@ -73,7 +73,7 @@
 	flex-direction: row-reverse;
 }
 
-.calendar-content {
+.persian-calendar-content {
 	display: grid;
 	grid-template-rows: auto repeat(6, auto);
 	/* 1 row for header, 6 for the weeks */
@@ -82,7 +82,7 @@
 	padding: 0 12px;
 }
 
-.calendar-weekdays-header {
+.persian-calendar-weekdays-header {
 	grid-column: 2 / span 7;
 	/* Weekday headers start at the second column and span 7 columns */
 	display: grid;
@@ -93,8 +93,8 @@
 	padding: 5px;
 }
 
-.calendar-weekday,
-.calendar-weekday-header {
+.persian-calendar-weekday,
+.persian-calendar-weekday-header {
 	padding: 5px;
 	text-align: center;
 	height: 2rem;
@@ -103,7 +103,7 @@
 	display: flex;
 }
 
-.calendar-week-numbers {
+.persian-calendar-week-numbers {
 	display: grid;
 	grid-template-rows: repeat(6, auto);
 	/* 6 weeks */
@@ -115,14 +115,14 @@
 	border-left: 1px solid var(--background-modifier-border);
 }
 
-.calendar-days-grid {
+.persian-calendar-days-grid {
 	display: grid;
 	align-items: start;
 	grid-row: 2 / span 6;
 	/* Align with the rows of days */
 }
 
-.calendar-week-number {
+.persian-calendar-week-number {
 	padding: 5px;
 	background-color: var(--background-secondary);
 	color: var(--text-normal);
@@ -139,7 +139,7 @@
 	position: relative;
 }
 
-.calendar-day {
+.persian-calendar-day {
 	padding: 0.3rem;
 	background-color: var(--color-background-day);
 	color: var(--text-normal);
@@ -196,21 +196,21 @@
 	margin-right: 3px;
 }
 
-.calendar-day.dim {
+.persian-calendar-day.dim {
 	opacity: 0.2;
 }
 
-.calendar-day:hover {
+.persian-calendar-day:hover {
 	background-color: var(--background-secondary-alt);
 }
 
-.calendar-day.today {
+.persian-calendar-day.today {
 	background: var(--interactive-accent);
 	font-weight: bold;
 	color: var(--interactive-normal) !important;
 }
 
-.calendar-day.has-note::before {
+.persian-calendar-day.has-note::before {
 	content: "\2022";
 	color: var(--interactive-accent);
 	font-size: 18px;
@@ -224,14 +224,14 @@
 	color: var(--text-error) !important;
 }
 
-.calendar-week-header {
+.persian-calendar-week-header {
 	height: 2.4rem;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 }
 
-.calendar-week-header svg:hover {
+.persian-calendar-week-header svg:hover {
 	opacity: 0.6;
 	cursor: pointer;
 }
@@ -240,7 +240,7 @@
 	opacity: 0.4;
 }
 
-.calendar-week-number .has-note {
+.persian-calendar-week-number .has-note {
 	content: "\2022";
 	color: var(--interactive-accent);
 	font-size: 18px;
@@ -257,7 +257,7 @@
 	grid-column-start: var(--day-grid-start);
 }
 
-.calendar-seasons-row {
+.persian-calendar-seasons-row {
 	display: grid;
 	grid-template-columns: repeat(4, 1fr);
 	align-items: center;
@@ -266,17 +266,17 @@
 	grid-row: auto;
 }
 
-.calendar-season {
+.persian-calendar-season {
 	cursor: pointer;
 	padding: 5px 10px;
 	font-size: 0.9rem;
 }
 
-.calendar-season.current-season {
+.persian-calendar-season.current-season {
 	color: var(--interactive-accent);
 }
 
-.calendar-tooltip {
+.persian-calendar-tooltip {
 	position: absolute;
 	background-color: var(--background-secondary);
 	color: var(--text-normal);
@@ -287,4 +287,10 @@
 	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 	display: none;
 	direction: rtl;
+}
+
+.persian-calendar-rtl-notice {
+	direction: rtl;
+	text-align: right;
+	unicode-bidi: plaintext;
 }

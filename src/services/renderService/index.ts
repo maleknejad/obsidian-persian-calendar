@@ -9,6 +9,7 @@ import {
 import { toArNumber, toFaNumber } from "src/utils/numberConverter";
 import { NoteService, CalendarState, TooltipService, GridService } from "..";
 import { setIcon } from "obsidian";
+import { RTLNotice } from "src/utils/RTLNotice";
 
 export default class RenderService {
 	private readonly tooltipService: TooltipService;
@@ -30,7 +31,7 @@ export default class RenderService {
 
 		await this.renderHeader(containerEl);
 
-		const contentEl = containerEl.createEl("div", { cls: "calendar-content" });
+		const contentEl = containerEl.createEl("div", { cls: "persian-calendar-content" });
 
 		const { jYearState, jMonthState } = this.calendarState.getJState();
 		await this.renderWeekNumbers(contentEl, { jy: jYearState, jm: jMonthState });
@@ -42,35 +43,39 @@ export default class RenderService {
 	}
 
 	private async renderHeader(containerEl: HTMLElement) {
-		const headerEl = containerEl.createEl("div", { cls: "calendar-header" });
+		const headerEl = containerEl.createEl("div", { cls: "persian-calendar-header" });
 
-		const navContainerEl = headerEl.createEl("div", { cls: "calendar-navigation" });
+		const navContainerEl = headerEl.createEl("div", { cls: "persian-calendar-navigation" });
 
-		const nextMonthArrow = navContainerEl.createEl("span", { cls: "calendar-change-month-arrow" });
+		const nextMonthArrow = navContainerEl.createEl("span", {
+			cls: "persian-calendar-change-month-arrow",
+		});
 		setIcon(nextMonthArrow, "square-chevron-left");
 
 		nextMonthArrow.addEventListener("click", () => this.changeMonth("next"));
 
-		const todayButton = navContainerEl.createEl("span", { cls: "calendar-today-button" });
+		const todayButton = navContainerEl.createEl("span", { cls: "persian-calendar-today-button" });
 		todayButton.textContent = "امروز";
 		todayButton.addEventListener("click", () => {
 			this.goToToday();
 		});
 
-		const prevMonthArrow = navContainerEl.createEl("span", { cls: "calendar-change-month-arrow" });
+		const prevMonthArrow = navContainerEl.createEl("span", {
+			cls: "persian-calendar-change-month-arrow",
+		});
 		setIcon(prevMonthArrow, "square-chevron-right");
 
 		prevMonthArrow.addEventListener("click", () => this.changeMonth("prev"));
 
-		const monthYearEl = headerEl.createEl("div", { cls: "calendar-month-year" });
-		const monthEl = monthYearEl.createEl("span", { cls: "calendar-month" });
-		const yearEl = monthYearEl.createEl("span", { cls: "calendar-year" });
+		const monthYearEl = headerEl.createEl("div", { cls: "persian-calendar-month-year" });
+		const monthEl = monthYearEl.createEl("span", { cls: "persian-calendar-month" });
+		const yearEl = monthYearEl.createEl("span", { cls: "persian-calendar-year" });
 
 		const georgianMonthYearEl = monthYearEl.createEl("div", {
-			cls: "calendar-gregorian-month-year",
+			cls: "persian-calendar-gregorian-month-year",
 		});
 		const hijriMonthYearEl = monthYearEl.createEl("div", {
-			cls: "calendar-hijri-month-year",
+			cls: "persian-calendar-hijri-month-year",
 		});
 
 		const { jYearState, jMonthState } = this.calendarState.getJState();
@@ -101,14 +106,14 @@ export default class RenderService {
 	}
 
 	private async renderWeekNumbers(contentEl: HTMLElement, jalaliDate: { jy: number; jm: number }) {
-		let weekNumbersEl = contentEl.querySelector(".calendar-week-numbers");
+		let weekNumbersEl = contentEl.querySelector(".persian-calendar-week-numbers");
 		if (weekNumbersEl) {
 			weekNumbersEl.remove();
 		}
 
-		weekNumbersEl = contentEl.createEl("div", { cls: "calendar-week-numbers" });
+		weekNumbersEl = contentEl.createEl("div", { cls: "persian-calendar-week-numbers" });
 
-		const weekHeader = weekNumbersEl.createEl("div", { cls: "calendar-week-header" });
+		const weekHeader = weekNumbersEl.createEl("div", { cls: "persian-calendar-week-header" });
 		setIcon(weekHeader, "refresh-ccw");
 
 		const weekNumbers = this.calendarState.getWeekNumbersForMonth(jalaliDate.jy, jalaliDate.jm);
@@ -116,22 +121,23 @@ export default class RenderService {
 
 		for (let i = 0; i < 6; i++) {
 			const weekNumber = weekNumbers[i];
-			const weekEl = weekNumbersEl.createEl("div", { cls: "calendar-week-number" });
+			const weekEl = weekNumbersEl.createEl("div", { cls: "persian-calendar-week-number" });
 			weekEl.textContent = toFaNumber(weekNumber);
 
 			if (!weeksWithNotes.includes(weekNumber)) {
 				weekEl.addClass("no-notes");
 			}
 
-			weekHeader.addEventListener("click", async (e) => {
-				e.stopPropagation();
-				await this.render();
-			});
-
 			weekEl.addEventListener("click", () => {
 				this.notesService.openOrCreateWeeklyNote(weekNumber, jalaliDate.jy);
 			});
 		}
+
+		weekHeader.addEventListener("click", async (e) => {
+			e.stopPropagation();
+			await this.render();
+			RTLNotice("نمایش تقویم بروزرسانی شد.");
+		});
 	}
 
 	private async renderDaysGrid(
@@ -139,9 +145,9 @@ export default class RenderService {
 		jalaliDate: { jy: number; jm: number },
 		local: TLocal = "fa",
 	) {
-		let gridEl = contentEl.querySelector(".calendar-days-grid") as HTMLElement | null;
+		let gridEl = contentEl.querySelector(".persian-calendar-days-grid") as HTMLElement | null;
 		gridEl?.remove();
-		gridEl = contentEl.createEl("div", { cls: "calendar-days-grid" });
+		gridEl = contentEl.createEl("div", { cls: "persian-calendar-days-grid" });
 
 		const { jy, jm } = jalaliDate;
 
@@ -150,7 +156,7 @@ export default class RenderService {
 			const fullName = weekdays_name[i];
 			const shortName = fullName.charAt(0);
 
-			const headerCell = gridEl!.createEl("div", { cls: "calendar-weekday-header" });
+			const headerCell = gridEl!.createEl("div", { cls: "persian-calendar-weekday-header" });
 			headerCell.textContent = shortName;
 			headerCell.classList.add("dynamic-grid-placement");
 			headerCell.style.setProperty("--dynamic-grid-start", (i + 1).toString());
@@ -184,7 +190,7 @@ export default class RenderService {
 		};
 
 		for (const cell of cells) {
-			const dayEl = gridEl.createEl("div", { cls: "calendar-day" });
+			const dayEl = gridEl.createEl("div", { cls: "persian-calendar-day" });
 
 			const persianDateEl = dayEl.createEl("div", { cls: "persian-date" });
 			persianDateEl.textContent = toFaNumber(cell.jd);
@@ -225,7 +231,7 @@ export default class RenderService {
 				});
 			}
 
-			dayEl.classList.add("dynamic-day-grid-placement", "dynamic-day-grid-placement");
+			dayEl.classList.add("dynamic-day-grid-placement");
 			dayEl.style.setProperty("--day-grid-start", (cell.column + 2).toString());
 
 			(dayEl as any).setAttr?.("data-day", cell.jd.toString());
@@ -241,7 +247,7 @@ export default class RenderService {
 	}
 
 	private async renderSeasonalNotesRow(containerEl: HTMLElement, local: TLocal = "fa") {
-		const seasonsRow = containerEl.createDiv({ cls: "calendar-seasons-row" });
+		const seasonsRow = containerEl.createDiv({ cls: "persian-calendar-seasons-row" });
 		const { jYearState, jMonthState } = this.calendarState.getJState();
 
 		const seasonState = jalaliToSeason(jMonthState);
@@ -251,7 +257,7 @@ export default class RenderService {
 
 		for (let seasonNumber = 1; seasonNumber <= 4; seasonNumber++) {
 			const seasonEl = seasonsRow.createDiv({
-				cls: `calendar-season${seasonNumber === seasonState ? " current-season" : ""}`,
+				cls: `persian-calendar-season${seasonNumber === seasonState ? " current-season" : ""}`,
 			});
 
 			seasonEl.textContent = seasons[seasonNumber as TNumberOfSeasons];

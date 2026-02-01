@@ -1,5 +1,4 @@
 import {
-	Notice,
 	Plugin,
 	MarkdownView,
 	Editor,
@@ -25,6 +24,7 @@ import UpdateModal from "./updatemodal";
 import PersianCalendarSettingTab from "src/settingstab";
 import { NoteService } from "src/services";
 import PersianCalendarView from "src/view";
+import { RTLNotice } from "./utils/RTLNotice";
 
 export default class PersianCalendarPlugin extends Plugin {
 	settings: TPluginSetting = DEFAULT_SETTING;
@@ -110,7 +110,7 @@ export default class PersianCalendarPlugin extends Plugin {
 			editorCallback: async (editor, view) => {
 				if (view.file) {
 					await this.placeholder?.insertPersianDate(view.file);
-					new Notice("جایگزینی با موفقیت انجام شد");
+					RTLNotice("جایگزینی با موفقیت انجام شد.");
 				}
 			},
 		});
@@ -186,14 +186,6 @@ export default class PersianCalendarPlugin extends Plugin {
 			callback: async () => {
 				const { jy } = dateToJalali(new Date());
 				await this.noteService.openOrCreateYearlyNote(jy);
-			},
-		});
-
-		this.addCommand({
-			id: "convert-to-date",
-			name: "Link Text to Periodic Note - ارجاع متن به یادداشت‌های دوره‌ای",
-			editorCallback: (editor) => {
-				this.dateSuggester?.convertTextToDate(editor);
 			},
 		});
 
