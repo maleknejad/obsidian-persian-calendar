@@ -1,4 +1,3 @@
-// gridService.ts
 import type { TSetting, TNumberOfMonths, MonthGridCell } from "src/types";
 import {
 	jalaliMonthLength,

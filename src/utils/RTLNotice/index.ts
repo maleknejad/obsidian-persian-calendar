@@ -6,7 +6,7 @@ export function RTLNotice(message: string, timeout?: number): Notice {
 	const noticeEl = (notice as any).noticeEl as HTMLElement | undefined;
 
 	if (noticeEl) {
-		noticeEl.classList.add("persian-calendar-rtl-notice");
+		noticeEl.setAttribute("dir", "rtl");
 	}
 
 	return notice;

@@ -5,7 +5,7 @@ import type { TDateFormat, TSetting, TBoolSettingKeys } from "src/types";
 
 type DropdownKeys = Extract<keyof TSetting, "dateFormat" | "weekendDays">;
 
-export default class PersianCalendarSettingTab extends PluginSettingTab {
+export default class PersianCalendarSetting extends PluginSettingTab {
 	plugin: PersianCalendarPlugin;
 
 	constructor(app: App, plugin: PersianCalendarPlugin) {
@@ -80,15 +80,17 @@ export default class PersianCalendarSettingTab extends PluginSettingTab {
 	display() {
 		const { containerEl } = this;
 		containerEl.empty();
+
 		containerEl.setAttribute("dir", "rtl");
+		containerEl.addClass("persian-calendar");
 
 		const intro = containerEl.createDiv({
-			cls: "pc-settings-header",
+			cls: "persian-calendar__settings-header",
 		});
 		intro.createEl("h2", {
 			text: "برای مطالعه‌ی راهنما، گزارش باگ یا ارائه‌ی بازخورد، از لینک‌های زیر استفاده کنید",
 		});
-		const links = intro.createDiv({ cls: "pc-settings-links" });
+		const links = intro.createDiv({ cls: "persian-calendar__settings-links" });
 		const github = links.createEl("a", {
 			href: "https://github.com/maleknejad/obsidian-persian-calendar",
 			title: "مستندات پلاگین در Github",
