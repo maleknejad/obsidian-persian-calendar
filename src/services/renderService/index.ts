@@ -54,10 +54,10 @@ export default class RenderService {
 		});
 
 		const hijriMonthYearEl = additionalCalendarStateEl.createEl("div", {
-			cls: "persian-calendar__hijri-month-year",
+			cls: "persian-calendar__hmonth-hyear",
 		});
 		const georgianMonthYearEl = additionalCalendarStateEl.createEl("div", {
-			cls: "persian-calendar__gregorian-month-year",
+			cls: "persian-calendar__gmonth-gyear",
 		});
 
 		if (this.settings.showGeorgianDates) {
@@ -78,8 +78,8 @@ export default class RenderService {
 			cls: "persian-calendar__jalali-state",
 		});
 
-		const monthEl = jalaliStateEl.createEl("span", { cls: "persian-calendar__jmonth--current" });
-		const yearEl = jalaliStateEl.createEl("span", { cls: "persian-calendar__jyear--current" });
+		const monthEl = jalaliStateEl.createEl("span", { cls: "persian-calendar__jmonth" });
+		const yearEl = jalaliStateEl.createEl("span", { cls: "persian-calendar__jyear" });
 
 		yearEl.textContent = toFaNumber(jYearState);
 		yearEl.addEventListener("click", (e) => {
@@ -284,7 +284,7 @@ export default class RenderService {
 			seasonEl.textContent = seasons[seasonNumber as TNumberOfSeasons];
 
 			if (!seasonsWithNotes.includes(seasonNumber)) {
-				seasonEl.addClass("persian-calendar__no-note");
+				seasonEl.addClass("persian-calendar__season--no-note");
 			}
 
 			seasonEl.addEventListener("click", () => {
