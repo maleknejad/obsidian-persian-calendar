@@ -1,4 +1,4 @@
-import type { TSetting, TNumberOfMonths, MonthGridCell } from "src/types";
+import CalendarState from "src/templates/CalendarView/CalendarState";
 import {
 	jalaliMonthLength,
 	jalaliToDate,
@@ -6,7 +6,7 @@ import {
 	jalaliToHijri,
 	checkHoliday,
 } from "src/utils/dateUtils";
-import { CalendarState } from "..";
+import type { TSetting, TMonthGridCell } from "src/types";
 
 export default class GridService {
 	constructor(
@@ -66,7 +66,8 @@ export default class GridService {
 		return { dayIndex, dayNumber, cellJy, cellJm, isInCurrentMonth };
 	}
 
-	public buildMonthGrid(jy: number, jm: TNumberOfMonths): MonthGridCell[] {
+	//todo: بعضی ماه‌ها پنج هفته‌ای و برخی چهار هفته‌ای هستن. اگه این تشخیصشون بده عالی میشه
+	public buildMonthGrid(jy: number, jm: number): TMonthGridCell[] {
 		const { showHolidays } = this.settings;
 
 		const daysInMonth = jalaliMonthLength(jy, jm);

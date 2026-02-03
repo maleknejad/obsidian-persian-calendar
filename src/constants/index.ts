@@ -10,3 +10,5 @@ export {
 	WEEKDAYS_NAME,
 } from "./dateNames";
 export { DEFAULT_SETTING } from "./setting";
+export { RELEASE_NOTES } from "./releaseNotes";
+export { DEFAULT_SOCIAL_LINKS } from "./socialLinks";

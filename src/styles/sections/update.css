@@ -1,0 +1,16 @@
+.persian-calendar__update-header {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+}
+.persian-calendar__update-header svg {
+	width: 80px;
+	height: 80px;
+}
+
+.persian-calendar__update-version {
+	color: var(--persian-calendar-color-primary);
+	border-top: solid var(--persian-calendar-color-primary);
+	border-bottom: solid var(--persian-calendar-color-primary);
+	text-align: center;
+}

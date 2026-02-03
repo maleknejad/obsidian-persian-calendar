@@ -1,13 +1,18 @@
 /*! ترتیب مهمه */
 
-@import "./sections/variable.css";
+/* base setups */
 @import "./sections/base.css";
+
+/* templates */
 @import "./sections/header.css";
 @import "./sections/calendar.css";
 @import "./sections/day.css";
-
 @import "./sections/tooltip.css";
-
 @import "./sections/setting.css";
+@import "./sections/update.css";
 
+/* components */
+@import "./sections/social-links.css";
+
+/* responsive */
 @import "./sections/responsive.css";

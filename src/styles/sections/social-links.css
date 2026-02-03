@@ -1,0 +1,26 @@
+.persian-calendar__social-links {
+	display: flex;
+	gap: 10px;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+}
+
+.persian-calendar__social-links a {
+	align-items: center;
+	border-radius: 999px;
+	display: inline-flex;
+	height: 30px;
+	justify-content: center;
+	opacity: 0.6;
+	transition:
+		transform var(--persian-calendar-duration) ease,
+		opacity var(--persian-calendar-duration) ease,
+		box-shadow var(--persian-calendar-duration) ease;
+	width: 30px;
+}
+.persian-calendar__social-links a:hover {
+	box-shadow: var(--shadow-l);
+	opacity: 1;
+	transform: translateY(-1px);
+}

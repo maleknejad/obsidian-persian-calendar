@@ -4,8 +4,9 @@
   "description": "This tool lets you see events, add and organize notes from daily to yearly on the Persian calendar, use templates with placeholders, and works with all Obsidian daily plugins.",
   "main": "main.js",
   "scripts": {
-    "dev": "node scripts/build-styles.mjs && node ./esbuild.config.mjs",
-    "build": "node scripts/build-styles.mjs && node ./esbuild.config.mjs production && node scripts/sync-version.mjs && tsc -noEmit -skipLibCheck",
+		"prepare": "node scripts/clean-data.mjs",
+    "dev": "node esbuild.config.mjs && node scripts/build-styles.mjs --watch",
+    "build": "node scripts/build-styles.mjs && node esbuild.config.mjs production && node scripts/sync-version.mjs && tsc -noEmit -skipLibCheck",
     "version": "node scripts/sync-version.mjs"
   },
   "keywords": [],
@@ -31,11 +32,12 @@
     "@typescript-eslint/eslint-plugin": "8.51.0",
     "@typescript-eslint/parser": "8.51.0",
     "builtin-modules": "5.0.0",
+    "chokidar": "^5.0.0",
+    "cssnano": "^7.1.2",
     "esbuild": "0.27.2",
     "obsidian": "latest",
-    "tslib": "2.8.1",
-    "cssnano": "^7.1.2",
     "postcss": "^8.5.6",
+    "tslib": "2.8.1",
     "typescript": "5.9.3"
   },
   "dependencies": {

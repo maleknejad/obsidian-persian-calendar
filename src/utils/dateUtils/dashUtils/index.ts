@@ -11,7 +11,7 @@ import {
 	jalaliToEndDayOfWeek,
 	jalaliToSeason,
 } from "..";
-import { dayFormat, monthFormat, seasonFormat, weekFormat, yearFormat } from "src/utils/format";
+import { dayFormat, monthFormat, seasonFormat, weekFormat } from "src/utils/format";
 import type { TDateFormat, TGregorian, TJalali, TWeekStart } from "src/types";
 
 export function gregorianDashToJalaliDash(
@@ -117,7 +117,7 @@ export function dashToDate(dashDate: string, dateFormat: TDateFormat): Date | nu
 
 export function dateToJYearDash(date: Date) {
 	const { jy } = dateToJalali(date);
-	return yearFormat(jy);
+	return String(jy);
 }
 
 export function dateToSeasonDash(date: Date, option?: { separator?: string }) {

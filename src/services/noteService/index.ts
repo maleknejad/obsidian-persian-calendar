@@ -1,7 +1,7 @@
 import { App, TFile, MarkdownView } from "obsidian";
 import type { TSetting } from "src/types";
 import { jalaliToGregorian, jalaliMonthLength } from "src/utils/dateUtils";
-import { RTLNotice } from "src/utils/RTLNotice";
+import RTLNotice from "src/components/RTLNotice";
 
 export default class NoteService {
 	constructor(
@@ -11,33 +11,6 @@ export default class NoteService {
 
 	private normalizeFolderPath(path: string): string {
 		return path.trim().replace(/^\/*|\/*$/g, "");
-	}
-
-	// todo: change this
-	public async getDaysWithNotes(jy: number, jm: number): Promise<number[]> {
-		const notesLocation = this.normalizeFolderPath(this.settings.dailyNotesPath);
-		const result: number[] = [];
-		const daysInMonth = jalaliMonthLength(jy, jm);
-
-		for (let jd = 1; jd <= daysInMonth; jd++) {
-			let fileName: string;
-
-			if (this.settings.dateFormat === "gregorian") {
-				const { gy, gm, gd } = jalaliToGregorian(jy, jm, jd);
-				fileName = `${gy}-${gm.toString().padStart(2, "0")}-${gd.toString().padStart(2, "0")}.md`;
-			} else {
-				fileName = `${jy}-${jm.toString().padStart(2, "0")}-${jd.toString().padStart(2, "0")}.md`;
-			}
-
-			const filePath = notesLocation ? `${notesLocation}/${fileName}` : fileName;
-			const file = this.app.vault.getAbstractFileByPath(filePath);
-
-			if (file instanceof TFile) {
-				result.push(jd);
-			}
-		}
-
-		return result;
 	}
 
 	public async getWeeksWithNotes(jy: number): Promise<number[]> {
@@ -89,6 +62,33 @@ export default class NoteService {
 		} else {
 			await this.app.workspace.openLinkText(noteFile.path, "", false);
 		}
+	}
+
+	// todo: change this
+	public async getDaysWithNotes(jy: number, jm: number): Promise<number[]> {
+		const notesLocation = this.normalizeFolderPath(this.settings.dailyNotesPath);
+		const result: number[] = [];
+		const daysInMonth = jalaliMonthLength(jy, jm);
+
+		for (let jd = 1; jd <= daysInMonth; jd++) {
+			let fileName: string;
+
+			if (this.settings.dateFormat === "gregorian") {
+				const { gy, gm, gd } = jalaliToGregorian(jy, jm, jd);
+				fileName = `${gy}-${gm.toString().padStart(2, "0")}-${gd.toString().padStart(2, "0")}.md`;
+			} else {
+				fileName = `${jy}-${jm.toString().padStart(2, "0")}-${jd.toString().padStart(2, "0")}.md`;
+			}
+
+			const filePath = notesLocation ? `${notesLocation}/${fileName}` : fileName;
+			const file = this.app.vault.getAbstractFileByPath(filePath);
+
+			if (file instanceof TFile) {
+				result.push(jd);
+			}
+		}
+
+		return result;
 	}
 
 	// todo: change this

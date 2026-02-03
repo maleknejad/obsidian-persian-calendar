@@ -20,7 +20,7 @@ import {
 } from "src/utils/dateUtils";
 import type { TBuildContext } from "src/types";
 
-export default class PersianPlaceholders {
+export default class Placeholder {
 	plugin: PersianCalendarPlugin;
 	private placeholderPatterns: Map<string, RegExp> = new Map();
 

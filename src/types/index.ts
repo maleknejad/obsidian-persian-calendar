@@ -23,14 +23,11 @@ export type THijri = {
 
 export type TWeekStart = "sat" | "sun" | "mon";
 
-export type TNumberOfMonths = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
-export type TNumberOfSeasons = 1 | 2 | 3 | 4;
-
 export type TEventBase = "IR Government" | "IR Islam" | "IR Ancient" | "Global";
 
 export type TEventObject = {
 	holiday: boolean;
-	month: TNumberOfMonths;
+	month: number;
 	day: number;
 	base: TEventBase;
 	title: string;
@@ -39,7 +36,7 @@ export type TEventObject = {
 export type TEventObjectWithoutDate = Omit<TEventObject, "month" | "day">;
 
 export type DayMap = Map<number, TEventObject[]>;
-export type MonthMap = Map<TNumberOfMonths, DayMap>;
+export type MonthMap = Map<number, DayMap>;
 
 export type TGetDayOfWeek = { jYear: number; jWeekNumber: number };
 
@@ -67,8 +64,8 @@ export type TBoolSettingKeys = Extract<
 >;
 
 export type TSetting = {
-	version: string;
-	announceUpdates: boolean;
+	lastSeenVersion?: string;
+	versionUpdate: boolean;
 	dateFormat: TDateFormat;
 	showSeasonalNotes: boolean;
 	// show holidays
@@ -101,7 +98,7 @@ export type TBuildContext = {
 	isMonthly: boolean;
 };
 
-export type MonthGridCell = TJalali & {
+export type TMonthGridCell = TJalali & {
 	date: Date;
 	gregorian: TGregorian;
 	hijri: THijri;
@@ -112,4 +109,15 @@ export type MonthGridCell = TJalali & {
 	isToday: boolean;
 	isWeekend: boolean;
 	isHoliday: boolean;
+};
+
+export type TReleaseNote = {
+	version: string;
+	changes: string[];
+};
+
+export type SocialLink = {
+	href: string;
+	title: string;
+	icon: string;
 };

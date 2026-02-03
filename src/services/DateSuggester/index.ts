@@ -14,8 +14,8 @@ import {
 	dateToJYearDash,
 	dateToJDayDash,
 } from "src/utils/dateUtils";
-import { WEEKDAYS_NAME } from "./constants";
-import type { TLocal } from "./types";
+import { WEEKDAYS_NAME } from "src/constants";
+import type { TLocal } from "src/types";
 
 export default class DateSuggester extends EditorSuggest<string> {
 	plugin: PersianCalendarPlugin;

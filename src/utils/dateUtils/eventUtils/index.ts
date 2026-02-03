@@ -1,6 +1,5 @@
 import { JALALI_EVENTS, HIJRI_EVENTS, GREGORIAN_EVENTS } from "src/constants";
 import type {
-	TNumberOfMonths,
 	MonthMap,
 	TEventObject,
 	TDateFormat,
@@ -45,9 +44,9 @@ export function dateToEvents(date: Date, option: TShowEvents = {}): TEventObject
 	const { gm, gd } = dateToGregorian(date);
 	const { hm, hd } = dateToHijri(date);
 
-	const jalaliEventsRaw = JALALI_EVENT_MAP.get(jm as TNumberOfMonths)?.get(jd) ?? [];
-	const gregorianEventsRaw = GREGORIAN_EVENT_MAP.get(gm as TNumberOfMonths)?.get(gd) ?? [];
-	const hijriEventsRaw = HIJRI_EVENT_MAP.get(hm as TNumberOfMonths)?.get(hd) ?? [];
+	const jalaliEventsRaw = JALALI_EVENT_MAP.get(jm)?.get(jd) ?? [];
+	const gregorianEventsRaw = GREGORIAN_EVENT_MAP.get(gm)?.get(gd) ?? [];
+	const hijriEventsRaw = HIJRI_EVENT_MAP.get(hm)?.get(hd) ?? [];
 
 	const jalaliEvents = jalaliEventsRaw.filter((event) => {
 		if (event.base === "IR Government") return showIRGovernmentEvents;

@@ -1,116 +1,27 @@
-import { App, PluginSettingTab, setIcon, Setting } from "obsidian";
-import PersianCalendarPlugin from "src/main";
-import { FolderSuggest } from "src/services";
-import type { TDateFormat, TSetting, TBoolSettingKeys } from "src/types";
+import type { App } from "obsidian";
+import type PersianCalendarPlugin from "src/main";
+import { SocialLinks } from "src/components/SocialLinks";
+import { SettingBase } from "./SettingBase";
 
-type DropdownKeys = Extract<keyof TSetting, "dateFormat" | "weekendDays">;
-
-export default class PersianCalendarSetting extends PluginSettingTab {
-	plugin: PersianCalendarPlugin;
+export default class CalendarSettings extends SettingBase {
+	icon = "calendar-heart";
 
 	constructor(app: App, plugin: PersianCalendarPlugin) {
 		super(app, plugin);
-		this.plugin = plugin;
-	}
-
-	private addPathSetting(containerEl: HTMLElement, name: string, settingKey: keyof TSetting) {
-		new Setting(containerEl).setName(name).addText((text) => {
-			text
-				.setPlaceholder("")
-				.setValue(this.plugin.settings[settingKey] as string)
-				.onChange(async (value) => {
-					(this.plugin.settings[settingKey] as string) = value;
-					await this.plugin.saveSettings();
-				});
-
-			new FolderSuggest(this.app, text.inputEl);
-		});
-	}
-
-	private addToggleSetting(
-		containerEl: HTMLElement,
-		opts: {
-			name: string;
-			desc?: string;
-			key: TBoolSettingKeys;
-			refresh?: boolean;
-		},
-	) {
-		new Setting(containerEl)
-			.setName(opts.name)
-			.setDesc(opts.desc ?? "")
-			.addToggle((toggle) =>
-				toggle.setValue(this.plugin.settings[opts.key]).onChange(async (value) => {
-					this.plugin.settings[opts.key] = value;
-					await this.plugin.saveSettings();
-					if (opts.refresh) this.plugin.refreshViews();
-				}),
-			);
-	}
-
-	private addDropdownSetting<T extends string = string>(
-		containerEl: HTMLElement,
-		opts: {
-			name: string;
-			desc?: string;
-			key: DropdownKeys;
-			options: Record<string, string>;
-			defaultValue: Omit<TDateFormat, "hijri">;
-			refresh?: boolean;
-		},
-	): void {
-		new Setting(containerEl)
-			.setName(opts.name)
-			.setDesc(opts.desc ?? "")
-			.addDropdown((dropdown) => {
-				Object.entries(opts.options).forEach(([value, label]) =>
-					dropdown.addOption(value as string, label as string),
-				);
-
-				dropdown
-					.setValue(this.plugin.settings[opts.key] ?? opts.defaultValue)
-					.onChange(async (value) => {
-						(this.plugin.settings[opts.key] as any) = value as T;
-						await this.plugin.saveSettings();
-						if (opts.refresh) this.plugin.refreshViews();
-					});
-			});
 	}
 
 	display() {
 		const { containerEl } = this;
 		containerEl.empty();
-
-		containerEl.setAttribute("dir", "rtl");
 		containerEl.addClass("persian-calendar");
 
-		const intro = containerEl.createDiv({
-			cls: "persian-calendar__settings-header",
+		const contactUs = containerEl.createDiv({
+			cls: "persian-calendar__setting-banner",
 		});
-		intro.createEl("h2", {
+		contactUs.createEl("h2", {
 			text: "برای مطالعه‌ی راهنما، گزارش باگ یا ارائه‌ی بازخورد، از لینک‌های زیر استفاده کنید",
 		});
-		const links = intro.createDiv({ cls: "persian-calendar__settings-links" });
-		const github = links.createEl("a", {
-			href: "https://github.com/maleknejad/obsidian-persian-calendar",
-			title: "مستندات پلاگین در Github",
-		});
-		setIcon(github, "github");
-		const website = links.createEl("a", {
-			href: "https://karfekr.ir",
-			title: "وبسایت کارفکر",
-		});
-		setIcon(website, "brain");
-		const telegramChannel = links.createEl("a", {
-			href: "https://t.me/karfekr",
-			title: "کانال تلگرام کارفکر",
-		});
-		setIcon(telegramChannel, "send");
-		const telegramGroup = links.createEl("a", {
-			href: "https://t.me/ObsidianFarsi",
-			title: "جامعه‌ی فارسی ابسیدین",
-		});
-		setIcon(telegramGroup, "message-circle");
+		SocialLinks(contactUs);
 
 		containerEl.createEl("h2", { text: "تنظیمات عمومی" });
 		this.addDropdownSetting(containerEl, {

@@ -8,6 +8,11 @@ import {
 	App,
 	type PluginManifest,
 } from "obsidian";
+import { DateSuggester, Placeholder, NoteService } from "./services";
+import CalendarView from "./templates/CalendarView";
+import Setting from "./templates/Settings";
+import RTLNotice from "./components/RTLNotice";
+import { DEFAULT_SETTING } from "./constants";
 import {
 	dateToJWeekNumber,
 	addDayDate,
@@ -15,29 +20,21 @@ import {
 	gregorianDashToJalaliDash,
 	jalaliDashToGregorianDash,
 	jalaliToSeason,
-} from "src/utils/dateUtils";
-import type { TSetting } from "src/types";
-import { DEFAULT_SETTING } from "src/constants";
-import DateSuggester from "src/suggester";
-import PersianPlaceholders from "src/placeholder";
-import UpdateModal from "./updatemodal";
-import PersianCalendarSetting from "src/setting";
-import { NoteService } from "src/services";
-import PersianCalendarView from "src/view";
-import { RTLNotice } from "./utils/RTLNotice";
+} from "./utils/dateUtils";
+import type { TSetting } from "./types";
 
 export default class PersianCalendarPlugin extends Plugin {
 	settings: TSetting = DEFAULT_SETTING;
 	dateSuggester: DateSuggester | undefined;
-	placeholder: PersianPlaceholders;
-	pluginsettingstab: PersianCalendarSetting | undefined;
+	placeholder: Placeholder;
+	pluginsettingstab: Setting | undefined;
 	plugin: PersianCalendarPlugin = this;
-	view: PersianCalendarView | undefined;
-	private noteService: NoteService;
+	view: CalendarView | undefined;
+	noteService: NoteService;
 
 	constructor(app: App, manifest: PluginManifest) {
 		super(app, manifest);
-		this.placeholder = new PersianPlaceholders(this);
+		this.placeholder = new Placeholder(this);
 		this.noteService = new NoteService(this.app, this.settings);
 	}
 
@@ -47,7 +44,7 @@ export default class PersianCalendarPlugin extends Plugin {
 		this.registerView(
 			"persian-calendar",
 			(leaf: WorkspaceLeaf) =>
-				(this.view = new PersianCalendarView(leaf, this.app, this.settings, this.plugin)),
+				(this.view = new CalendarView(leaf, this.app, this.settings, this.plugin)),
 		);
 
 		if (this.app.workspace.getLeavesOfType("persian-calendar").length === 0) {
@@ -60,9 +57,9 @@ export default class PersianCalendarPlugin extends Plugin {
 
 		this.dateSuggester = new DateSuggester(this);
 
-		this.pluginsettingstab = new PersianCalendarSetting(this.app, this);
+		this.pluginsettingstab = new Setting(this.app, this);
 
-		this.announceUpdate();
+		this.checkForVersionUpdate();
 
 		this.registerEvent(
 			this.app.vault.on("modify", async (file) => {
@@ -102,7 +99,7 @@ export default class PersianCalendarPlugin extends Plugin {
 			}),
 		);
 
-		this.addSettingTab(new PersianCalendarSetting(this.app, this));
+		this.addSettingTab(new Setting(this.app, this));
 
 		this.addCommand({
 			id: "replace-persian-placeholders",
@@ -235,15 +232,68 @@ export default class PersianCalendarPlugin extends Plugin {
 		}
 	}
 
-	private announceUpdate() {
+	private async checkForVersionUpdate(): Promise<void> {
 		const currentVersion = this.manifest.version;
-		const knownVersion = this.settings.version;
-		if (currentVersion === knownVersion) return;
-		this.settings.version = currentVersion;
-		this.saveSettings();
-		if (this.settings.announceUpdates === false) return;
-		const updateModal = new UpdateModal(this.app);
-		updateModal.open();
+		const lastSeenVersion = this.settings.lastSeenVersion;
+
+		if (this.settings.versionUpdate === false) {
+			if (lastSeenVersion !== currentVersion) {
+				this.settings.lastSeenVersion = currentVersion;
+				await this.saveSettings();
+			}
+			return;
+		}
+
+		if (!lastSeenVersion) {
+			const { getReleaseNotesForVersion, isReleaseNote } = await import("src/utils/release");
+
+			if (!isReleaseNote(currentVersion)) {
+				this.settings.lastSeenVersion = currentVersion;
+				await this.saveSettings();
+				return;
+			}
+
+			const { UpdateModal } = await import("src/templates/UpdateModal");
+			const releaseNotes = getReleaseNotesForVersion(currentVersion);
+
+			new UpdateModal(this.app, releaseNotes, () => {
+				this.settings.lastSeenVersion = currentVersion;
+				this.saveSettings().catch(console.error);
+			}).open();
+
+			return;
+		}
+
+		if (lastSeenVersion === currentVersion) {
+			return;
+		}
+
+		const {
+			getReleaseNotesBetweenVersions,
+			getLatestReleaseNotes,
+			compareVersions,
+			isReleaseNote,
+		} = await import("src/utils/release");
+
+		if (!isReleaseNote(currentVersion)) {
+			this.settings.lastSeenVersion = currentVersion;
+			await this.saveSettings();
+			return;
+		}
+
+		const { UpdateModal } = await import("src/templates/UpdateModal");
+
+		let releaseNotes;
+		if (compareVersions(currentVersion, lastSeenVersion) > 0) {
+			releaseNotes = getReleaseNotesBetweenVersions(lastSeenVersion, currentVersion);
+		} else {
+			releaseNotes = getLatestReleaseNotes();
+		}
+
+		new UpdateModal(this.app, releaseNotes, () => {
+			this.settings.lastSeenVersion = currentVersion;
+			this.saveSettings().catch(console.error);
+		}).open();
 	}
 
 	async loadSettings() {
@@ -256,7 +306,7 @@ export default class PersianCalendarPlugin extends Plugin {
 
 	private async handleFileUpdate() {
 		const view = this.app.workspace.getLeavesOfType("persian-calendar")[0]?.view;
-		if (view instanceof PersianCalendarView) {
+		if (view instanceof CalendarView) {
 			view.refreshCalendar();
 		}
 	}
@@ -285,7 +335,7 @@ export default class PersianCalendarPlugin extends Plugin {
 	refreshViews() {
 		if (this.app.workspace.getLeavesOfType("persian-calendar").length > 0) {
 			this.app.workspace.getLeavesOfType("persian-calendar").forEach((leaf) => {
-				if (leaf.view instanceof PersianCalendarView) {
+				if (leaf.view instanceof CalendarView) {
 					leaf.view.render();
 				}
 			});

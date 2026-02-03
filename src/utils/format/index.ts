@@ -29,7 +29,3 @@ export function seasonFormat(year: number, season: number, option?: { separator?
 
 	return `${year}${separator}${season.toString().padStart(2, "0")}`;
 }
-
-export function yearFormat(year: number) {
-	return `${year}`;
-}

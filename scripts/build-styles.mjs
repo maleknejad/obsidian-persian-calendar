@@ -1,6 +1,7 @@
 //? Combines all styles(from: src/styles/index.css) into a single file
 //? Minifies output using PostCSS + cssnano
 
+import chokidar from "chokidar";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -130,7 +131,58 @@ async function build() {
 		await fs.writeFile(outputPath, finalCSS, "utf8");
 	}
 
-	console.log('Built minify "styles.css" successfuly.');
+	console.log('Built minify "styles.css" => successfully');
 }
 
-await build();
+function startWatch() {
+	const stylesDir = path.join(projectRoot, "src", "styles");
+
+	console.log(
+		`Watching "${path.relative(projectRoot, stylesDir)}" (and all subdirectories) for CSS changes... (press Ctrl+C to stop)`,
+	);
+
+	let timer = null;
+
+	const triggerBuild = () => {
+		if (timer) clearTimeout(timer);
+
+		timer = setTimeout(async () => {
+			console.log("Change detected in CSS files, rebuilding...");
+			try {
+				await build();
+			} catch (err) {
+				console.error("Build failed in watch mode:", err);
+			}
+		}, 150);
+	};
+
+	const watcher = chokidar.watch(stylesDir, {
+		ignoreInitial: true,
+	});
+
+	watcher
+		.on("ready", () => {
+			const watched = watcher.getWatched();
+			for (const [dir, files] of Object.entries(watched)) {
+				console.log("  ", dir, "=>", files);
+			}
+		})
+		.on("all", (event, filePath) => {
+			if (!filePath.toLowerCase().endsWith(".css")) return;
+
+			console.log(`[${event}] ${filePath}`);
+			triggerBuild();
+		})
+		.on("error", (error) => {
+			console.error("Watcher error:", error);
+		});
+}
+
+const watchMode = process.argv.includes("--watch");
+
+if (watchMode) {
+	await build();
+	startWatch();
+} else {
+	await build();
+}

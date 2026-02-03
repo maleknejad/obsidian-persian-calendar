@@ -1,6 +1,6 @@
-import type { TLocal, TNumberOfMonths, TNumberOfSeasons } from "src/types";
+import type { TLocal } from "src/types";
 
-export const SEASONS_NAME: Record<TLocal, Record<TNumberOfSeasons, string>> = {
+export const SEASONS_NAME: Record<TLocal, Record<number, string>> = {
 	fa: {
 		1: "بهار",
 		2: "تابستان",
@@ -15,7 +15,7 @@ export const SEASONS_NAME: Record<TLocal, Record<TNumberOfSeasons, string>> = {
 	},
 } as const;
 
-export const JALALI_MONTHS_NAME: Record<TLocal, Record<TNumberOfMonths, string>> = {
+export const JALALI_MONTHS_NAME: Record<TLocal, Record<number, string>> = {
 	fa: {
 		1: "فروردین",
 		2: "اردیبهشت",
@@ -46,7 +46,7 @@ export const JALALI_MONTHS_NAME: Record<TLocal, Record<TNumberOfMonths, string>>
 	},
 } as const;
 
-export const GREGORIAN_MONTHS_NAME: Record<TLocal, Record<TNumberOfMonths, string>> = {
+export const GREGORIAN_MONTHS_NAME: Record<TLocal, Record<number, string>> = {
 	fa: {
 		1: "ژانویه",
 		2: "فوریه",
@@ -77,7 +77,7 @@ export const GREGORIAN_MONTHS_NAME: Record<TLocal, Record<TNumberOfMonths, strin
 	},
 } as const;
 
-export const HIJRI_MONTHS_NAME: Record<TLocal, Record<TNumberOfMonths, string>> = {
+export const HIJRI_MONTHS_NAME: Record<TLocal, Record<number, string>> = {
 	fa: {
 		1: "محرم",
 		2: "صفر",

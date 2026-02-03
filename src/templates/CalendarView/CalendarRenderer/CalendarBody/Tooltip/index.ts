@@ -1,6 +1,6 @@
 import type { TEventObjectWithoutDate } from "src/types";
 
-export default class TooltipService {
+export default class Tooltip {
 	private tooltipWrapperSelector = ".persian-calendar--tooltip-wrapper";
 	private tooltipSelector = ".persian-calendar__tooltip";
 	private offsetX = 10;
@@ -11,7 +11,6 @@ export default class TooltipService {
 		let tooltip: HTMLElement | null = null;
 
 		if (!wrapper) {
-			// wrapper برای استفاده از CSS variables
 			wrapper = document.createElement("div");
 			wrapper.className = "persian-calendar persian-calendar--tooltip-wrapper";
 
@@ -59,7 +58,6 @@ export default class TooltipService {
 
 		if (x === undefined || y === undefined) return;
 
-		// ابتدا موقتاً موقعیت بده تا offsetWidth درست حساب بشه
 		tooltip.style.left = "0px";
 		tooltip.style.top = "0px";
 
@@ -68,14 +66,12 @@ export default class TooltipService {
 		const viewportWidth = window.innerWidth;
 		const viewportHeight = window.innerHeight;
 
-		// تشخیص این‌که سمت راست جا داریم یا نه
-		let left = x - tooltipWidth - this.offsetX; // حالت RTL: سمت چپ اشاره‌گر
+		let left = x - tooltipWidth - this.offsetX;
 		const leftSpaceEnough = left >= 0;
 
 		if (!leftSpaceEnough) {
-			// اگر جا کم بود، تولتیپ رو سمت راست اشاره‌گر بذار
 			left = x + this.offsetX;
-			// اگر سمت راست هم تا لبه رفت، کل تولتیپ رو داخل ویو نگه دار
+
 			if (left + tooltipWidth > viewportWidth) {
 				left = Math.max(0, viewportWidth - tooltipWidth - this.offsetX);
 			}
@@ -83,7 +79,6 @@ export default class TooltipService {
 
 		let top = y + this.offsetY;
 
-		// اگر پایین جا نداشت، تولتیپ رو بالای اشاره‌گر بذار
 		if (top + tooltipHeight > viewportHeight + window.scrollY) {
 			top = y - tooltipHeight - this.offsetY;
 		}

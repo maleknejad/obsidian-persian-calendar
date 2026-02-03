@@ -1,6 +1,6 @@
 import { Notice } from "obsidian";
 
-export function RTLNotice(message: string, timeout?: number): Notice {
+export default function RTLNotice(message: string, timeout?: number): Notice {
 	const notice = new Notice(message, timeout);
 
 	const noticeEl = (notice as any).noticeEl as HTMLElement | undefined;
