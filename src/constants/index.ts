@@ -9,6 +9,6 @@ export {
 	HIJRI_MONTHS_NAME,
 	WEEKDAYS_NAME,
 } from "./dateNames";
-export { DEFAULT_SETTING } from "./setting";
+export { DEFAULT_SETTING } from "./settings";
 export { RELEASE_NOTES } from "./releaseNotes";
 export { DEFAULT_SOCIAL_LINKS } from "./socialLinks";

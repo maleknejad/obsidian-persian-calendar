@@ -10,7 +10,7 @@ import {
 } from "obsidian";
 import { DateSuggester, Placeholder, NoteService } from "./services";
 import CalendarView from "./templates/CalendarView";
-import Setting from "./templates/Settings";
+import Settings from "./templates/Settings";
 import RTLNotice from "./components/RTLNotice";
 import { DEFAULT_SETTING } from "./constants";
 import {
@@ -27,7 +27,7 @@ export default class PersianCalendarPlugin extends Plugin {
 	settings: TSetting = DEFAULT_SETTING;
 	dateSuggester: DateSuggester | undefined;
 	placeholder: Placeholder;
-	pluginsettingstab: Setting | undefined;
+	pluginsettingstab: Settings | undefined;
 	plugin: PersianCalendarPlugin = this;
 	view: CalendarView | undefined;
 	noteService: NoteService;
@@ -57,7 +57,7 @@ export default class PersianCalendarPlugin extends Plugin {
 
 		this.dateSuggester = new DateSuggester(this);
 
-		this.pluginsettingstab = new Setting(this.app, this);
+		this.pluginsettingstab = new Settings(this.app, this);
 
 		this.checkForVersionUpdate();
 
@@ -99,7 +99,7 @@ export default class PersianCalendarPlugin extends Plugin {
 			}),
 		);
 
-		this.addSettingTab(new Setting(this.app, this));
+		this.addSettingTab(new Settings(this.app, this));
 
 		this.addCommand({
 			id: "replace-persian-placeholders",

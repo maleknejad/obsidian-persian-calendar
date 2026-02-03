@@ -1,9 +1,9 @@
-import { App, PluginSettingTab, Setting } from "obsidian";
+import { App, PluginSettingTab, Setting as ObsidianSettings } from "obsidian";
 import PersianCalendarPlugin from "src/main";
 import FolderSuggest from "./FolderSuggest";
 import type { TDateFormat, TSetting, TBoolSettingKeys } from "src/types";
 
-export abstract class SettingBase extends PluginSettingTab {
+export abstract class SettingsBase extends PluginSettingTab {
 	plugin: PersianCalendarPlugin;
 
 	constructor(app: App, plugin: PersianCalendarPlugin) {
@@ -12,7 +12,7 @@ export abstract class SettingBase extends PluginSettingTab {
 	}
 
 	protected addPathSetting(containerEl: HTMLElement, name: string, settingKey: keyof TSetting) {
-		new Setting(containerEl).setName(name).addText((text) => {
+		new ObsidianSettings(containerEl).setName(name).addText((text) => {
 			text
 				.setPlaceholder("")
 				.setValue(this.plugin.settings[settingKey] as string)
@@ -34,7 +34,7 @@ export abstract class SettingBase extends PluginSettingTab {
 			refresh?: boolean;
 		},
 	) {
-		new Setting(containerEl)
+		new ObsidianSettings(containerEl)
 			.setName(opts.name)
 			.setDesc(opts.desc ?? "")
 			.addToggle((toggle) =>
@@ -57,7 +57,7 @@ export abstract class SettingBase extends PluginSettingTab {
 			refresh?: boolean;
 		},
 	): void {
-		new Setting(containerEl)
+		new ObsidianSettings(containerEl)
 			.setName(opts.name)
 			.setDesc(opts.desc ?? "")
 			.addDropdown((dropdown) => {

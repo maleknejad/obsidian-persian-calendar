@@ -1,9 +1,9 @@
 import type { App } from "obsidian";
 import type PersianCalendarPlugin from "src/main";
 import { SocialLinks } from "src/components/SocialLinks";
-import { SettingBase } from "./SettingBase";
+import { SettingsBase } from "./SettingBase";
 
-export default class CalendarSettings extends SettingBase {
+export default class CalendarSettings extends SettingsBase {
 	icon = "calendar-heart";
 
 	constructor(app: App, plugin: PersianCalendarPlugin) {
