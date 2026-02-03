@@ -1,0 +1,33 @@
+.persian-calendar__setting-header {
+	border: 2px dashed var(--persian-calendar-color-primary);
+	border-radius: 10px;
+	margin-bottom: 19px;
+	padding: 10px 0;
+	text-align: center;
+}
+
+.persian-calendar__setting-social-links {
+	display: flex;
+	gap: 10px;
+	justify-content: center;
+	width: 100%;
+}
+
+.persian-calendar__setting-social-links a {
+	align-items: center;
+	border-radius: 999px;
+	display: inline-flex;
+	height: 30px;
+	justify-content: center;
+	opacity: 0.6;
+	transition:
+		transform var(--persian-calendar-duration) ease,
+		opacity var(--persian-calendar-duration) ease,
+		box-shadow var(--persian-calendar-duration) ease;
+	width: 30px;
+}
+.persian-calendar__setting-social-links a:hover {
+	box-shadow: var(--shadow-l);
+	opacity: 1;
+	transform: translateY(-1px);
+}

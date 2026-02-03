@@ -1,0 +1,31 @@
+.persian-calendar--tooltip-wrapper {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	z-index: 9999;
+}
+
+.persian-calendar__tooltip {
+	position: absolute;
+	background-color: var(--color-base-20);
+	color: var(--color-base-100);
+	border: 1px solid var(--persian-calendar-color-base);
+	border-radius: 5px;
+	padding: 6px 8px;
+	z-index: 1;
+	display: none;
+	max-width: 260px;
+	font-size: 12px;
+	line-height: 1.6;
+	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+	pointer-events: auto;
+}
+
+.persian-calendar__tooltip-event {
+	padding: 4px 0;
+	border-bottom: 1px dashed var(--persian-calendar-color-base);
+}
+
+.persian-calendar__tooltip-event:last-child {
+	border-bottom: none;
+}

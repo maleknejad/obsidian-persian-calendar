@@ -2,6 +2,7 @@ README.md
 LICENSE
 node_modules
 .eslintrc
+pnpm-lock.yaml
 
 *.min.js
 *.min.css

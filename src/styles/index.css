@@ -1,0 +1,13 @@
+/*! ترتیب مهمه */
+
+@import "./sections/variable.css";
+@import "./sections/base.css";
+@import "./sections/header.css";
+@import "./sections/calendar.css";
+@import "./sections/day.css";
+
+@import "./sections/tooltip.css";
+
+@import "./sections/setting.css";
+
+@import "./sections/responsive.css";

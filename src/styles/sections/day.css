@@ -1,0 +1,94 @@
+.persian-calendar__days {
+	align-items: start;
+	display: grid;
+	gap: var(--persian-calendar-gap-y-days) var(--persian-calendar-gap-x-days);
+	grid-auto-rows: 40px;
+	grid-column: 2;
+	grid-row: 2 / span 6;
+	grid-template-columns: repeat(7, minmax(0, 1fr));
+	margin: 0;
+	padding: 0 5px;
+}
+
+.persian-calendar__day {
+	border: 1px solid transparent;
+	border-radius: 5px;
+	color: var(--color-base-100);
+	cursor: pointer;
+	display: flex;
+	height: 42px;
+	justify-content: center;
+	position: relative;
+	transform: perspective(1px) translateZ(0);
+	transition:
+		background-color var(--persian-calendar-duration),
+		color var(--persian-calendar-duration),
+		border-color var(--persian-calendar-duration),
+		opacity var(--persian-calendar-duration);
+}
+.persian-calendar__day:hover {
+	background-color: var(--persian-calendar-color-base);
+	border-color: var(--color-base-40);
+}
+
+.persian-calendar__day-grid {
+	grid-column-start: auto;
+}
+
+.persian-calendar__day--holiday {
+	color: var(--persian-calendar-color-holiday);
+	font-weight: 600;
+}
+
+.persian-calendar__no-note {
+	opacity: 0.4;
+}
+
+.persian-calendar__no-current-month {
+	border: none;
+	opacity: 0.1;
+}
+
+.persian-calendar__jalali-day {
+	font-size: 16px;
+	line-height: 2;
+}
+
+.persian-calendar__day--current {
+	background-color: color-mix(in srgb, var(--persian-calendar-color-primary) 10%, transparent);
+	border: 1px solid var(--persian-calendar-color-primary) !important;
+	border-radius: 5px;
+	box-shadow: 0 0 0 1px color-mix(in srgb, var(--persian-calendar-color-primary) 50%, transparent);
+}
+
+.persian-calendar__gregorian-day--center,
+.persian-calendar__hijri-day--center {
+	color: var(--persian-calendar-color-additional-calendar);
+	font-size: 10px;
+	position: absolute;
+}
+.persian-calendar__gregorian-day--center {
+	bottom: -2%;
+	left: 50%;
+	transform: translateX(-50%);
+}
+.persian-calendar__hijri-day--center {
+	bottom: -2%;
+	right: 50%;
+	transform: translateX(50%);
+}
+
+.persian-calendar__gregorian-day--corner,
+.persian-calendar__hijri-day--corner {
+	bottom: 0;
+	color: var(--persian-calendar-color-additional-calendar);
+	font-size: 10px;
+	opacity: 0.75;
+	position: absolute;
+}
+.persian-calendar__gregorian-day--corner {
+	left: 5%;
+}
+.persian-calendar__hijri-day--corner {
+	right: 5%;
+}
