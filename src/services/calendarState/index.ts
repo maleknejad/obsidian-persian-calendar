@@ -125,7 +125,7 @@ export default class CalendarState {
 		if (firstDayOfMonthGeorgian.gm === lastDayOfMonthGeorgian.gm) {
 			return `${startMonthName} ${firstDayOfMonthGeorgian.gy}`;
 		} else {
-			return `${startMonthName}-${endMonthName} ${lastDayOfMonthGeorgian.gy}`;
+			return `${startMonthName} - ${endMonthName} ${lastDayOfMonthGeorgian.gy}`;
 		}
 	}
 
@@ -158,7 +158,7 @@ export default class CalendarState {
 		if (startHijriDate.hm === endHijriDate.hm) {
 			return `${startHijriMonth} ${startHijriYear}`;
 		} else {
-			return `${startHijriMonth}-${endHijriMonth} ${endHijriYear}`;
+			return `${startHijriMonth} - ${endHijriMonth} ${endHijriYear}`;
 		}
 	}
 }

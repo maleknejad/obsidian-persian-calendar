@@ -198,9 +198,9 @@ export default class RenderService {
 			dayEl.addEventListener("touchcancel", () => this.tooltipService.hideTooltip());
 		};
 
-		let gridEl = contentEl.querySelector(".persian-calendar__days-grid") as HTMLElement | null;
+		let gridEl = contentEl.querySelector(".persian-calendar__days") as HTMLElement | null;
 		gridEl?.remove();
-		gridEl = contentEl.createEl("div", { cls: "persian-calendar__days-grid" });
+		gridEl = contentEl.createEl("div", { cls: "persian-calendar__days" });
 
 		for (const cell of cells) {
 			const dayEl = gridEl.createEl("div", { cls: "persian-calendar__day" });
@@ -223,7 +223,7 @@ export default class RenderService {
 				if (showGeorgianDates) {
 					const cls = showBothCalendars
 						? "persian-calendar__gregorian-day--corner"
-						: "persian-calendar__gregorian-day";
+						: "persian-calendar__gregorian-day--center";
 					const georgianDateEl = dayEl.createEl("div", { cls });
 					georgianDateEl.textContent = cell.gregorian.gd.toString();
 				}
@@ -231,7 +231,7 @@ export default class RenderService {
 				if (showHijriDates) {
 					const cls = showBothCalendars
 						? "persian-calendar__hijri-day--corner"
-						: "persian-calendar__hijri-day";
+						: "persian-calendar__hijri-day--center";
 					const hijriDateEl = dayEl.createEl("div", { cls });
 					hijriDateEl.textContent = toArNumber(cell.hijri.hd);
 				}
@@ -245,7 +245,7 @@ export default class RenderService {
 				dayEl.addClass("persian-calendar__day--holiday");
 				dayEl
 					.querySelectorAll(
-						".persian-calendar__jalali-day, .persian-calendar__gregorian-day, .persian-calendar__hijri-day",
+						".persian-calendar__jalali-day, .persian-calendar__gregorian-day--center, .persian-calendar__hijri-day--center",
 					)
 					.forEach((el) => {
 						el.classList.add("persian-calendar__day--holiday");
