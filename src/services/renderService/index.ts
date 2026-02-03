@@ -5,6 +5,8 @@ import {
 	getJalaliMonthName,
 	dateToEvents,
 	jalaliToSeason,
+	jalaliMonthLength,
+	jalaliToDate,
 } from "src/utils/dateUtils";
 import { toArNumber, toFaNumber } from "src/utils/numberConverter";
 import { NoteService, CalendarState, TooltipService, GridService } from "..";
@@ -121,7 +123,9 @@ export default class RenderService {
 			weekNumbersEl.remove();
 		}
 
-		weekNumbersEl = contentEl.createEl("div", { cls: "persian-calendar__week-numbers" });
+		weekNumbersEl = contentEl.createEl("div", {
+			cls: "persian-calendar__week-numbers",
+		});
 
 		const weekHeader = weekNumbersEl.createEl("div", {
 			cls: "persian-calendar__refresh",
@@ -134,12 +138,21 @@ export default class RenderService {
 			RTLNotice("نمایش تقویم بروزرسانی شد.");
 		});
 
-		const weekNumbers = this.calendarState.getWeekNumbersForMonth(jalaliDate.jy, jalaliDate.jm);
-		const weeksWithNotes = await this.notesService.getWeeksWithNotes(jalaliDate.jy);
+		const { jy, jm } = jalaliDate;
+
+		const weekNumbers = this.calendarState.getWeekNumbersForMonth(jy, jm);
+		const weeksWithNotes = await this.notesService.getWeeksWithNotes(jy);
+
+		const startDay = jalaliToDate(jy, jm, 1).getDay() + 1;
+		const firstDayColumn = startDay % 7;
+		const monthLength = jalaliMonthLength(jy, jm);
 
 		for (let i = 0; i < 6; i++) {
 			const weekNumber = weekNumbers[i];
-			const weekEl = weekNumbersEl.createEl("div", { cls: "persian-calendar__week-number" });
+
+			const weekEl = weekNumbersEl.createEl("div", {
+				cls: "persian-calendar__week-number",
+			});
 			weekEl.textContent = toFaNumber(weekNumber);
 
 			if (!weeksWithNotes.includes(weekNumber)) {
@@ -147,7 +160,14 @@ export default class RenderService {
 			}
 
 			weekEl.addEventListener("click", () => {
-				this.notesService.openOrCreateWeeklyNote(weekNumber, jalaliDate.jy);
+				const weekStartDayIndex = 1 - firstDayColumn + i * 7;
+
+				// اگر اولین روز این هفته بعد از آخرین روز ماه جاریه، یعنی کل این هفته مال ماه بعده
+				if (weekStartDayIndex > monthLength) {
+					this.changeMonth("next");
+				}
+
+				this.notesService.openOrCreateWeeklyNote(weekNumber, jy);
 			});
 		}
 	}
@@ -259,6 +279,14 @@ export default class RenderService {
 
 			dayEl.addEventListener("click", () => {
 				this.notesService.openOrCreateDailyNote(cell.jy, cell.jm, cell.jd);
+
+				if (!cell.isInCurrentMonth && cell.jd > 15) {
+					return this.changeMonth("prev");
+				}
+
+				if (!cell.isInCurrentMonth && cell.jd < 15) {
+					return this.changeMonth("next");
+				}
 			});
 
 			if (cell.isInCurrentMonth) {
