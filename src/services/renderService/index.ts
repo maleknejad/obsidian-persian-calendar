@@ -159,9 +159,12 @@ export default class RenderService {
 				weekEl.addClass("persian-calendar__no-note");
 			}
 
-			weekEl.addEventListener("click", () => {
-				const weekStartDayIndex = 1 - firstDayColumn + i * 7;
+			const weekStartDayIndex = 1 - firstDayColumn + i * 7;
+			if (weekStartDayIndex > monthLength) {
+				weekEl.addClass("persian-calendar__no-current-month");
+			}
 
+			weekEl.addEventListener("click", () => {
 				// اگر اولین روز این هفته بعد از آخرین روز ماه جاریه، یعنی کل این هفته مال ماه بعده
 				if (weekStartDayIndex > monthLength) {
 					this.changeMonth("next");
@@ -229,7 +232,7 @@ export default class RenderService {
 			persianDateEl.textContent = toFaNumber(cell.jd);
 
 			if (!cell.isInCurrentMonth) {
-				dayEl.addClass("persian-calendar__day--dim");
+				dayEl.addClass("persian-calendar__no-current-month");
 			}
 
 			if (cell.isInCurrentMonth && !daysWithNotes.has(cell.jd)) {

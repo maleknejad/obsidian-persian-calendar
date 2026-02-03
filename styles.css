@@ -246,7 +246,7 @@
 	border-color: var(--color-base-40);
 }
 
-.persian-calendar__day--dim {
+.persian-calendar__no-current-month {
 	opacity: 0.1;
 	border: none;
 }
