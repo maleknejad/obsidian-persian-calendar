@@ -8,8 +8,12 @@
 .persian-calendar__cmodal-confirm,
 .persian-calendar__cmodal-cancel {
 	cursor: pointer;
+	transition: opacity var(--persian-calendar-duration);
 }
-
+.persian-calendar__cmodal-confirm:hover,
+.persian-calendar__cmodal-cancel:hover {
+	opacity: 0.8;
+}
 .persian-calendar__cmodal-confirm {
 	background-color: var(--color-accent) !important;
 	color: var(--color-base-05) !important;

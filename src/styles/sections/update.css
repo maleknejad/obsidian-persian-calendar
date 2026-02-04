@@ -14,3 +14,20 @@
 	border-bottom: solid var(--persian-calendar-color-primary);
 	text-align: center;
 }
+
+.persian-calendar__update-body {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	padding-right: 0.5rem;
+}
+
+.persian-calendar__update-change {
+	position: relative;
+	padding: 0.4rem 0.75rem 0.4rem 0.5rem;
+	margin: 0;
+	font-size: 0.9rem;
+	line-height: 1.6;
+	border-radius: 6px;
+	border-right: 3px solid var(--color-accent);
+}

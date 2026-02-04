@@ -37,9 +37,15 @@ export class UpdateModal extends Modal {
 			});
 
 			if (note.changes && note.changes.length > 0) {
-				const ul = section.createEl("ul");
+				const changesContainer = section.createEl("div", {
+					cls: "persian-calendar__update-body",
+				});
+
 				note.changes.forEach((change) => {
-					ul.createEl("li", { text: change });
+					changesContainer.createEl("p", {
+						text: change,
+						cls: "persian-calendar__update-change",
+					});
 				});
 			}
 		});
