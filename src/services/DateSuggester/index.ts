@@ -13,16 +13,19 @@ import {
 	dateToJWeekDash,
 	dateToJYearDash,
 	dateToJDayDash,
+	jalaliDashToGregorianDash,
 } from "src/utils/dateUtils";
 import { WEEKDAYS_NAME } from "src/constants";
-import type { TLocal } from "src/types";
+import type { TDateFormat, TLocal } from "src/types";
 
 export default class DateSuggester extends EditorSuggest<string> {
 	plugin: PersianCalendarPlugin;
+	dateFormat: Omit<TDateFormat, "hijri">;
 
 	constructor(plugin: PersianCalendarPlugin) {
 		super(plugin.app);
 		this.plugin = plugin;
+		this.dateFormat = plugin.settings.dateFormat;
 	}
 
 	onTrigger(cursor: EditorPosition, editor: Editor): EditorSuggestTriggerInfo | null {
@@ -90,7 +93,7 @@ export default class DateSuggester extends EditorSuggest<string> {
 
 	getFormattedDateLink(keyword: string, date: Date, local: TLocal = "fa") {
 		const now = new Date();
-		let dateText = "";
+		let jDateDash = "";
 
 		const weekdaysName = WEEKDAYS_NAME[local];
 
@@ -122,9 +125,16 @@ export default class DateSuggester extends EditorSuggest<string> {
 				now.setDate(now.getDate() + daysFromNowToWeekday);
 			}
 
-			dateText = dateToJDayDash(now);
+			jDateDash = dateToJDayDash(now);
+			const gDateDash = jalaliDashToGregorianDash(jDateDash); //todo: create dateToDash function
+
 			const formatSpecifier = specifier ? ` ${specifier.trim()}` : "";
-			return `[[${dateText}|${weekdayName}${formatSpecifier}]]`;
+
+			if(this.dateFormat === "gregorian") {
+				return `[[${gDateDash}|${weekdayName}${formatSpecifier}]]`;
+			}
+
+			return `[[${jDateDash}|${weekdayName}${formatSpecifier}]]`;
 		}
 
 		switch (keyword) {

@@ -55,6 +55,8 @@ export default class PersianCalendarPlugin extends Plugin {
 
 		this.registerEditorSuggest(new DateSuggester(this));
 
+		this.settings.dateFormat;
+
 		this.dateSuggester = new DateSuggester(this);
 
 		this.pluginsettingstab = new Settings(this.app, this);
