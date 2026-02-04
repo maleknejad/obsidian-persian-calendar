@@ -1,7 +1,8 @@
 import { App, TFile, MarkdownView } from "obsidian";
-import type { TSetting } from "src/types";
+import type { TLocal, TSetting } from "src/types";
 import { jalaliToGregorian, jalaliMonthLength } from "src/utils/dateUtils";
 import { createNoteModal } from "src/components/ConfirmModal";
+import { JALALI_MONTHS_NAME, SEASONS_NAME } from "src/constants";
 
 export default class NoteService {
 	constructor(
@@ -145,7 +146,7 @@ export default class NoteService {
 		});
 	}
 
-	public async openOrCreateWeeklyNote(weekNumber: number, jy: number) {
+	public async openOrCreateWeeklyNote(jy: number, weekNumber: number) {
 		const fileName = `${jy}-W${weekNumber}.md`;
 		const notesLocation = this.settings.weeklyNotesPath;
 		const filePath = this.buildNotePath(notesLocation, fileName);
@@ -153,31 +154,35 @@ export default class NoteService {
 		await this.openOrCreateNoteWithConfirm({
 			filePath,
 			confirmTitle: "ایجاد هفته‌نوشت جدید",
-			confirmMessage: `هفته‌نوشت ${weekNumber} سال ${jy} ایجاد شود؟`,
+			confirmMessage: `هفته‌نوشت هفته‌ی${weekNumber}ام سال ${jy} ایجاد شود؟`,
 		});
 	}
 
-	public async openOrCreateMonthlyNote(month: number, jy: number) {
-		const fileName = `${jy}-${month.toString().padStart(2, "0")}.md`;
+	public async openOrCreateMonthlyNote(jy: number, jm: number, local: TLocal = "fa") {
+		const fileName = `${jy}-${jm.toString().padStart(2, "0")}.md`;
 		const notesLocation = this.settings.monthlyNotesPath;
 		const filePath = this.buildNotePath(notesLocation, fileName);
+
+		const jMonthName = JALALI_MONTHS_NAME[local];
 
 		await this.openOrCreateNoteWithConfirm({
 			filePath,
 			confirmTitle: "ایجاد ماه‌نوشت جدید",
-			confirmMessage: `ماه‌نوشت ${month.toString().padStart(2, "0")} سال ${jy} ایجاد شود؟`,
+			confirmMessage: `ماه‌نوشت ${jMonthName[jm]} ${jy} ایجاد شود؟`,
 		});
 	}
 
-	public async openOrCreateSeasonalNote(seasonNumber: number, jy: number) {
+	public async openOrCreateSeasonalNote(jy: number, seasonNumber: number, local: TLocal = "fa") {
 		const fileName = `${jy}-S${seasonNumber}.md`;
 		const notesLocation = this.settings.seasonalNotesPath;
 		const filePath = this.buildNotePath(notesLocation, fileName);
 
+		const seasonsName = SEASONS_NAME[local];
+
 		await this.openOrCreateNoteWithConfirm({
 			filePath,
 			confirmTitle: "ایجاد فصل‌نوشت جدید",
-			confirmMessage: `فصل‌نوشت ${seasonNumber} سال ${jy} ایجاد شود؟`,
+			confirmMessage: `فصل‌نوشت ${seasonsName[seasonNumber]} ${jy} ایجاد شود؟`,
 		});
 	}
 

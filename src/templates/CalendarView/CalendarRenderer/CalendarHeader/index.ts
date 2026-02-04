@@ -61,7 +61,7 @@ export default class CalendarHeaderRender {
 		monthEl.textContent = monthName;
 		monthEl.addEventListener("click", (e) => {
 			e.stopPropagation();
-			this.notesService.openOrCreateMonthlyNote(jMonthState, jYearState);
+			this.notesService.openOrCreateMonthlyNote(jYearState, jMonthState);
 		});
 
 		const navContainerEl = stateControlEl.createEl("div", {

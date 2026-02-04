@@ -11,7 +11,7 @@
 }
 
 .persian-calendar__day {
-	border: 1px solid transparent;
+	border: 1px solid var(--color-base-40);
 	border-radius: 5px;
 	color: var(--color-base-100);
 	cursor: pointer;
@@ -28,7 +28,6 @@
 }
 .persian-calendar__day:hover {
 	background-color: var(--persian-calendar-color-base);
-	border-color: var(--color-base-40);
 }
 
 .persian-calendar__day-grid {
@@ -42,6 +41,7 @@
 
 .persian-calendar__no-note {
 	opacity: 0.4;
+	border-color: transparent;
 }
 
 .persian-calendar__no-current-month {
@@ -59,6 +59,9 @@
 	border: 1px solid var(--persian-calendar-color-primary) !important;
 	border-radius: 5px;
 	box-shadow: 0 0 0 1px color-mix(in srgb, var(--persian-calendar-color-primary) 50%, transparent);
+}
+.persian-calendar__day--current:hover {
+	background-color: color-mix(in srgb, var(--persian-calendar-color-primary) 30%, transparent);
 }
 
 .persian-calendar__gregorian-day--center,

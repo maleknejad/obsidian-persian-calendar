@@ -54,7 +54,7 @@ export default class CalendarBodyRender {
 			}
 
 			seasonEl.addEventListener("click", () => {
-				this.notesService.openOrCreateSeasonalNote(seasonNumber, jYearState);
+				this.notesService.openOrCreateSeasonalNote(jYearState, seasonNumber);
 			});
 		}
 	}
@@ -102,7 +102,7 @@ export default class CalendarBodyRender {
 			}
 
 			weekEl.addEventListener("click", () => {
-				this.notesService.openOrCreateWeeklyNote(weekNumber, jy);
+				this.notesService.openOrCreateWeeklyNote(jy, weekNumber);
 			});
 		}
 	}

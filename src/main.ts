@@ -152,7 +152,7 @@ export default class PersianCalendarPlugin extends Plugin {
 				const { jy } = dateToJalali(now);
 				const currentWeekNumber = dateToJWeekNumber(now);
 
-				await this.noteService.openOrCreateWeeklyNote(currentWeekNumber, jy);
+				await this.noteService.openOrCreateWeeklyNote(jy, currentWeekNumber);
 			},
 		});
 
@@ -164,7 +164,7 @@ export default class PersianCalendarPlugin extends Plugin {
 				const { jy, jm } = dateToJalali(now);
 				const season = jalaliToSeason(jm);
 
-				await this.noteService.openOrCreateSeasonalNote(season, jy);
+				await this.noteService.openOrCreateSeasonalNote(jy, season);
 			},
 		});
 
@@ -173,7 +173,7 @@ export default class PersianCalendarPlugin extends Plugin {
 			name: "Monthly - بازکردن ماه‌نوشت این ماه",
 			callback: async () => {
 				const { jy, jm } = dateToJalali(new Date());
-				await this.noteService.openOrCreateMonthlyNote(jm, jy);
+				await this.noteService.openOrCreateMonthlyNote(jy, jm);
 			},
 		});
 
