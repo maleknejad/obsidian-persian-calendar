@@ -1,6 +1,6 @@
-import type { SocialLink } from "src/types";
+import type { TSocialLink } from "src/types";
 
-export const DEFAULT_SOCIAL_LINKS: SocialLink[] = [
+export const DEFAULT_SOCIAL_LINKS: TSocialLink[] = [
 	{
 		href: "https://github.com/maleknejad/obsidian-persian-calendar",
 		title: "مستندات پلاگین در Github",

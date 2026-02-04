@@ -1,6 +1,6 @@
 import { JALALI_EVENTS, HIJRI_EVENTS, GREGORIAN_EVENTS } from "src/constants";
 import type {
-	MonthMap,
+	TMonthMap,
 	TEventObject,
 	TDateFormat,
 	TShowEvents,
@@ -8,12 +8,12 @@ import type {
 } from "src/types";
 import { dashToDate, dateToGregorian, dateToHijri, dateToJalali } from "..";
 
-const JALALI_EVENT_MAP: MonthMap = buildEventMap(JALALI_EVENTS);
-const HIJRI_EVENT_MAP: MonthMap = buildEventMap(HIJRI_EVENTS);
-const GREGORIAN_EVENT_MAP: MonthMap = buildEventMap(GREGORIAN_EVENTS);
+const JALALI_EVENT_MAP: TMonthMap = buildEventMap(JALALI_EVENTS);
+const HIJRI_EVENT_MAP: TMonthMap = buildEventMap(HIJRI_EVENTS);
+const GREGORIAN_EVENT_MAP: TMonthMap = buildEventMap(GREGORIAN_EVENTS);
 
-function buildEventMap(events: TEventObject[]): MonthMap {
-	const monthMap: MonthMap = new Map();
+function buildEventMap(events: TEventObject[]): TMonthMap {
+	const monthMap: TMonthMap = new Map();
 
 	for (const event of events) {
 		if (!monthMap.has(event.month)) {

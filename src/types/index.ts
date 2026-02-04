@@ -35,12 +35,12 @@ export type TEventObject = {
 
 export type TEventObjectWithoutDate = Omit<TEventObject, "month" | "day">;
 
-export type DayMap = Map<number, TEventObject[]>;
-export type MonthMap = Map<number, DayMap>;
+export type TDayMap = Map<number, TEventObject[]>;
+export type TMonthMap = Map<number, TDayMap>;
 
 export type TGetDayOfWeek = { jYear: number; jWeekNumber: number };
 
-export type SupportedHijriYearType = keyof typeof IRAN_HIJRI_MONTHS_LENGTH;
+export type TSupportedHijriYear = keyof typeof IRAN_HIJRI_MONTHS_LENGTH;
 
 export type TDateFormat = "jalali" | "gregorian" | "hijri";
 
@@ -118,8 +118,15 @@ export type TReleaseNote = {
 	changes: string[];
 };
 
-export type SocialLink = {
+export type TSocialLink = {
 	href: string;
 	title: string;
 	icon: string;
+};
+
+export type TPathTokenContext = {
+	jy?: number;
+	jm?: number;
+	season?: number;
+	local?: TLocal;
 };

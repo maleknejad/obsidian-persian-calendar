@@ -1,5 +1,5 @@
 import { IRAN_HIJRI_ANCHORS, IRAN_HIJRI_MONTHS_LENGTH } from "src/constants";
-import type { THijri, TGregorian, SupportedHijriYearType } from "src/types";
+import type { THijri, TGregorian, TSupportedHijriYear } from "src/types";
 
 function gregorianToJulian(year: number, month: number, day: number): number {
 	if (month < 3) {
@@ -12,8 +12,8 @@ function gregorianToJulian(year: number, month: number, day: number): number {
 		year === 1582 && (month > 10 || (month === 10 && day > 4))
 			? -10
 			: year > 1582
-			? 2 - a + Math.floor(a / 4)
-			: 0;
+				? 2 - a + Math.floor(a / 4)
+				: 0;
 
 	return Math.floor(365.25 * (year + 4716)) + Math.floor(30.6001 * (month + 1)) + day + b - 1524;
 }
@@ -51,7 +51,7 @@ function getPreviousMonth(hy: number, hm: number) {
 }
 
 function getMonthLength(hy: number, hm: number): number {
-	const yearData = IRAN_HIJRI_MONTHS_LENGTH[hy as SupportedHijriYearType];
+	const yearData = IRAN_HIJRI_MONTHS_LENGTH[hy as TSupportedHijriYear];
 
 	if (yearData && hm <= yearData.length) {
 		return Number(yearData[hm - 1]);

@@ -1,6 +1,6 @@
 import { App, TFile, MarkdownView } from "obsidian";
-import type { TLocal, TSetting } from "src/types";
-import { jalaliToGregorian, jalaliMonthLength } from "src/utils/dateUtils";
+import type { TLocal, TPathTokenContext, TSetting } from "src/types";
+import { jalaliToGregorian, jalaliMonthLength, jalaliToSeason } from "src/utils/dateUtils";
 import { createNoteModal } from "src/components/ConfirmModal";
 import { JALALI_MONTHS_NAME, SEASONS_NAME } from "src/constants";
 
@@ -9,14 +9,77 @@ export default class NoteService {
 		private readonly app: App,
 		private readonly settings: TSetting,
 	) {}
-	private normalizeFolderPath(path?: string | null): string {
+	private normalizeFolderPath(path?: string | null) {
 		if (!path) return "";
 		return path.trim().replace(/^\/*|\/*$/g, "");
 	}
 
-	private buildNotePath(basePath: string | undefined, fileName: string): string {
+	private resolvePathTokens(path: string, ctx?: TPathTokenContext, local: TLocal = "fa") {
+		if (!ctx) return path;
+
+		let result = path;
+		const { jy, jm } = ctx;
+
+		if (jy != null) {
+			result = result.replace(/jYYYY/g, String(jy));
+		}
+
+		if (jm != null) {
+			const monthName = JALALI_MONTHS_NAME[local][jm];
+
+			result = result
+				.replace(/jMMMM/g, monthName)
+				.replace(/jMM/g, jm.toString().padStart(2, "0"))
+				.replace(/jM/g, jm.toString());
+		}
+
+		let { season } = ctx;
+		if (season == null && jm != null) {
+			season = jalaliToSeason(jm);
+		}
+
+		if (season != null) {
+			const seasonName = SEASONS_NAME["fa"][season];
+
+			result = result
+				.replace(/jQQQQ/g, seasonName)
+				.replace(/jQQ/g, season.toString().padStart(2, "0"))
+				.replace(/jQ/g, season.toString());
+		}
+
+		return result;
+	}
+
+	private buildNotePath(
+		basePath: string | undefined,
+		fileName: string,
+		tokenContext?: TPathTokenContext,
+		local: TLocal = "fa",
+	) {
 		const normalized = this.normalizeFolderPath(basePath);
-		return normalized ? `${normalized}/${fileName}` : fileName;
+		const resolved = this.resolvePathTokens(normalized, tokenContext, local);
+
+		return resolved ? `${resolved}/${fileName}` : fileName;
+	}
+
+	private async ensureFolderExistsForPath(filePath: string) {
+		const parts = filePath.split("/");
+		parts.pop();
+
+		const folderPath = parts.join("/");
+		if (!folderPath) return;
+
+		let currentPath = "";
+		for (const part of parts) {
+			if (!part) continue;
+
+			currentPath = currentPath ? `${currentPath}/${part}` : part;
+
+			const existing = this.app.vault.getAbstractFileByPath(currentPath);
+			if (!existing) {
+				await this.app.vault.createFolder(currentPath);
+			}
+		}
 	}
 
 	private async openNoteInWorkspace(noteFile: TFile) {
@@ -60,6 +123,8 @@ export default class NoteService {
 				}
 			}
 
+			await this.ensureFolderExistsForPath(filePath);
+
 			const createdFile = await this.app.vault.create(filePath, "");
 
 			if (createdFile instanceof TFile) {
@@ -74,7 +139,7 @@ export default class NoteService {
 
 		for (let weekNumber = 1; weekNumber <= 53; weekNumber++) {
 			const fileName = `${jy}-W${weekNumber}.md`;
-			const filePath = this.buildNotePath(notesLocation, fileName);
+			const filePath = this.buildNotePath(notesLocation, fileName, { jy });
 
 			const file = this.app.vault.getAbstractFileByPath(filePath);
 			if (file instanceof TFile) {
@@ -91,7 +156,10 @@ export default class NoteService {
 
 		for (let seasonNumber = 1; seasonNumber <= 4; seasonNumber++) {
 			const fileName = `${jy}-S${seasonNumber}.md`;
-			const filePath = this.buildNotePath(notesLocation, fileName);
+			const filePath = this.buildNotePath(notesLocation, fileName, {
+				jy,
+				season: seasonNumber,
+			});
 
 			const file = this.app.vault.getAbstractFileByPath(filePath);
 			if (file instanceof TFile) {
@@ -117,7 +185,11 @@ export default class NoteService {
 				fileName = `${jy}-${jm.toString().padStart(2, "0")}-${jd.toString().padStart(2, "0")}.md`;
 			}
 
-			const filePath = this.buildNotePath(notesLocation, fileName);
+			const filePath = this.buildNotePath(notesLocation, fileName, {
+				jy,
+				jm,
+			});
+
 			const file = this.app.vault.getAbstractFileByPath(filePath);
 
 			if (file instanceof TFile) {
@@ -137,7 +209,10 @@ export default class NoteService {
 		}
 
 		const notesLocation = this.settings.dailyNotesPath;
-		const filePath = this.buildNotePath(notesLocation, `${dateString}.md`);
+		const filePath = this.buildNotePath(notesLocation, `${dateString}.md`, {
+			jy,
+			jm,
+		});
 
 		await this.openOrCreateNoteWithConfirm({
 			filePath,
@@ -149,7 +224,7 @@ export default class NoteService {
 	public async openOrCreateWeeklyNote(jy: number, weekNumber: number) {
 		const fileName = `${jy}-W${weekNumber}.md`;
 		const notesLocation = this.settings.weeklyNotesPath;
-		const filePath = this.buildNotePath(notesLocation, fileName);
+		const filePath = this.buildNotePath(notesLocation, fileName, { jy });
 
 		await this.openOrCreateNoteWithConfirm({
 			filePath,
@@ -161,7 +236,15 @@ export default class NoteService {
 	public async openOrCreateMonthlyNote(jy: number, jm: number, local: TLocal = "fa") {
 		const fileName = `${jy}-${jm.toString().padStart(2, "0")}.md`;
 		const notesLocation = this.settings.monthlyNotesPath;
-		const filePath = this.buildNotePath(notesLocation, fileName);
+		const filePath = this.buildNotePath(
+			notesLocation,
+			fileName,
+			{
+				jy,
+				jm,
+			},
+			local,
+		);
 
 		const jMonthName = JALALI_MONTHS_NAME[local];
 
@@ -175,7 +258,15 @@ export default class NoteService {
 	public async openOrCreateSeasonalNote(jy: number, seasonNumber: number, local: TLocal = "fa") {
 		const fileName = `${jy}-S${seasonNumber}.md`;
 		const notesLocation = this.settings.seasonalNotesPath;
-		const filePath = this.buildNotePath(notesLocation, fileName);
+		const filePath = this.buildNotePath(
+			notesLocation,
+			fileName,
+			{
+				jy,
+				season: seasonNumber,
+			},
+			local,
+		);
 
 		const seasonsName = SEASONS_NAME[local];
 
@@ -189,7 +280,7 @@ export default class NoteService {
 	public async openOrCreateYearlyNote(jy: number) {
 		const fileName = `${jy}.md`;
 		const notesLocation = this.settings.yearlyNotesPath;
-		const filePath = this.buildNotePath(notesLocation, fileName);
+		const filePath = this.buildNotePath(notesLocation, fileName, { jy });
 
 		await this.openOrCreateNoteWithConfirm({
 			filePath,
