@@ -3,6 +3,7 @@ import type { TSetting } from "src/types";
 export const DEFAULT_SETTING: TSetting = {
 	versionUpdate: true,
 	dateFormat: "gregorian",
+	askForCreateNote: true,
 	showSeasonalNotes: true,
 	showHolidays: true,
 	weekendDays: "friday",

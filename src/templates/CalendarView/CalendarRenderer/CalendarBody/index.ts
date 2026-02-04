@@ -37,7 +37,7 @@ export default class CalendarBodyRender {
 
 		const seasonState = jalaliToSeason(jMonthState);
 
-		const seasonsWithNotes = await this.notesService.getSeasensWithNotes(jYearState);
+		const seasonsWithNotes = await this.notesService.getSeasonsWithNotes(jYearState);
 		const seasons = SEASONS_NAME[local];
 
 		for (let seasonNumber = 1; seasonNumber <= 4; seasonNumber++) {

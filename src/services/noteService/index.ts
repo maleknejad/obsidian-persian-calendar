@@ -1,25 +1,79 @@
 import { App, TFile, MarkdownView } from "obsidian";
 import type { TSetting } from "src/types";
 import { jalaliToGregorian, jalaliMonthLength } from "src/utils/dateUtils";
-import RTLNotice from "src/components/RTLNotice";
+import { createNoteModal } from "src/components/ConfirmModal";
 
 export default class NoteService {
 	constructor(
 		private readonly app: App,
 		private readonly settings: TSetting,
 	) {}
-
-	private normalizeFolderPath(path: string): string {
+	private normalizeFolderPath(path?: string | null): string {
+		if (!path) return "";
 		return path.trim().replace(/^\/*|\/*$/g, "");
 	}
 
+	private buildNotePath(basePath: string | undefined, fileName: string): string {
+		const normalized = this.normalizeFolderPath(basePath);
+		return normalized ? `${normalized}/${fileName}` : fileName;
+	}
+
+	private async openNoteInWorkspace(noteFile: TFile) {
+		const markdownLeaves = this.app.workspace.getLeavesOfType("markdown");
+
+		const existingLeaf = markdownLeaves.find(
+			(leaf) => leaf.view instanceof MarkdownView && leaf.view.file === noteFile,
+		);
+
+		if (existingLeaf) {
+			this.app.workspace.setActiveLeaf(existingLeaf);
+			return;
+		}
+
+		await this.app.workspace.openLinkText(noteFile.path, "", false);
+	}
+
+	private async openOrCreateNoteWithConfirm(options: {
+		filePath: string;
+		confirmTitle: string;
+		confirmMessage: string;
+	}) {
+		const { filePath, confirmTitle, confirmMessage } = options;
+
+		try {
+			let noteFile = this.app.vault.getAbstractFileByPath(filePath);
+
+			if (noteFile instanceof TFile) {
+				await this.openNoteInWorkspace(noteFile);
+				return;
+			}
+
+			if (this.settings.askForCreateNote) {
+				const shouldCreate = await createNoteModal(this.app, {
+					title: confirmTitle,
+					message: confirmMessage,
+				});
+
+				if (!shouldCreate) {
+					return;
+				}
+			}
+
+			const createdFile = await this.app.vault.create(filePath, "");
+
+			if (createdFile instanceof TFile) {
+				await this.openNoteInWorkspace(createdFile);
+			}
+		} catch (error) {}
+	}
+
 	public async getWeeksWithNotes(jy: number): Promise<number[]> {
-		const notesLocation = this.normalizeFolderPath(this.settings.weeklyNotesPath);
+		const notesLocation = this.settings.weeklyNotesPath;
 		const result: number[] = [];
 
 		for (let weekNumber = 1; weekNumber <= 53; weekNumber++) {
 			const fileName = `${jy}-W${weekNumber}.md`;
-			const filePath = notesLocation ? `${notesLocation}/${fileName}` : fileName;
+			const filePath = this.buildNotePath(notesLocation, fileName);
 
 			const file = this.app.vault.getAbstractFileByPath(filePath);
 			if (file instanceof TFile) {
@@ -30,13 +84,13 @@ export default class NoteService {
 		return result;
 	}
 
-	public async getSeasensWithNotes(jy: number): Promise<number[]> {
-		const notesLocation = this.normalizeFolderPath(this.settings.seasonalNotesPath);
+	public async getSeasonsWithNotes(jy: number): Promise<number[]> {
+		const notesLocation = this.settings.seasonalNotesPath;
 		const result: number[] = [];
 
 		for (let seasonNumber = 1; seasonNumber <= 4; seasonNumber++) {
 			const fileName = `${jy}-S${seasonNumber}.md`;
-			const filePath = notesLocation ? `${notesLocation}/${fileName}` : fileName;
+			const filePath = this.buildNotePath(notesLocation, fileName);
 
 			const file = this.app.vault.getAbstractFileByPath(filePath);
 			if (file instanceof TFile) {
@@ -47,26 +101,8 @@ export default class NoteService {
 		return result;
 	}
 
-	private async openNoteInWorkspace(noteFile: TFile) {
-		const isOpen = this.app.workspace
-			.getLeavesOfType("markdown")
-			.some((leaf) => leaf.view instanceof MarkdownView && leaf.view.file === noteFile);
-
-		if (isOpen) {
-			const leaf = this.app.workspace
-				.getLeavesOfType("markdown")
-				.find((leaf) => leaf.view instanceof MarkdownView && leaf.view.file === noteFile);
-			if (leaf) {
-				this.app.workspace.setActiveLeaf(leaf);
-			}
-		} else {
-			await this.app.workspace.openLinkText(noteFile.path, "", false);
-		}
-	}
-
-	// todo: change this
 	public async getDaysWithNotes(jy: number, jm: number): Promise<number[]> {
-		const notesLocation = this.normalizeFolderPath(this.settings.dailyNotesPath);
+		const notesLocation = this.settings.dailyNotesPath;
 		const result: number[] = [];
 		const daysInMonth = jalaliMonthLength(jy, jm);
 
@@ -80,7 +116,7 @@ export default class NoteService {
 				fileName = `${jy}-${jm.toString().padStart(2, "0")}-${jd.toString().padStart(2, "0")}.md`;
 			}
 
-			const filePath = notesLocation ? `${notesLocation}/${fileName}` : fileName;
+			const filePath = this.buildNotePath(notesLocation, fileName);
 			const file = this.app.vault.getAbstractFileByPath(filePath);
 
 			if (file instanceof TFile) {
@@ -91,121 +127,69 @@ export default class NoteService {
 		return result;
 	}
 
-	// todo: change this
 	public async openOrCreateDailyNote(jy: number, jm: number, jd: number) {
 		let dateString = `${jy}-${jm.toString().padStart(2, "0")}-${jd.toString().padStart(2, "0")}`;
 
 		if (this.settings.dateFormat === "gregorian") {
-			const g = jalaliToGregorian(jy, jm, jd);
-			dateString = `${g.gy}-${g.gm.toString().padStart(2, "0")}-${g.gd
-				.toString()
-				.padStart(2, "0")}`;
+			const { gy, gm, gd } = jalaliToGregorian(jy, jm, jd);
+			dateString = `${gy}-${gm.toString().padStart(2, "0")}-${gd.toString().padStart(2, "0")}`;
 		}
 
-		const notesLocation = this.normalizeFolderPath(this.settings.dailyNotesPath);
-		const filePath = `${notesLocation === "" ? "" : notesLocation + "/"}${dateString}.md`;
+		const notesLocation = this.settings.dailyNotesPath;
+		const filePath = this.buildNotePath(notesLocation, `${dateString}.md`);
 
-		try {
-			let dailyNoteFile = this.app.vault.getAbstractFileByPath(filePath);
-
-			if (!dailyNoteFile) {
-				await this.app.vault.create(filePath, "");
-				dailyNoteFile = this.app.vault.getAbstractFileByPath(filePath);
-			}
-
-			if (dailyNoteFile && dailyNoteFile instanceof TFile) {
-				await this.openNoteInWorkspace(dailyNoteFile);
-			}
-		} catch (error) {
-			RTLNotice("خطا در بازکردن یادداشت روزنوشت.");
-		}
+		await this.openOrCreateNoteWithConfirm({
+			filePath,
+			confirmTitle: "ایجاد روزنوشت جدید",
+			confirmMessage: `روزنوشت \u202A${dateString}\u202C ایجاد شود؟`,
+		});
 	}
 
-	// todo: change this
 	public async openOrCreateWeeklyNote(weekNumber: number, jy: number) {
-		const weekString = `${jy}-W${weekNumber}`;
-		const notesLocation = this.normalizeFolderPath(this.settings.weeklyNotesPath);
-		const filePath = `${notesLocation === "" ? "" : notesLocation + "/"}${weekString}.md`;
+		const fileName = `${jy}-W${weekNumber}.md`;
+		const notesLocation = this.settings.weeklyNotesPath;
+		const filePath = this.buildNotePath(notesLocation, fileName);
 
-		try {
-			let weeklyNoteFile = this.app.vault.getAbstractFileByPath(filePath);
-
-			if (!weeklyNoteFile) {
-				await this.app.vault.create(filePath, "");
-				weeklyNoteFile = this.app.vault.getAbstractFileByPath(filePath);
-			}
-
-			if (weeklyNoteFile && weeklyNoteFile instanceof TFile) {
-				await this.openNoteInWorkspace(weeklyNoteFile);
-			}
-		} catch (error) {
-			RTLNotice("خطا در بازکردن یادداشت هفته‌نوشت.");
-		}
+		await this.openOrCreateNoteWithConfirm({
+			filePath,
+			confirmTitle: "ایجاد هفته‌نوشت جدید",
+			confirmMessage: `هفته‌نوشت ${weekNumber} سال ${jy} ایجاد شود؟`,
+		});
 	}
 
-	// todo: change this
 	public async openOrCreateMonthlyNote(month: number, jy: number) {
-		const monthString = `${jy}-${month.toString().padStart(2, "0")}`;
-		const notesLocation = this.normalizeFolderPath(this.settings.monthlyNotesPath);
-		const filePath = `${notesLocation === "" ? "" : notesLocation + "/"}${monthString}.md`;
+		const fileName = `${jy}-${month.toString().padStart(2, "0")}.md`;
+		const notesLocation = this.settings.monthlyNotesPath;
+		const filePath = this.buildNotePath(notesLocation, fileName);
 
-		try {
-			let monthlyNoteFile = this.app.vault.getAbstractFileByPath(filePath);
-
-			if (!monthlyNoteFile) {
-				await this.app.vault.create(filePath, "");
-				monthlyNoteFile = this.app.vault.getAbstractFileByPath(filePath);
-			}
-
-			if (monthlyNoteFile && monthlyNoteFile instanceof TFile) {
-				await this.openNoteInWorkspace(monthlyNoteFile);
-			}
-		} catch (error) {
-			RTLNotice("خطا در بازکردن یادداشت ماه‌نوشت.");
-		}
+		await this.openOrCreateNoteWithConfirm({
+			filePath,
+			confirmTitle: "ایجاد ماه‌نوشت جدید",
+			confirmMessage: `ماه‌نوشت ${month.toString().padStart(2, "0")} سال ${jy} ایجاد شود؟`,
+		});
 	}
 
-	// todo: change this
 	public async openOrCreateSeasonalNote(seasonNumber: number, jy: number) {
-		const seasonString = `${jy}-S${seasonNumber}`;
-		const notesLocation = this.normalizeFolderPath(this.settings.seasonalNotesPath);
-		const filePath = `${notesLocation === "" ? "" : notesLocation + "/"}${seasonString}.md`;
+		const fileName = `${jy}-S${seasonNumber}.md`;
+		const notesLocation = this.settings.seasonalNotesPath;
+		const filePath = this.buildNotePath(notesLocation, fileName);
 
-		try {
-			let seasonalNoteFile = this.app.vault.getAbstractFileByPath(filePath);
-
-			if (!seasonalNoteFile) {
-				await this.app.vault.create(filePath, "");
-				seasonalNoteFile = this.app.vault.getAbstractFileByPath(filePath);
-			}
-
-			if (seasonalNoteFile && seasonalNoteFile instanceof TFile) {
-				await this.openNoteInWorkspace(seasonalNoteFile);
-			}
-		} catch (error) {
-			RTLNotice("خطا در بازکردن یادداشت فصل‌نوشت.");
-		}
+		await this.openOrCreateNoteWithConfirm({
+			filePath,
+			confirmTitle: "ایجاد فصل‌نوشت جدید",
+			confirmMessage: `فصل‌نوشت ${seasonNumber} سال ${jy} ایجاد شود؟`,
+		});
 	}
 
-	// todo: change this
 	public async openOrCreateYearlyNote(jy: number) {
-		const yearString = String(jy);
-		const notesLocation = this.normalizeFolderPath(this.settings.yearlyNotesPath);
-		const filePath = `${notesLocation === "" ? "" : notesLocation + "/"}${yearString}.md`;
+		const fileName = `${jy}.md`;
+		const notesLocation = this.settings.yearlyNotesPath;
+		const filePath = this.buildNotePath(notesLocation, fileName);
 
-		try {
-			let yearlyNoteFile = this.app.vault.getAbstractFileByPath(filePath);
-
-			if (!yearlyNoteFile) {
-				await this.app.vault.create(filePath, "");
-				yearlyNoteFile = this.app.vault.getAbstractFileByPath(filePath);
-			}
-
-			if (yearlyNoteFile && yearlyNoteFile instanceof TFile) {
-				await this.openNoteInWorkspace(yearlyNoteFile);
-			}
-		} catch (error) {
-			RTLNotice("خطا در بازکردن یادداشت سال‌نوشت.");
-		}
+		await this.openOrCreateNoteWithConfirm({
+			filePath,
+			confirmTitle: "ایجاد سال‌نوشت جدید",
+			confirmMessage: `سال‌نوشت ${jy} ایجاد شود؟`,
+		});
 	}
 }

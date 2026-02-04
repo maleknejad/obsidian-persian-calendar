@@ -13,6 +13,7 @@
 
 /* components */
 @import "./sections/social-links.css";
+@import "./sections/confirm-modal.css";
 
 /* responsive */
 @import "./sections/responsive.css";

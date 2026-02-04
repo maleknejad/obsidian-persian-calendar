@@ -1,0 +1,16 @@
+.persian-calendar__cmodal-container {
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+	margin-top: 16px;
+}
+
+.persian-calendar__cmodal-confirm,
+.persian-calendar__cmodal-cancel {
+	cursor: pointer;
+}
+
+.persian-calendar__cmodal-confirm {
+	background-color: var(--color-accent) !important;
+	color: var(--color-base-05) !important;
+}

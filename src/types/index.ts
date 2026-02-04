@@ -61,11 +61,13 @@ export type TBoolSettingKeys = Extract<
 	| "showIRAncientEvents"
 	| "showIRIslamEvents"
 	| "showGlobalEvents"
+	| "askForCreateNote"
 >;
 
 export type TSetting = {
 	lastSeenVersion?: string;
 	versionUpdate: boolean;
+	askForCreateNote: boolean;
 	dateFormat: TDateFormat;
 	showSeasonalNotes: boolean;
 	// show holidays
