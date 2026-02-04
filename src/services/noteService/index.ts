@@ -154,7 +154,7 @@ export default class NoteService {
 		await this.openOrCreateNoteWithConfirm({
 			filePath,
 			confirmTitle: "ایجاد هفته‌نوشت جدید",
-			confirmMessage: `هفته‌نوشت هفته‌ی${weekNumber}ام سال ${jy} ایجاد شود؟`,
+			confirmMessage: `هفته‌نوشت هفته‌ی ${weekNumber}ام سال ${jy} ایجاد شود؟`,
 		});
 	}
 

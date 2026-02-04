@@ -36,7 +36,7 @@ export default class CalendarSettings extends SettingsBase {
 			refresh: true,
 		});
 		this.addToggleSetting(containerEl, {
-			name: "دریافت تایید پیش از ایجاد یادداشت",
+			name: "تایید پیش از ایجاد یادداشت",
 			desc: "با فعال‌سازی این گزینه، پیش از ایجاد هر یادداشت، پنجره‌ی تایید نمایش داده می‌شود.",
 			key: "askForCreateNote",
 			refresh: true,
