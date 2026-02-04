@@ -60,7 +60,7 @@
 	padding-left: 5px;
 }
 
-.persian-calendar__additional-calendar-state{
+.persian-calendar__additional-calendar-state {
 	text-align: center;
 }
 
@@ -98,11 +98,23 @@
 	opacity: 0.6;
 }
 .persian-calendar__season--no-note {
-	border: none;
+	border: hidden;
 }
 
 .persian-calendar__season--current {
 	color: var(--persian-calendar-color-primary);
 	border-color: var(--persian-calendar-color-primary);
 	font-weight: 800;
+}
+
+.persian-calendar__seasons-row {
+	align-items: center;
+	border-top: 1px dashed var(--persian-calendar-color-base);
+	display: flex;
+	grid-column: 1 / span 2;
+	grid-row: 2;
+	justify-content: space-evenly;
+	margin-top: var(--persian-calendar-spacing-md);
+	padding-top: var(--persian-calendar-spacing-sm);
+	height: 34px;
 }

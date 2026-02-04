@@ -66,22 +66,30 @@ export default class GridService {
 		return { dayIndex, dayNumber, cellJy, cellJm, isInCurrentMonth };
 	}
 
-	//todo: بعضی ماه‌ها پنج هفته‌ای و برخی چهار هفته‌ای هستن. اگه این تشخیصشون بده عالی میشه
 	public buildMonthGrid(jy: number, jm: number): TMonthGridCell[] {
 		const { showHolidays } = this.settings;
 
 		const daysInMonth = jalaliMonthLength(jy, jm);
 		const firstDayOfWeekIndex = this.calendarState.calculateFirstDayOfWeekIndex(jy, jm);
-		const totalCells = 42;
 
 		const daysFromPrevMonth =
 			this.calendarState.calculateDaysFromPreviousMonth(firstDayOfWeekIndex);
+
+		const daysFromPrevMonthCount = daysFromPrevMonth.length;
+
+		const totalDaysInGrid = daysFromPrevMonthCount + daysInMonth;
+
+		const weeks = Math.ceil(totalDaysInGrid / 7);
+
+		const totalCells = weeks * 7;
+
 		const daysFromNextMonth = this.calendarState.calculateDaysFromNextMonth(
 			firstDayOfWeekIndex,
 			daysInMonth,
+			totalCells,
 		);
 
-		const cells = [];
+		const cells: TMonthGridCell[] = [];
 
 		for (let index = 0; index < totalCells; index++) {
 			const {

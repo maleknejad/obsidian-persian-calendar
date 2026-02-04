@@ -60,13 +60,17 @@ export default class CalendarState {
 		return daysFromPrevMonth;
 	}
 
-	public calculateDaysFromNextMonth(firstDayOfWeek: number, currentMonthLength?: number) {
-		const effectiveMonthLength =
-			currentMonthLength ?? jalaliMonthLength(this.jYearState, this.jMonthState);
+	public calculateDaysFromNextMonth(
+		firstDayOfWeek: number,
+		daysInMonth: number,
+		totalCells: number = 42,
+	) {
+		const daysFromPrevCount = firstDayOfWeek;
+
+		const totalDaysInGrid = daysFromPrevCount + daysInMonth;
+		const daysToInclude = totalCells - totalDaysInGrid;
 
 		const daysFromNextMonth: number[] = [];
-		const totalCells = 6 * 7;
-		const daysToInclude = totalCells - effectiveMonthLength - firstDayOfWeek;
 
 		for (let i = 1; i <= daysToInclude; i++) {
 			daysFromNextMonth.push(i);
@@ -75,7 +79,20 @@ export default class CalendarState {
 		return daysFromNextMonth;
 	}
 
-	//todo: update & move to dateUtils
+	public getWeeksCountForMonth(jy: number, jm: number): number {
+		const daysInMonth = jalaliMonthLength(jy, jm);
+		const firstDayOfWeekIndex = this.calculateFirstDayOfWeekIndex(jy, jm);
+
+		const daysFromPrevMonth = this.calculateDaysFromPreviousMonth(firstDayOfWeekIndex);
+		const daysFromPrevMonthCount = daysFromPrevMonth.length;
+
+		const totalDaysInGrid = daysFromPrevMonthCount + daysInMonth;
+
+		const weeks = Math.ceil(totalDaysInGrid / 7);
+
+		return weeks;
+	}
+
 	public calculateFirstDayOfWeekIndex(jy: number, jm: number): number {
 		const { gy, gm, gd } = jalaliToGregorian(jy, jm, 1);
 		const firstDayDate = new Date(gy, gm - 1, gd);
@@ -86,14 +103,15 @@ export default class CalendarState {
 		return adjustedDayOfWeek;
 	}
 
-	//todo: move to dateUtils
 	public getWeekNumbersForMonth(jy: number, jm: number): number[] {
 		const startOfMonthDate = jalaliToDate(jy, jm, 1);
 		const startWeekNumber = dateToJWeekNumber(startOfMonthDate);
 
+		const weeks = this.getWeeksCountForMonth(jy, jm);
+
 		const weekNumbers: number[] = [];
 
-		for (let i = 0; i < 6; i++) {
+		for (let i = 0; i < weeks; i++) {
 			const weekNumberForIthWeek = startWeekNumber + i;
 			weekNumbers.push(weekNumberForIthWeek);
 		}

@@ -83,14 +83,13 @@ export default class CalendarBodyRender {
 
 		const { jy, jm } = jalaliDate;
 
+		const weeksCount = this.calendarState.getWeeksCountForMonth(jy, jm);
+		contentEl.style.setProperty("--persian-calendar-weeks-count", String(weeksCount));
+
 		const weekNumbers = this.calendarState.getWeekNumbersForMonth(jy, jm);
 		const weeksWithNotes = await this.notesService.getWeeksWithNotes(jy);
 
-		const startDay = jalaliToDate(jy, jm, 1).getDay() + 1;
-		const firstDayColumn = startDay % 7;
-		const monthLength = jalaliMonthLength(jy, jm);
-
-		for (let i = 0; i < 6; i++) {
+		for (let i = 0; i < weekNumbers.length; i++) {
 			const weekNumber = weekNumbers[i];
 
 			const weekEl = weekNumbersEl.createEl("div", {
@@ -102,16 +101,7 @@ export default class CalendarBodyRender {
 				weekEl.addClass("persian-calendar__no-note");
 			}
 
-			const weekStartDayIndex = 1 - firstDayColumn + i * 7;
-			if (weekStartDayIndex > monthLength) {
-				weekEl.addClass("persian-calendar__no-current-month");
-			}
-
 			weekEl.addEventListener("click", () => {
-				if (weekStartDayIndex > monthLength) {
-					this.navigation.changeMonth("next");
-				}
-
 				this.notesService.openOrCreateWeeklyNote(weekNumber, jy);
 			});
 		}

@@ -4,7 +4,7 @@
 	gap: var(--persian-calendar-gap-y-days) var(--persian-calendar-gap-x-days);
 	grid-auto-rows: 40px;
 	grid-column: 2;
-	grid-row: 2 / span 6;
+	grid-row: 2 / -1;
 	grid-template-columns: repeat(7, minmax(0, 1fr));
 	margin: 0;
 	padding: 0 5px;

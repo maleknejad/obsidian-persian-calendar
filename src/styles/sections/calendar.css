@@ -12,7 +12,7 @@
 	column-gap: var(--persian-calendar-spacing-sm);
 	display: grid;
 	grid-template-columns: 50px minmax(0, 1fr);
-	grid-template-rows: 40px repeat(6, 40px);
+	grid-template-rows: 40px repeat(var(--persian-calendar-weeks-count, 6), 40px);
 	padding: 0 var(--persian-calendar-spacing-md);
 	row-gap: var(--persian-calendar-gap-y-days);
 }
@@ -42,8 +42,9 @@
 	border-left: 1px dashed var(--persian-calendar-color-base);
 	display: grid;
 	grid-column: 1;
-	grid-row: 1 / span 7;
-	grid-template-rows: 40px repeat(6, 40px);
+	grid-row: 1 / -1;
+	grid-template-rows: 40px;
+	grid-auto-rows: 40px;
 	row-gap: var(--persian-calendar-gap-y-days);
 	text-align: center;
 }
@@ -79,15 +80,4 @@
 }
 .persian-calendar__refresh svg:hover {
 	opacity: 0.8;
-}
-
-.persian-calendar__seasons-row {
-	align-items: center;
-	border-top: 1px dashed var(--persian-calendar-color-base);
-	display: flex;
-	grid-column: 1 / span 2;
-	grid-row: 2;
-	justify-content: space-evenly;
-	margin-top: var(--persian-calendar-spacing-md);
-	padding-top: var(--persian-calendar-spacing-sm);
 }
