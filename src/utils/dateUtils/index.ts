@@ -10,8 +10,8 @@ export {
 	dateToJWeekNumber, // (Date) => Number(jalali_week_number)
 	jalaliToJWeekNumber, // (jy, jm, jd) => Number(jalali_week_number)
 	getFirstWeekStartOfJYear, // (jy) => (first saturday in jy){jy, jm, jd}
-	jalaliToStartDayOfWeek, // ({jYear, jWeekNumber}) => (start day of week){jy, jm, jd}
-	jalaliToEndDayOfWeek, // ({jYear, jWeekNumber}) => (end day of week){jy, jm, jd}
+	jalaliToStartDayOfWeek, // ({jYear, jWeekNumber}) => (start day of week){jy, jm, jd, gy, gm, gd}
+	jalaliToEndDayOfWeek, // ({jYear, jWeekNumber}) => (end day of week){jy, jm, jd, gy, gm, gd}
 } from "./jalaliUtils";
 export {
 	gregorianToDate, // (gy, gm, gd) => (Is it a valid Gregorian date?)Date|null

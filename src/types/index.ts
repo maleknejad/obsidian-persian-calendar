@@ -93,11 +93,13 @@ export type TLocal = "fa" | "en";
 
 export type TBuildContext = {
 	currentDate: Date;
-	fileDate: Date;
+	fileDate: Date | null;
 	fileName: string;
 	baseDate: TDateFormat;
 	isWeekly: boolean;
 	isMonthly: boolean;
+	isSeasonal: boolean;
+	targetYear: number | null;
 };
 
 export type TMonthGridCell = TJalali & {

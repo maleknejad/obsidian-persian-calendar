@@ -1,6 +1,6 @@
 import { toJalaali, toGregorian, jalaaliMonthLength, isValidJalaaliDate } from "jalaali-js";
 import { dateToGregorian, weekStartNumber } from "..";
-import type { TJalali, TGregorian, TWeekStart, TGetDayOfWeek, TDateFormat } from "src/types";
+import type { TJalali, TGregorian, TWeekStart, TGetDayOfWeek } from "src/types";
 
 export function checkValidJalali(jy: number, jm: number, jd: number) {
 	return isValidJalaaliDate(jy, jm, jd);
@@ -23,11 +23,7 @@ export function jalaliToGregorian(jy: number, jm: number, jd: number): TGregoria
 	return toGregorian(jy, jm, jd);
 }
 
-export function gregorianToJalali(
-	gy: number,
-	gm: number,
-	gd: number,
-): TJalali {
+export function gregorianToJalali(gy: number, gm: number, gd: number): TJalali {
 	const { jy, jm, jd } = toJalaali(gy, gm, gd);
 	return { jy, jm, jd };
 }
@@ -104,9 +100,8 @@ export function getFirstWeekStartOfJYear(jy: number, weekStart: TWeekStart = "sa
 
 export function jalaliToStartDayOfWeek(
 	{ jYear, jWeekNumber }: TGetDayOfWeek,
-	baseDate: TDateFormat = "jalali",
 	weekStart: TWeekStart = "sat",
-): TJalali | TGregorian {
+): TJalali & TGregorian {
 	const { gy, gm, gd } = jalaliToGregorian(jYear, 1, 1);
 	const firstDayOfYear = new Date(gy, gm - 1, gd);
 
@@ -127,28 +122,18 @@ export function jalaliToStartDayOfWeek(
 	const targetDate = new Date(firstWeekStartDate);
 	targetDate.setDate(firstWeekStartDate.getDate() + (jWeekNumber - 1) * 7);
 
-	return baseDate === "jalali" ? dateToJalali(targetDate) : dateToGregorian(targetDate);
+	return { ...dateToJalali(targetDate), ...dateToGregorian(targetDate) };
 }
 
 export function jalaliToEndDayOfWeek(
 	{ jYear, jWeekNumber }: TGetDayOfWeek,
-	baseDate: TDateFormat = "jalali",
 	weekStart: TWeekStart = "sat",
-): TJalali | TGregorian {
-	const startDate = jalaliToStartDayOfWeek({ jYear, jWeekNumber }, baseDate, weekStart);
+): TJalali & TGregorian {
+	const { gy, gm, gd } = jalaliToStartDayOfWeek({ jYear, jWeekNumber }, weekStart);
 
-	let targetDate: Date;
-
-	if (baseDate === "jalali") {
-		const jalaliStart = startDate as TJalali;
-		const { gy, gm, gd } = jalaliToGregorian(jalaliStart.jy, jalaliStart.jm, jalaliStart.jd);
-		targetDate = new Date(gy, gm - 1, gd);
-	} else {
-		const gregorianStart = startDate as TGregorian;
-		targetDate = new Date(gregorianStart.gy, gregorianStart.gm - 1, gregorianStart.gd);
-	}
+	let targetDate = new Date(gy, gm - 1, gd);
 
 	targetDate.setDate(targetDate.getDate() + 6);
 
-	return baseDate === "jalali" ? dateToJalali(targetDate) : dateToGregorian(targetDate);
+	return { ...dateToJalali(targetDate), ...dateToGregorian(targetDate) };
 }

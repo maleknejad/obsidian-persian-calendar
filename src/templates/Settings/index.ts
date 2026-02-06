@@ -25,8 +25,8 @@ export default class CalendarSettings extends SettingsBase {
 
 		containerEl.createEl("h2", { text: "تنظیمات عمومی" });
 		this.addDropdownSetting(containerEl, {
-			name: "فرمت نام‌گذاری و شناسایی روزنوشت‌ها",
-			desc: "روزنوشت‌ها با چه فرمتی نام‌گذاری و شناسایی شود؟",
+			name: "فرمت عبارات معنادار و روزنوشت‌ها",
+			desc: '*پیشنهاد می‌شود برای هماهنگی با دیگر پلاگین‌ها از فرمت "میلادی" استفاده کنید.',
 			key: "dateFormat",
 			options: {
 				jalali: "هجری شمسی",

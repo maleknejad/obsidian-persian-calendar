@@ -255,7 +255,7 @@ export default class PersianCalendarPlugin extends Plugin {
 				return;
 			}
 
-			const { UpdateModal } = await import("src/templates/UpdateModal");
+			const { UpdateModal } = await import("src/components/UpdateModal");
 			const releaseNotes = getReleaseNotesForVersion(currentVersion);
 
 			new UpdateModal(this.app, releaseNotes, () => {
@@ -283,7 +283,7 @@ export default class PersianCalendarPlugin extends Plugin {
 			return;
 		}
 
-		const { UpdateModal } = await import("src/templates/UpdateModal");
+		const { UpdateModal } = await import("src/components/UpdateModal");
 
 		let releaseNotes;
 		if (compareVersions(currentVersion, lastSeenVersion) > 0) {
