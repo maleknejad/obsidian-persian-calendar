@@ -8,11 +8,10 @@ import {
 	getDaysInJalaliYear,
 	dateToJWeekNumber,
 	jalaliToStartDayOfWeek,
-	jalaliToEndDayOfWeek,
 	jalaliToSeason,
 } from "..";
 import { dayFormat, monthFormat, seasonFormat, weekFormat } from "src/utils/format";
-import type { TDateFormat, TGregorian, TJalali, TWeekStart } from "src/types";
+import type { TDateFormat, TJalali, TWeekStart } from "src/types";
 
 export function gregorianDashToJalaliDash(
 	dashDate: string,
@@ -193,13 +192,13 @@ export function dateToStartDayOfWeekDash(
 	const { jy: jYear } = dateToJalali(date);
 	const jWeekNumber = dateToJWeekNumber(date);
 
+	const { jy, jm, jd, gy, gm, gd } = jalaliToStartDayOfWeek({ jYear, jWeekNumber });
+
 	if (baseDate === "jalali") {
-		const { jy, jm, jd } = jalaliToStartDayOfWeek({ jYear, jWeekNumber }, "jalali") as TJalali;
 		return dayFormat(jy, jm, jd, { separator });
 	}
 
-	const { gy, gm, gd } = jalaliToStartDayOfWeek({ jYear, jWeekNumber }, "gregorian") as TGregorian;
-	return dayFormat(gy, gm, gd);
+	return dayFormat(gy, gm, gd, { separator });
 }
 
 export function dateToEndDayOfWeekDash(
@@ -212,11 +211,11 @@ export function dateToEndDayOfWeekDash(
 	const { jy: jYear } = dateToJalali(date);
 	const jWeekNumber = dateToJWeekNumber(date);
 
+	const { jy, jm, jd, gy, gm, gd } = jalaliToStartDayOfWeek({ jYear, jWeekNumber });
+
 	if (baseDate === "jalali") {
-		const { jy, jm, jd } = jalaliToEndDayOfWeek({ jYear, jWeekNumber }, "jalali") as TJalali;
 		return dayFormat(jy, jm, jd);
 	}
 
-	const { gy, gm, gd } = jalaliToEndDayOfWeek({ jYear, jWeekNumber }, "gregorian") as TGregorian;
 	return dayFormat(gy, gm, gd, { separator });
 }

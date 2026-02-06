@@ -23,11 +23,11 @@ export function getJalaliMonthName(month: number, local: TLocal = "fa"): string 
 }
 
 export function dateToGregorian(date: Date): TGregorian {
-	return {
-		gy: date.getFullYear(),
-		gm: date.getMonth() + 1,
-		gd: date.getDate(),
-	};
+	const year = date.getUTCFullYear();
+	const month = date.getUTCMonth() + 1;
+	const day = date.getUTCDate();
+
+	return { gy: year, gm: month, gd: day };
 }
 
 export function dateToWeekdayName(date: Date, local: TLocal = "fa"): string {

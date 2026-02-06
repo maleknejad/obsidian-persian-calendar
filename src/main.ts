@@ -7,6 +7,7 @@ import {
 	TAbstractFile,
 	App,
 	type PluginManifest,
+	TFolder,
 } from "obsidian";
 import { DateSuggester, Placeholder, NoteService } from "./services";
 import CalendarView from "./templates/CalendarView";
@@ -76,6 +77,7 @@ export default class PersianCalendarPlugin extends Plugin {
 			}),
 		);
 
+		// todo: improve this
 		this.registerEvent(
 			this.app.vault.on("create", (file: TAbstractFile) => {
 				if (file instanceof TFile && file.path.endsWith(".md")) {
@@ -85,9 +87,7 @@ export default class PersianCalendarPlugin extends Plugin {
 					const timeDiff = now - fileCreationTime;
 
 					if (timeDiff < 2000) {
-						if (this.placeholder) {
-							this.placeholder.insertPersianDate(file);
-						}
+						this.placeholder.insertPersianDate(file);
 					}
 				}
 			}),
@@ -95,7 +95,7 @@ export default class PersianCalendarPlugin extends Plugin {
 
 		this.registerEvent(
 			this.app.vault.on("delete", (file) => {
-				if (file instanceof TFile && file.path.endsWith(".md")) {
+				if ((file instanceof TFile && file.path.endsWith(".md")) || file instanceof TFolder) {
 					this.handleFileUpdate();
 				}
 			}),
@@ -108,7 +108,7 @@ export default class PersianCalendarPlugin extends Plugin {
 			name: "Replace Placeholders - جایگزینی عبارات معنادار در این یادداشت",
 			editorCallback: async (editor, view) => {
 				if (view.file) {
-					await this.placeholder?.insertPersianDate(view.file);
+					await this.placeholder.insertPersianDate(view.file);
 					RTLNotice("جایگزینی با موفقیت انجام شد.");
 				}
 			},

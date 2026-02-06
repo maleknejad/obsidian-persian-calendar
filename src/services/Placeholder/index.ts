@@ -1,4 +1,4 @@
-import { TFile } from "obsidian";
+import { Notice, TFile } from "obsidian";
 import PersianCalendarPlugin from "src/main";
 import {
 	dateToJWeekDash,
@@ -10,15 +10,17 @@ import {
 	dashToDate,
 	dateToDaysPassedJYear,
 	dateToDaysRemainingJYear,
-	dateToStartDayOfWeekDash,
-	dateToEndDayOfWeekDash,
 	dashToEvents,
 	eventsToString,
-	jalaliToGregorian,
 	jalaliMonthLength,
 	checkKabiseh,
+	jalaliToDate,
+	dateToGregorian,
+	jalaliToStartDayOfWeek,
+	jalaliToEndDayOfWeek,
+	dateToJalali,
 } from "src/utils/dateUtils";
-import type { TBuildContext } from "src/types";
+import type { TBuildContext, TDateFormat } from "src/types";
 
 export default class Placeholder {
 	plugin: PersianCalendarPlugin;
@@ -43,7 +45,6 @@ export default class Placeholder {
 
 		const placeholders = this.getPlaceholderMap(context);
 
-		// Single pass replacement with proper escaping
 		let result = content;
 		for (const [placeholder, value] of placeholders.entries()) {
 			if (!content.includes(placeholder)) continue;
@@ -61,15 +62,22 @@ export default class Placeholder {
 	private buildContext(file: TFile): TBuildContext {
 		const fileName = file.basename;
 		const baseDate = this.plugin.settings.dateFormat;
-		const fileDate = dashToDate(fileName, baseDate) as Date;
+
+		let fileDate = dashToDate(fileName, baseDate);
+
+		const isMonthly = this.isMonthlyFile(fileName);
+		const isWeekly = this.isWeeklyFile(fileName);
+		const isSeasonal = this.isSeasonalFile(fileName);
 
 		return {
 			currentDate: new Date(),
 			fileDate,
 			fileName,
 			baseDate,
-			isWeekly: this.isWeeklyFile(fileName),
-			isMonthly: this.isMonthlyFile(fileName),
+			isWeekly,
+			isMonthly,
+			isSeasonal,
+			targetYear: this.extractYear(fileName, fileDate),
 		};
 	}
 
@@ -80,28 +88,35 @@ export default class Placeholder {
 		baseDate,
 		isMonthly,
 		isWeekly,
+		isSeasonal,
+		targetYear,
 	}: TBuildContext): Map<string, unknown> {
 		return new Map<string, unknown>([
 			["{{امروز}}", dateToJDayDash(currentDate)],
-			["{{این روز}}", dateToJDayDash(fileDate)],
+			["{{این روز}}", fileDate ? dateToJDayDash(fileDate) : null],
 			["{{روز هفته}}", dateToWeekdayName(currentDate)],
-			["{{این روز هفته}}", dateToWeekdayName(fileDate)],
+			["{{این روز هفته}}", fileDate ? dateToWeekdayName(fileDate) : null],
 			["{{هفته}}", dateToJWeekDash(currentDate)],
-			["{{این هفته}}", dateToJWeekDash(fileDate)],
+			["{{این هفته}}", fileDate ? dateToJWeekDash(fileDate) : null],
 			["{{ماه}}", dateToJMonthDash(currentDate)],
-			["{{این ماه}}", dateToJMonthDash(fileDate)],
+			["{{این ماه}}", fileDate ? dateToJMonthDash(fileDate) : null],
 			["{{فصل}}", dateToSeasonDash(currentDate)],
-			["{{این فصل}}", dateToSeasonDash(fileDate)],
+			["{{این فصل}}", fileDate ? dateToSeasonDash(fileDate) : null],
 			["{{سال}}", dateToJYearDash(currentDate)],
-			["{{این سال}}", dateToJYearDash(fileDate)],
+			["{{این سال}}", fileDate ? dateToJYearDash(fileDate) : null],
 			["{{روزهای گذشته}}", dateToDaysPassedJYear(currentDate)],
 			["{{روزهای باقیمانده}}", dateToDaysRemainingJYear(currentDate)],
-			["{{اول هفته}}", isWeekly ? dateToStartDayOfWeekDash(fileDate, { baseDate }) : null],
-			["{{آخر هفته}}", isWeekly ? dateToEndDayOfWeekDash(fileDate, { baseDate }) : null],
+			["{{اول هفته}}", isWeekly ? this.getWeekStartDate(fileName, baseDate) : null],
+			["{{آخر هفته}}", isWeekly ? this.getWeekEndDate(fileName, baseDate) : null],
+
+			// برای ماه‌‌های 11, 12 درست کار نمیکنه
 			["{{اول ماه}}", isMonthly ? this.getMonthStartDate(fileName, baseDate) : null],
 			["{{آخر ماه}}", isMonthly ? this.getMonthEndDate(fileName, baseDate) : null],
-			["{{اول سال}}", this.getFirstDayOfYear(fileName)],
-			["{{آخر سال}}", this.getLastDayOfYear(fileName)],
+
+			["{{اول فصل}}", isSeasonal ? this.getSeasonStartDate(fileName, baseDate) : null],
+			["{{آخر فصل}}", isSeasonal ? this.getSeasonEndDate(fileName, baseDate) : null],
+			["{{اول سال}}", targetYear ? this.getYearStartDate(targetYear, baseDate) : null],
+			["{{آخر سال}}", targetYear ? this.getYearEndDate(targetYear, baseDate) : null],
 			["{{مناسبت}}", eventsToString(dashToEvents(fileName, baseDate, this.plugin.settings))],
 		]);
 	}
@@ -114,79 +129,128 @@ export default class Placeholder {
 		return this.placeholderPatterns.get(placeholder)!;
 	}
 
-	//todo: move to utils
 	private isWeeklyFile(title: string): boolean {
 		return /^\d{4}-W\d{1,2}$/.test(title);
 	}
 
-	//todo: move to utils
 	private isMonthlyFile(title: string): boolean {
 		return /^\d{4}-\d{1,2}$/.test(title);
 	}
 
-	//todo: move to utils
-	private getMonthStartDate(title: string, dateFormat: string): string | null {
-		const [year, month] = title.split("-").map(Number);
-		if (!year || !month) return null;
-
-		if (dateFormat === "jalali") {
-			return `${year}-${month.toString().padStart(2, "0")}-01`;
-		}
-
-		const gregorianStart = jalaliToGregorian(year, month, 1);
-		return `${gregorianStart.gy}-${gregorianStart.gm
-			.toString()
-			.padStart(2, "0")}-${gregorianStart.gd.toString().padStart(2, "0")}`;
+	private isSeasonalFile(title: string): boolean {
+		return /^\d{4}-S[1-4]$/.test(title);
 	}
 
-	//todo: move to utils
-	private getMonthEndDate(title: string, dateFormat: string): string | null {
-		const [year, month] = title.split("-").map(Number);
-		if (!year || !month) return null;
+	private extractYear(fileName: string, fileDate: Date | null): number | null {
+		if (fileDate) {
+			const { jy } = dateToJalali(fileDate);
+			return jy;
+		}
+
+		const yearMatch = fileName.match(/^(\d{4})/);
+		if (!yearMatch) return null;
+
+		return Number(yearMatch[1]);
+	}
+
+	private getWeekStartDate(title: string, dateFormat: TDateFormat): string | null {
+		const match = title.match(/^(\d{4})-W(\d{1,2})$/);
+		if (!match) return null;
+
+		const year = Number(match[1]);
+		const week = Number(match[2]);
+
+		const startDay = jalaliToStartDayOfWeek({ jYear: year, jWeekNumber: week });
+		const startDate = jalaliToDate(startDay.jy, startDay.jm, startDay.jd);
+
+		return this.formatDateByBase(startDate, dateFormat);
+	}
+
+	private getWeekEndDate(title: string, dateFormat: TDateFormat): string | null {
+		const match = title.match(/^(\d{4})-W(\d{1,2})$/);
+		if (!match) return null;
+
+		const year = Number(match[1]);
+		const week = Number(match[2]);
+
+		const endDay = jalaliToEndDayOfWeek({ jYear: year, jWeekNumber: week });
+		const endDate = jalaliToDate(endDay.jy, endDay.jm, endDay.jd);
+
+		return this.formatDateByBase(endDate, dateFormat);
+	}
+
+	private getMonthStartDate(title: string, dateFormat: TDateFormat) {
+		const match = title.match(/^(\d{4})-(\d{1,2})$/);
+		if (!match) return null;
+
+		const year = Number(match[1]);
+		const month = Number(match[2]);
+
+		const startDate = jalaliToDate(year, month, 1);
+
+		return this.formatDateByBase(startDate, dateFormat);
+	}
+
+	private getMonthEndDate(title: string, dateFormat: TDateFormat): string | null {
+		const match = title.match(/^(\d{4})-(\d{1,2})$/);
+		if (!match) return null;
+
+		const year = parseInt(match[1]);
+		const month = parseInt(match[2]);
 
 		const jalaliEndDay = jalaliMonthLength(year, month);
+		const endDate = jalaliToDate(year, month, jalaliEndDay);
 
-		if (dateFormat === "jalali") {
-			return `${year}-${month.toString().padStart(2, "0")}-${jalaliEndDay
-				.toString()
-				.padStart(2, "0")}`;
-		}
-
-		const gregorianEnd = jalaliToGregorian(year, month, jalaliEndDay);
-		return `${gregorianEnd.gy}-${gregorianEnd.gm.toString().padStart(2, "0")}-${gregorianEnd.gd
-			.toString()
-			.padStart(2, "0")}`;
+		return this.formatDateByBase(endDate, dateFormat);
 	}
 
-	//todo: move to utils
-	private getFirstDayOfYear(fileBasename: string): string {
-		const year = parseInt(fileBasename);
-		if (isNaN(year)) return "";
+	private getSeasonStartDate(title: string, dateFormat: TDateFormat): string | null {
+		const match = title.match(/^(\d{4})-S([1-4])$/);
+		if (!match) return null;
 
-		if (this.plugin.settings.dateFormat === "gregorian") {
-			const georgianDate = jalaliToGregorian(year, 1, 1);
-			return `${georgianDate.gy}-${georgianDate.gm.toString().padStart(2, "0")}-${georgianDate.gd
-				.toString()
-				.padStart(2, "0")}`;
-		}
+		const year = Number(match[1]);
+		const season = Number(match[2]);
 
-		return `${year}-01-01`;
+		const startMonth = (season - 1) * 3 + 1;
+		const startDate = jalaliToDate(year, startMonth, 1);
+
+		return this.formatDateByBase(startDate, dateFormat);
 	}
 
-	//todo: move to utils
-	private getLastDayOfYear(fileBasename: string): string {
-		const year = parseInt(fileBasename);
-		if (isNaN(year)) return "";
+	private getSeasonEndDate(title: string, dateFormat: TDateFormat): string | null {
+		const match = title.match(/^(\d{4})-S([1-4])$/);
+		if (!match) return null;
 
-		if (this.plugin.settings.dateFormat === "gregorian") {
-			const nextYear = jalaliToGregorian(year + 1, 1, 1);
-			const lastDay = new Date(nextYear.gy, nextYear.gm - 1, nextYear.gd - 1);
-			return `${lastDay.getFullYear()}-${String(lastDay.getMonth() + 1).padStart(2, "0")}-${String(
-				lastDay.getDate(),
-			).padStart(2, "0")}`;
+		const year = Number(match[1]);
+		const season = Number(match[2]);
+
+		const endMonth = season * 3;
+		const jalaliEndDay = jalaliMonthLength(year, endMonth);
+		const endDate = jalaliToDate(year, endMonth, jalaliEndDay);
+
+		return this.formatDateByBase(endDate, dateFormat);
+	}
+
+	private getYearStartDate(year: number, dateFormat: TDateFormat): string | null {
+		const startDate = jalaliToDate(year, 1, 1);
+		return this.formatDateByBase(startDate, dateFormat);
+	}
+
+	private getYearEndDate(year: number, dateFormat: TDateFormat): string | null {
+		const isLeap = checkKabiseh(year);
+		const endDay = isLeap ? 30 : 29;
+		const endDate = jalaliToDate(year, 12, endDay);
+
+		return this.formatDateByBase(endDate, dateFormat);
+	}
+
+	private formatDateByBase(date: Date, dateFormat: TDateFormat): string {
+		if (dateFormat === "gregorian") {
+			const { gy, gm, gd } = dateToGregorian(date);
+
+			return `${gy}-${gm.toString().padStart(2, "0")}-${gd.toString().padStart(2, "0")}`;
 		}
 
-		const isLeapYear = checkKabiseh(year);
-		return isLeapYear ? `${year}-12-30` : `${year}-12-29`;
+		return dateToJDayDash(date);
 	}
 }
