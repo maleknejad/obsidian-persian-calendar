@@ -1,3 +1,5 @@
+// todo: cleanup
+
 import {
 	Plugin,
 	MarkdownView,
@@ -8,6 +10,7 @@ import {
 	App,
 	type PluginManifest,
 	TFolder,
+	debounce,
 } from "obsidian";
 import { DateSuggester, Placeholder, NoteService } from "./services";
 import CalendarView from "./templates/CalendarView";
@@ -306,11 +309,17 @@ export default class PersianCalendarPlugin extends Plugin {
 		await this.saveData(this.settings);
 	}
 
-	private async handleFileUpdate() {
-		const view = this.app.workspace.getLeavesOfType("persian-calendar")[0]?.view;
-		if (view instanceof CalendarView) {
-			view.refreshCalendar();
-		}
+	private handleFileUpdate() {
+		const debouncedRefresh = debounce(() => {
+			const leaves = this.app.workspace.getLeavesOfType("persian-calendar");
+			leaves.forEach((leaf) => {
+				if (leaf.view instanceof CalendarView) {
+					leaf.view.refreshCalendar();
+				}
+			});
+		}, 50);
+
+		debouncedRefresh();
 	}
 
 	async activateView(): Promise<WorkspaceLeaf | null> {
