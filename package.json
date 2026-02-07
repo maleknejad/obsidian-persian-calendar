@@ -1,46 +1,48 @@
 {
-  "name": "obsidian-persian-calendar",
-  "version": "4.0.0",
-  "description": "This tool lets you see events, add and organize notes from daily to yearly on the Persian calendar, use templates with placeholders, and works with all Obsidian daily plugins.",
-  "main": "main.js",
-  "scripts": {
+	"name": "obsidian-persian-calendar",
+	"version": "4.0.0",
+	"description": "This tool lets you see events, add and organize notes from daily to yearly on the Persian calendar, use templates with placeholders, and works with all Obsidian daily plugins.",
+	"main": "main.js",
+	"scripts": {
 		"prepare": "node scripts/clean-data.mjs",
-    "dev": "node esbuild.config.mjs && node scripts/build-styles.mjs --watch",
-    "build": "node scripts/build-styles.mjs && node esbuild.config.mjs production && node scripts/sync-version.mjs && tsc -noEmit -skipLibCheck",
-    "version": "node scripts/sync-version.mjs"
-  },
-  "keywords": [],
-  "author": {
-    "name": "Hossein Maleknejad",
-    "url": "http://karfekr.ir"
-  },
-  "contributors": [
-    {
-      "name": "Muhammadhussein Ammari",
-      "url": "https://github.com/xmha97"
-    },
-    {
-      "name": "Alireza Mohammadzadeh(NedaMani)",
-      "url": "https://github.com/NedaMani"
-    }
-  ],
-  "repository": "https://github.com/maleknejad/obsidian-persian-calendar",
-  "license": "MIT",
-  "devDependencies": {
-    "@types/jalaali-js": "^1.2.0",
-    "@types/node": "^25.0.3",
-    "@typescript-eslint/eslint-plugin": "8.51.0",
-    "@typescript-eslint/parser": "8.51.0",
-    "builtin-modules": "5.0.0",
-    "chokidar": "^5.0.0",
-    "cssnano": "^7.1.2",
-    "esbuild": "0.27.2",
-    "obsidian": "latest",
-    "postcss": "^8.5.6",
-    "tslib": "2.8.1",
-    "typescript": "5.9.3"
-  },
-  "dependencies": {
-    "jalaali-js": "^1.2.8"
-  }
+		"version": "node scripts/sync-version.mjs",
+		"test": "vitest",
+		"dev": "node esbuild.config.mjs && node scripts/build-styles.mjs --watch",
+		"build": "node scripts/build-styles.mjs && node esbuild.config.mjs production && node scripts/sync-version.mjs && tsc -noEmit -skipLibCheck"
+	},
+	"keywords": [],
+	"author": {
+		"name": "Hossein Maleknejad",
+		"url": "http://karfekr.ir"
+	},
+	"contributors": [
+		{
+			"name": "Muhammadhussein Ammari",
+			"url": "https://github.com/xmha97"
+		},
+		{
+			"name": "Alireza Mohammadzadeh(NedaMani)",
+			"url": "https://github.com/NedaMani"
+		}
+	],
+	"repository": "https://github.com/maleknejad/obsidian-persian-calendar",
+	"license": "MIT",
+	"devDependencies": {
+		"@types/jalaali-js": "^1.2.0",
+		"@types/node": "^25.0.3",
+		"@typescript-eslint/eslint-plugin": "8.51.0",
+		"@typescript-eslint/parser": "8.51.0",
+		"builtin-modules": "5.0.0",
+		"chokidar": "^5.0.0",
+		"cssnano": "^7.1.2",
+		"esbuild": "0.27.2",
+		"obsidian": "latest",
+		"postcss": "^8.5.6",
+		"tslib": "2.8.1",
+		"typescript": "5.9.3",
+		"vitest": "^4.0.18"
+	},
+	"dependencies": {
+		"jalaali-js": "^1.2.8"
+	}
 }

@@ -1,6 +1,9 @@
 {
 	"compilerOptions": {
 		"baseUrl": ".",
+		"paths": {
+			"src/*": ["src/*"]
+		},
 		"inlineSourceMap": true,
 		"allowSyntheticDefaultImports": true,
 		"inlineSources": true,

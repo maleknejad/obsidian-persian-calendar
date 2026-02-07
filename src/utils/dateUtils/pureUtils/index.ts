@@ -1,14 +1,49 @@
 import { JALALI_MONTHS_NAME } from "src/constants";
 import type { TGregorian, TLocal, TWeekStart } from "src/types";
 
-export function gregorianToDate(gy: number, gm: number, gd: number) {
-	const date = new Date(gy, gm - 1, gd);
+export function gregorianToDate(gy: number, gm: number, gd: number): Date | null {
+	const utcGuess = new Date(Date.UTC(gy, gm - 1, gd));
 
-	if (date.getFullYear() !== gy || date.getMonth() !== gm - 1 || date.getDate() !== gd) {
-		return null;
+	const parts = new Intl.DateTimeFormat("en-US", {
+		timeZone: "Asia/Tehran",
+		year: "numeric",
+		month: "numeric",
+		day: "numeric",
+	}).formatToParts(utcGuess);
+
+	const get = (t: string) => Number(parts.find((p) => p.type === t)?.value);
+
+	if (get("year") !== gy || get("month") !== gm || get("day") !== gd) {
+		throw new Error("Invalid date for 'gregorianToDate'");
 	}
 
-	return date;
+	return utcGuess;
+}
+
+export function dateToGregorian(date: Date): TGregorian {
+	const parts = new Intl.DateTimeFormat("en-US", {
+		timeZone: "Asia/Tehran",
+		year: "numeric",
+		month: "numeric",
+		day: "numeric",
+	}).formatToParts(date);
+
+	const get = (t: string) => Number(parts.find((p) => p.type === t)?.value);
+
+	return {
+		gy: get("year"),
+		gm: get("month"),
+		gd: get("day"),
+	};
+}
+
+export function dateToWeekdayName(date: Date, local: TLocal = "fa"): string {
+	const locale = local === "fa" ? "fa-IR" : "en-US";
+
+	return new Intl.DateTimeFormat(locale, {
+		weekday: "long",
+		timeZone: "Asia/Tehran",
+	}).format(date);
 }
 
 export const weekStartNumber = (weekStart: TWeekStart): number =>
@@ -22,29 +57,12 @@ export function getJalaliMonthName(month: number, local: TLocal = "fa"): string 
 	return JALALI_MONTHS_NAME[local][month];
 }
 
-export function dateToGregorian(date: Date): TGregorian {
-	const year = date.getUTCFullYear();
-	const month = date.getUTCMonth() + 1;
-	const day = date.getUTCDate();
-
-	return { gy: year, gm: month, gd: day };
-}
-
-export function dateToWeekdayName(date: Date, local: TLocal = "fa"): string {
-	const locale = local === "fa" ? "fa-IR" : "en-US";
-
-	return new Intl.DateTimeFormat(locale, {
-		weekday: "long",
-		timeZone: "Asia/Tehran",
-	}).format(date);
-}
-
-export function addDayDate(date: Date, days: number): Date {
+export function addDayDate(date: Date, days: number) {
 	const result = new Date(date);
 	result.setDate(result.getDate() + days);
 	return result;
 }
 
-export function jalaliToSeason(jm: number) {
+export function jalaliToSeason(jm: number): number {
 	return Math.ceil(jm / 3);
 }

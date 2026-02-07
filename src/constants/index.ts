@@ -1,7 +1,7 @@
 export { GREGORIAN_EVENTS } from "./eventDays/gregorian";
 export { JALALI_EVENTS } from "./eventDays/jalali";
 export { HIJRI_EVENTS } from "./eventDays/hijri";
-export { IRAN_HIJRI_MONTHS_LENGTH, IRAN_HIJRI_ANCHORS } from "./iranHijri";
+export { IRAN_HIJRI_MONTHS_LENGTH, IRAN_HIJRI_ANCHORS, TEHRAN_OFFSET } from "./dateSet";
 export {
 	SEASONS_NAME,
 	JALALI_MONTHS_NAME,
