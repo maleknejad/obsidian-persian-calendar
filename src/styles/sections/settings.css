@@ -1,0 +1,7 @@
+.persian-calendar__setting-banner {
+	border: 2px dashed var(--persian-calendar-color-primary);
+	border-radius: 10px;
+	margin-bottom: 19px;
+	padding: 10px 0;
+	text-align: center;
+}

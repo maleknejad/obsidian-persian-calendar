@@ -1,324 +1,359 @@
-/* eslint-disable no-useless-escape */
-import { Notice, Plugin, TFile ,MarkdownView, TAbstractFile ,Editor, WorkspaceLeaf} from 'obsidian';
-import PersianCalendarView from './view';
-import { PluginSettings, DEFAULT_SETTINGS } from './settings';
-import { toJalaali , toGregorian } from 'jalaali-js';
-import moment from 'moment-jalaali';
-import DateSuggester from './suggester';
-import PersianPlaceholders from './placeholder';
-import UpdateModal from './updatemodal';
-import PersianCalendarSettingTab from './settingstab';
+// todo: cleanup
 
-//Authored by Hossein Maleknejad, for support and development ideas, follow Karfekr Telegram at https://t.me/karfekr
-//I know this repository has lots of duplicate codes and must be cleaned. I will clean it in next releases. 
-//I am working on it. 1403-04-31
-
-
-
+import {
+	Plugin,
+	MarkdownView,
+	Editor,
+	WorkspaceLeaf,
+	TFile,
+	TAbstractFile,
+	App,
+	type PluginManifest,
+	TFolder,
+	debounce,
+} from "obsidian";
+import { DateSuggester, Placeholder, NoteService } from "./services";
+import CalendarView from "./templates/CalendarView";
+import Settings from "./templates/Settings";
+import RTLNotice from "./components/RTLNotice";
+import { DEFAULT_SETTING } from "./constants";
+import {
+	dateToJWeekNumber,
+	addDayDate,
+	dateToJalali,
+	gregorianDashToJalaliDash,
+	jalaliDashToGregorianDash,
+	jalaliToSeason,
+} from "./utils/dateUtils";
+import type { TSetting } from "./types";
 
 export default class PersianCalendarPlugin extends Plugin {
-    settings: PluginSettings = DEFAULT_SETTINGS;
-    dateSuggester: DateSuggester | undefined;
-    placeholder: PersianPlaceholders  | undefined;
-    pluginsettingstab: PersianCalendarSettingTab | undefined;
-    plugin: PersianCalendarPlugin = this;
-    view: PersianCalendarView | undefined;
+	settings: TSetting = DEFAULT_SETTING;
+	dateSuggester: DateSuggester | undefined;
+	placeholder: Placeholder;
+	pluginsettingstab: Settings | undefined;
+	plugin: PersianCalendarPlugin = this;
+	view: CalendarView | undefined;
+	noteService: NoteService;
 
+	constructor(app: App, manifest: PluginManifest) {
+		super(app, manifest);
+		this.placeholder = new Placeholder(this);
+		this.noteService = new NoteService(this.app, this.settings);
+	}
 
+	async onload() {
+		await this.loadSettings();
 
+		this.registerView(
+			"persian-calendar",
+			(leaf: WorkspaceLeaf) =>
+				(this.view = new CalendarView(leaf, this.app, this.settings, this.plugin)),
+		);
 
-    
-    async onload() {
-        await this.loadSettings();
-        this.registerView(
-            'persian-calendar',
-            (leaf: WorkspaceLeaf) => (this.view = new PersianCalendarView(leaf, this.app, this.settings, this.plugin))
-        );       
-        
-        if (this.app.workspace.getLeavesOfType('persian-calendar').length === 0) {
-            this.activateView();
-        }
-        
-        this.addRibbonIcon('calendar', 'روزنوشت امروز', async () => {
-            const today = new Date();
-            const todayJalaali = toJalaali(today);
-            const dayNumber = todayJalaali.jd;
-            openNoteForDate(todayJalaali.jy, todayJalaali.jm, dayNumber);
-        });
-        super.onload();
-        this.registerEditorSuggest(new DateSuggester(this));
-        this.dateSuggester = new DateSuggester(this);
-        this.pluginsettingstab = new PersianCalendarSettingTab(this.app, this);
-        this.placeholder = new PersianPlaceholders(this);
-        this.announceUpdate();
-        
-        
+		if (this.app.workspace.getLeavesOfType("persian-calendar").length === 0) {
+			this.activateView();
+		}
 
-        this.registerEvent(this.app.vault.on('create', (file: TAbstractFile) => {
-            if (file instanceof TFile && file.path.endsWith('.md')) {
-                    this.handleFileUpdate(file, true);
-                    const fileCreationTime = file.stat.ctime;
-            const now = Date.now();
-            const timeDiff = now - fileCreationTime;
+		super.onload();
 
-            if (timeDiff < 10000) { 
-                if (this.placeholder) {
-                    this.placeholder.insertPersianDate(file);
-                } else {
-                    console.error("Placeholder is not initialized");
-                }
-            } else {
-                console.log("File is not newly created or too old for processing:", file.path);
-            }
-            } 
-        }));
+		this.registerEditorSuggest(new DateSuggester(this));
 
+		this.settings.dateFormat;
 
-        this.registerEvent(this.app.vault.on('delete', (file) => {
-            if (file instanceof TFile && file.path.endsWith('.md')) {
-                this.handleFileUpdate(file, false);
-            }
-        }));
+		this.dateSuggester = new DateSuggester(this);
 
+		this.pluginsettingstab = new Settings(this.app, this);
 
-        this.addSettingTab(new PersianCalendarSettingTab(this.app, this));
-        this.addCommand({
-            id: 'open-todays-daily-note',
-            name: 'Today - باز کردن روزنوشت امروز',
-            callback: async () => {
-                const today = new Date();
-                const todayJalaali = toJalaali(today);
-                const dayNumber = todayJalaali.jd;
-                openNoteForDate(todayJalaali.jy, todayJalaali.jm, dayNumber);
-            }
-        });
-        this.addCommand({
-            id: 'open-tomorrow-daily-note',
-            name: 'Tomorrow - باز کردن روزنوشت فردا',
-            callback: async () => {
-                const tomorrow = new Date();
-                tomorrow.setDate(tomorrow.getDate() + 1); 
-                const tomorrowJalaali = toJalaali(tomorrow);
-                const dayNumber = tomorrowJalaali.jd;
-                openNoteForDate(tomorrowJalaali.jy, tomorrowJalaali.jm, dayNumber);
-            }
-        });
-        this.addCommand({
-            id: 'open-yesterday-daily-note',
-            name: 'Yesterday - باز کردن روزنوشت دیروز',
-            callback: async () => {
-                const yesterday = new Date();
-                yesterday.setDate(yesterday.getDate() - 1); 
-                const yesterdayJalaali = toJalaali(yesterday);
-                const dayNumber = yesterdayJalaali.jd;
-                openNoteForDate(yesterdayJalaali.jy, yesterdayJalaali.jm, dayNumber);
-            }
-        });
-        
-        this.addCommand({
-            id: 'open-persian-calendar-view',
-            name: 'Open Persian Calendar View - باز کردن تقویم فارسی',
-            callback: async () => {
-                await this.activateView();
-            },
-        });
+		this.checkForVersionUpdate();
 
-        this.addCommand({
-            id: 'open-this-weeks-note',
-            name: 'Weekly - باز کردن هفته‌نوشت این هفته',
-            callback: async () => {
-                const today = new Date();
-                const todayJalaali = toJalaali(today); 
-                const currentWeekNumber = this.calculateCurrentWeekNumber(todayJalaali);
-                const leaf = this.app.workspace.getLeavesOfType('persian-calendar')[0];
-                if (leaf) {
-                    const view = leaf.view;
-                    if (view instanceof PersianCalendarView) {
-                        view.openOrCreateWeeklyNote(currentWeekNumber, todayJalaali.jy);
-                    }
-                } else {
-                    console.error('Persian Calendar view is not open.');
-                }
-            },
-        });
+		this.registerEvent(
+			this.app.vault.on("modify", async (file) => {
+				if (!(file instanceof TFile)) return;
+				if (file.extension !== "md") return;
 
-         
-        this.addCommand({
-            id: 'open-current-quarterly-note',
-            name: 'ْQuarterly - باز کردن فصل نوشت این فصل',
-            callback: async () => {
-                const leaf = this.app.workspace.getLeavesOfType('persian-calendar')[0];
-                if (leaf && leaf.view instanceof PersianCalendarView) {
-                    const { quarter, jy } = leaf.view.getCurrentQuarter();
-                    await leaf.view.openOrCreateQuarterlyNote(quarter, jy);
-                } else {
-                    new Notice('Persian Calendar view is not open. Please open the Persian Calendar first.');
-                }
-            },
-        });
+				const content = await this.app.vault.read(file);
 
+				if (content.includes("{{tp_")) return;
 
-        this.addCommand({
-            id: 'open-current-months-note',
-            name: 'Monthly - بازکردن ماه‌نوشت این ماه',
-            callback: async () => {
-                const today = new Date();
-                const todayJalaali = toJalaali(today);
-                const jy = todayJalaali.jy;
-                const month = todayJalaali.jm;
-                const leaf = this.app.workspace.getLeavesOfType('persian-calendar')[0];
-                if (leaf) {
-                    const view = leaf.view;
-                    if (view instanceof PersianCalendarView) {
-                        await view.openOrCreateMonthlyNote(month, jy);
-                    }
-                } else {
-                    console.error('Persian Calendar view is not open. Please open the Persian Calendar first.');
-                }
-            },
-        });
-        this.addCommand({
-            id: 'open-current-years-note',
-            name: 'Yearly - باز کردن سال‌نوشت امسال',
-            callback: async () => {
-                const today = new Date();
-                const todayJalaali = toJalaali(today);
-                const jy = todayJalaali.jy;        
-                const leaf = this.app.workspace.getLeavesOfType('persian-calendar')[0];
-                if (leaf) {
-                    const view = leaf.view;
-                    if (view instanceof PersianCalendarView) {
-                        await view.openOrCreateYearlyNote(jy);
-                    }
-                } else {
-                    console.error('Persian Calendar view is not open. Please open the Persian Calendar first.');
-                }
-            },
-        });
+				await this.placeholder.insertPersianDate(file);
+			}),
+		);
 
-        this.addCommand({
-            id: 'convert-date', // For my friend, Amir Napster.
-            name: 'Convert Date Format - تبدیل تاریخ بین شمسی و میلادی',
-            checkCallback: (checking: boolean) => {
-                const editor = this.app.workspace.getActiveViewOfType(MarkdownView)?.editor;
-                if (editor) {
-                    const cursorPos = editor.getCursor();
-                    const lineText = editor.getLine(cursorPos.line);
-                    const hasDate = /(\d{4}[\/\-]\d{1,2}[\/\-]\d{1,2}|\d{8})/.test(lineText);
-                    
-                    if (checking) {
-                        return hasDate;
-                    } else if (hasDate) {
-                        this.convertDate(editor, cursorPos.line, lineText);
-                    }
-                }
-                return false;
-            }
-        });
-        
+		// todo: improve this
+		this.registerEvent(
+			this.app.vault.on("create", (file: TAbstractFile) => {
+				if (file instanceof TFile && file.path.endsWith(".md")) {
+					this.handleFileUpdate();
+					const fileCreationTime = file.stat.ctime;
+					const now = Date.now();
+					const timeDiff = now - fileCreationTime;
 
-        this.addCommand({
-            id: 'convert-to-date',
-            name: 'Link Text to Periodic Note - ارجاع متن به یادداشت‌های دوره‌ای',
-            editorCallback: (editor, view) => {
-                this.dateSuggester?.convertTextToDate(editor);
-            }
-        });
+					if (timeDiff < 2000) {
+						this.placeholder.insertPersianDate(file);
+					}
+				}
+			}),
+		);
 
-        const openNoteForDate = (year: number, month: number, dayNumber: number) => {
-            const leaf = this.app.workspace.getLeavesOfType('persian-calendar')[0];
-            if (leaf) {
-                const view = leaf.view;
-                if (view instanceof PersianCalendarView) {
-                    view.openOrCreateDailyNote(dayNumber);
-                }
-            } else {
-                console.error('Persian Calendar view is not open.');
-            }
-        };
+		this.registerEvent(
+			this.app.vault.on("delete", (file) => {
+				if ((file instanceof TFile && file.path.endsWith(".md")) || file instanceof TFolder) {
+					this.handleFileUpdate();
+				}
+			}),
+		);
 
-    }
+		this.addSettingTab(new Settings(this.app, this));
 
-    
-   
-    public convertDate(editor: Editor, lineIndex: number, textLine: string) {
-        // eslint-disable-next-line no-useless-escape
-        const regex = /(\d{4})[\/\-]?(\d{1,2})[\/\-]?(\d{1,2})/g;
-        let match;
-        while ((match = regex.exec(textLine)) !== null) {
-            const [fullMatch, year, month, day] = match;
-            
-            if (parseInt(year) > 1500) {
-                const persianDate = toJalaali(parseInt(year), parseInt(month), parseInt(day));
-                const formatted = `${persianDate.jy}-${persianDate.jm.toString().padStart(2, '0')}-${persianDate.jd.toString().padStart(2, '0')}`;
-                editor.replaceRange(formatted, { line: lineIndex, ch: match.index }, { line: lineIndex, ch: match.index + fullMatch.length });
-            } else {
-                const georgianDate = toGregorian(parseInt(year), parseInt(month), parseInt(day));
-                const formatted = `${georgianDate.gy}-${georgianDate.gm.toString().padStart(2, '0')}-${georgianDate.gd.toString().padStart(2, '0')}`;
-                editor.replaceRange(formatted, { line: lineIndex, ch: match.index }, { line: lineIndex, ch: match.index + fullMatch.length });
-            }
-        }
-    }
+		this.addCommand({
+			id: "replace-persian-placeholders",
+			name: "Replace Placeholders - جایگزینی عبارات معنادار در این یادداشت",
+			editorCallback: async (editor, view) => {
+				if (view.file) {
+					await this.placeholder.insertPersianDate(view.file);
+					RTLNotice("جایگزینی با موفقیت انجام شد.");
+				}
+			},
+		});
 
+		this.addCommand({
+			id: "open-todays-daily-note",
+			name: "Today - باز کردن روزنوشت امروز",
+			callback: async () => {
+				openNoteForDate(new Date());
+			},
+		});
 
-    private announceUpdate(): void {
-        const currentVersion = this.manifest.version;
-        const knownVersion = this.settings.version;
-        if (currentVersion === knownVersion) return;
-        this.settings.version = currentVersion;
-        void this.saveSettings(); 
-        if (this.settings.announceUpdates === false) return;
-        const updateModal = new UpdateModal(this.app);
-        updateModal.open();
-    }
-    
+		this.addCommand({
+			id: "open-tomorrow-daily-note",
+			name: "Tomorrow - باز کردن روزنوشت فردا",
+			callback: async () => {
+				openNoteForDate(addDayDate(new Date(), 1));
+			},
+		});
 
-    async loadSettings() {
-        this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-    }
+		this.addCommand({
+			id: "open-yesterday-daily-note",
+			name: "Yesterday - باز کردن روزنوشت دیروز",
+			callback: async () => {
+				openNoteForDate(addDayDate(new Date(), -1));
+			},
+		});
 
+		this.addCommand({
+			id: "open-persian-calendar-view",
+			name: "Open Persian Calendar View - باز کردن تقویم فارسی",
+			callback: async () => {
+				await this.activateView();
+			},
+		});
 
-    async saveSettings() {
-        await this.saveData(this.settings);
-    }
-    
-    private async handleFileUpdate(file: TFile, isCreation: boolean): Promise<void> {
-        const view = this.app.workspace.getLeavesOfType('persian-calendar')[0]?.view;
-        if (view instanceof PersianCalendarView) {
-            view.refreshCalendarDots(file, isCreation);
-        }
-    }
+		this.addCommand({
+			id: "open-this-weeks-note",
+			name: "Weekly - باز کردن هفته‌نوشت این هفته",
+			callback: async () => {
+				const now = new Date();
+				const { jy } = dateToJalali(now);
+				const currentWeekNumber = dateToJWeekNumber(now);
 
+				await this.noteService.openOrCreateWeeklyNote(jy, currentWeekNumber);
+			},
+		});
 
-    private calculateCurrentWeekNumber(jalaaliDate: {jy: number, jm: number, jd: number}): number {
-        moment.loadPersian({usePersianDigits: false, dialect: 'persian-modern'});    
-        const currentDate = moment(`${jalaaliDate.jy}/${jalaaliDate.jm}/${jalaaliDate.jd}`, 'jYYYY/jM/jD');
-        const currentWeekNumber = currentDate.jWeek();
-        return currentWeekNumber;
-    }
-    async activateView() {
-        const leaf = this.app.workspace.getRightLeaf(false); // Get a leaf in the right sidebar
-        await leaf.setViewState({
-            type: 'persian-calendar',
-            active: true
-        });
-        this.app.workspace.revealLeaf(leaf); // Ensure the leaf is visible
-    }
+		this.addCommand({
+			id: "open-current-seasonal-note",
+			name: "seasonal - باز کردن فصل نوشت این فصل",
+			callback: async () => {
+				const now = new Date();
+				const { jy, jm } = dateToJalali(now);
+				const season = jalaliToSeason(jm);
 
-    refreshViews() {
-        if (this.app.workspace.getLeavesOfType('persian-calendar').length > 0) {
-            this.app.workspace.getLeavesOfType('persian-calendar').forEach(leaf => {
-                if (leaf.view instanceof PersianCalendarView) {
-                    leaf.view.render(); 
-                }
-            });
-        }
-    }
+				await this.noteService.openOrCreateSeasonalNote(jy, season);
+			},
+		});
 
-    onunload(): void {
-        this.app.workspace
-            .getLeavesOfType('persian-calendar')
-            .forEach((leaf) => leaf.detach());
-    }
-    
+		this.addCommand({
+			id: "open-current-months-note",
+			name: "Monthly - بازکردن ماه‌نوشت این ماه",
+			callback: async () => {
+				const { jy, jm } = dateToJalali(new Date());
+				await this.noteService.openOrCreateMonthlyNote(jy, jm);
+			},
+		});
+
+		this.addCommand({
+			id: "open-current-years-note",
+			name: "Yearly - باز کردن سال‌نوشت امسال",
+			callback: async () => {
+				const { jy } = dateToJalali(new Date());
+				await this.noteService.openOrCreateYearlyNote(jy);
+			},
+		});
+
+		const openNoteForDate = async (date: Date) => {
+			const { jy, jm, jd } = dateToJalali(date);
+			await this.noteService.openOrCreateDailyNote(jy, jm, jd);
+		};
+
+		this.addCommand({
+			id: "convert-date",
+			name: "Convert Date Format - تبدیل تاریخ بین شمسی و میلادی",
+			checkCallback: (checking: boolean) => {
+				const editor = this.app.workspace.getActiveViewOfType(MarkdownView)?.editor;
+				if (!editor) return false;
+
+				const { line } = editor.getCursor();
+				const text = editor.getLine(line);
+
+				if (!/^\b\d{4}-?\d{2}-?\d{2}\b$/.test(text)) return false;
+
+				if (!checking) {
+					this.convertDate(editor, line, text);
+				}
+
+				return true;
+			},
+		});
+	}
+
+	// todo: change this
+	public convertDate(editor: Editor, lineIndex: number, textLine: string) {
+		const dateRegex = /\b(\d{4})-?(\d{2})-?(\d{2})\b/g;
+
+		const newLine = textLine.replace(dateRegex, (full, y, m, d) => {
+			const date = `${y}-${m}-${d}`;
+			const convert = +y > 2000 ? gregorianDashToJalaliDash : jalaliDashToGregorianDash;
+
+			return convert(date) ?? full;
+		});
+
+		if (newLine !== textLine) {
+			editor.replaceRange(
+				newLine,
+				{ line: lineIndex, ch: 0 },
+				{ line: lineIndex, ch: textLine.length },
+			);
+		}
+	}
+
+	private async checkForVersionUpdate(): Promise<void> {
+		const currentVersion = this.manifest.version;
+		const lastSeenVersion = this.settings.lastSeenVersion;
+
+		if (this.settings.versionUpdate === false) {
+			if (lastSeenVersion !== currentVersion) {
+				this.settings.lastSeenVersion = currentVersion;
+				await this.saveSettings();
+			}
+			return;
+		}
+
+		if (!lastSeenVersion) {
+			const { getReleaseNotesForVersion, isReleaseNote } = await import("src/utils/release");
+
+			if (!isReleaseNote(currentVersion)) {
+				this.settings.lastSeenVersion = currentVersion;
+				await this.saveSettings();
+				return;
+			}
+
+			const { UpdateModal } = await import("src/components/UpdateModal");
+			const releaseNotes = getReleaseNotesForVersion(currentVersion);
+
+			new UpdateModal(this.app, releaseNotes, () => {
+				this.settings.lastSeenVersion = currentVersion;
+				this.saveSettings().catch(console.error);
+			}).open();
+
+			return;
+		}
+
+		if (lastSeenVersion === currentVersion) {
+			return;
+		}
+
+		const {
+			getReleaseNotesBetweenVersions,
+			getLatestReleaseNotes,
+			compareVersions,
+			isReleaseNote,
+		} = await import("src/utils/release");
+
+		if (!isReleaseNote(currentVersion)) {
+			this.settings.lastSeenVersion = currentVersion;
+			await this.saveSettings();
+			return;
+		}
+
+		const { UpdateModal } = await import("src/components/UpdateModal");
+
+		let releaseNotes;
+		if (compareVersions(currentVersion, lastSeenVersion) > 0) {
+			releaseNotes = getReleaseNotesBetweenVersions(lastSeenVersion, currentVersion);
+		} else {
+			releaseNotes = getLatestReleaseNotes();
+		}
+
+		new UpdateModal(this.app, releaseNotes, () => {
+			this.settings.lastSeenVersion = currentVersion;
+			this.saveSettings().catch(console.error);
+		}).open();
+	}
+
+	async loadSettings() {
+		this.settings = Object.assign({}, DEFAULT_SETTING, await this.loadData());
+	}
+
+	async saveSettings() {
+		await this.saveData(this.settings);
+	}
+
+	private handleFileUpdate() {
+		const debouncedRefresh = debounce(() => {
+			const leaves = this.app.workspace.getLeavesOfType("persian-calendar");
+			leaves.forEach((leaf) => {
+				if (leaf.view instanceof CalendarView) {
+					leaf.view.refreshCalendar();
+				}
+			});
+		}, 50);
+
+		debouncedRefresh();
+	}
+
+	async activateView(): Promise<WorkspaceLeaf | null> {
+		const existingLeaves = this.app.workspace.getLeavesOfType("persian-calendar");
+		if (existingLeaves.length > 0) {
+			this.app.workspace.revealLeaf(existingLeaves[0]);
+			return existingLeaves[0];
+		}
+
+		const leaf =
+			this.app.workspace.getRightLeaf(false) ??
+			this.app.workspace.getRightLeaf(true) ??
+			this.app.workspace.getLeaf("tab");
+
+		await leaf.setViewState({
+			type: "persian-calendar",
+			active: true,
+		});
+
+		this.app.workspace.revealLeaf(leaf);
+		return leaf;
+	}
+
+	refreshViews() {
+		if (this.app.workspace.getLeavesOfType("persian-calendar").length > 0) {
+			this.app.workspace.getLeavesOfType("persian-calendar").forEach((leaf) => {
+				if (leaf.view instanceof CalendarView) {
+					leaf.view.render();
+				}
+			});
+		}
+	}
+
+	onunload() {
+		this.app.workspace.getLeavesOfType("persian-calendar").forEach((leaf) => leaf.detach());
+	}
 }

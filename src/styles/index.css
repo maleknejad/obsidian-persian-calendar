@@ -1,0 +1,19 @@
+/*! ترتیب مهمه */
+
+/* base setups */
+@import "./sections/base.css";
+
+/* templates */
+@import "./sections/header.css";
+@import "./sections/calendar.css";
+@import "./sections/day.css";
+@import "./sections/tooltip.css";
+@import "./sections/settings.css";
+@import "./sections/update.css";
+
+/* components */
+@import "./sections/social-links.css";
+@import "./sections/confirm-modal.css";
+
+/* responsive */
+@import "./sections/responsive.css";
