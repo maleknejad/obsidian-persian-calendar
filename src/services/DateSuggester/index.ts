@@ -155,6 +155,10 @@ export default class DateSuggester extends EditorSuggest<string> {
 				}[keyword];
 
 				date.setDate(date.getDate() + dateAdjustment);
+				if(this.dateFormat === "gregorian") {
+					return `[[${jalaliDashToGregorianDash(dateToJDayDash(date))}|${keyword}]]`;
+				}
+				
 				return `[[${dateToJDayDash(date)}|${keyword}]]`;
 
 			case "این هفته":
