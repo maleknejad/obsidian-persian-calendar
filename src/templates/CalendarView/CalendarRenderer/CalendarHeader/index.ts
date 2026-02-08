@@ -1,5 +1,5 @@
 import { setIcon } from "obsidian";
-import { toFaNumber } from "src/utils/numberConverter";
+import { toFaNumber } from "src/utils/format";
 import CalendarState from "src/templates/CalendarView/CalendarState";
 import { NoteService } from "src/services";
 import CalendarNavigation from "../CalendarNavigation";

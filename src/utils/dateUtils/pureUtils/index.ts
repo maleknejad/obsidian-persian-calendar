@@ -1,23 +1,21 @@
 import { JALALI_MONTHS_NAME } from "src/constants";
 import type { TGregorian, TLocal, TWeekStart } from "src/types";
 
-export function gregorianToDate(gy: number, gm: number, gd: number): Date | null {
-	const utcGuess = new Date(Date.UTC(gy, gm - 1, gd));
+export function gregorianToDate(gy: number, gm: number, gd: number) {
+	const utcDate = new Date(Date.UTC(gy, gm - 1, gd));
 
 	const parts = new Intl.DateTimeFormat("en-US", {
 		timeZone: "Asia/Tehran",
 		year: "numeric",
 		month: "numeric",
 		day: "numeric",
-	}).formatToParts(utcGuess);
+	}).formatToParts(utcDate);
 
 	const get = (t: string) => Number(parts.find((p) => p.type === t)?.value);
 
-	if (get("year") !== gy || get("month") !== gm || get("day") !== gd) {
-		throw new Error("Invalid date for 'gregorianToDate'");
-	}
+	if (get("year") !== gy || get("month") !== gm || get("day") !== gd) return null;
 
-	return utcGuess;
+	return utcDate;
 }
 
 export function dateToGregorian(date: Date): TGregorian {

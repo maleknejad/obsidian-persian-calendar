@@ -162,7 +162,7 @@ export function dateToDaysPassedJYear(date: Date): number {
 	let daysPassed = 0;
 
 	for (let month = 1; month < jm; month++) {
-		daysPassed += jalaliMonthLength(jy, month);
+		daysPassed += jalaliMonthLength(jy, month)!;
 	}
 
 	return daysPassed + jd;
@@ -174,7 +174,7 @@ export function dateToDaysRemainingJYear(date: Date): number {
 	let daysPassed = 0;
 
 	for (let month = 1; month < jm; month++) {
-		daysPassed += jalaliMonthLength(jy, month);
+		daysPassed += jalaliMonthLength(jy, month)!;
 	}
 
 	daysPassed += jd;

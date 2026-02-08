@@ -199,7 +199,7 @@ export default class Placeholder {
 		const month = parseInt(match[2]);
 
 		const jalaliEndDay = jalaliMonthLength(year, month);
-		const endDate = jalaliToDate(year, month, jalaliEndDay);
+		const endDate = jalaliToDate(year, month, jalaliEndDay!);
 
 		return this.formatDateByBase(endDate, dateFormat);
 	}
@@ -226,7 +226,7 @@ export default class Placeholder {
 
 		const endMonth = season * 3;
 		const jalaliEndDay = jalaliMonthLength(year, endMonth);
-		const endDate = jalaliToDate(year, endMonth, jalaliEndDay);
+		const endDate = jalaliToDate(year, endMonth, jalaliEndDay!);
 
 		return this.formatDateByBase(endDate, dateFormat);
 	}

@@ -175,7 +175,7 @@ export default class NoteService {
 		const result: number[] = [];
 		const daysInMonth = jalaliMonthLength(jy, jm);
 
-		for (let jd = 1; jd <= daysInMonth; jd++) {
+		for (let jd = 1; jd <= daysInMonth!; jd++) {
 			let fileName: string;
 
 			if (this.settings.dateFormat === "gregorian") {

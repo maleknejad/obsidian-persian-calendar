@@ -1,4 +1,4 @@
-import type { IRAN_HIJRI_MONTHS_LENGTH } from "src/constants";
+import type { HIJRI_MONTHS_LENGTH } from "src/constants";
 
 // jalali = هجری شمسی/خورشیدی
 export type TJalali = {
@@ -40,7 +40,7 @@ export type TMonthMap = Map<number, TDayMap>;
 
 export type TGetDayOfWeek = { jYear: number; jWeekNumber: number };
 
-export type TSupportedHijriYear = keyof typeof IRAN_HIJRI_MONTHS_LENGTH;
+export type TSupportedHijriYear = keyof typeof HIJRI_MONTHS_LENGTH;
 
 export type TDateFormat = "jalali" | "gregorian" | "hijri";
 
@@ -49,6 +49,17 @@ export type TShowEvents = {
 	showIRAncientEvents?: boolean;
 	showIRIslamEvents?: boolean;
 	showGlobalEvents?: boolean;
+};
+
+export type THijriAnchor = {
+	first: {
+		gregorian: { gy: number; gm: number; gd: number };
+		hijri: { hy: number; hm: number; hd: number };
+	};
+	last: {
+		gregorian: { gy: number; gm: number; gd: number };
+		hijri: { hy: number; hm: number; hd: number };
+	};
 };
 
 export type TBoolSettingKeys = Extract<

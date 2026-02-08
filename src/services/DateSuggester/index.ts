@@ -130,7 +130,7 @@ export default class DateSuggester extends EditorSuggest<string> {
 
 			const formatSpecifier = specifier ? ` ${specifier.trim()}` : "";
 
-			if(this.dateFormat === "gregorian") {
+			if (this.dateFormat === "gregorian") {
 				return `[[${gDateDash}|${weekdayName}${formatSpecifier}]]`;
 			}
 
@@ -154,12 +154,14 @@ export default class DateSuggester extends EditorSuggest<string> {
 					پس‌فردا: 2,
 				}[keyword];
 
+				const jDayDash = dateToJDayDash(date);
+
 				date.setDate(date.getDate() + dateAdjustment);
-				if(this.dateFormat === "gregorian") {
-					return `[[${jalaliDashToGregorianDash(dateToJDayDash(date))}|${keyword}]]`;
+				if (this.dateFormat === "gregorian") {
+					return `[[${jalaliDashToGregorianDash(jDayDash)}|${keyword}]]`;
 				}
-				
-				return `[[${dateToJDayDash(date)}|${keyword}]]`;
+
+				return `[[${jDayDash}|${keyword}]]`;
 
 			case "این هفته":
 				return `[[${dateToJWeekDash(new Date())}|${keyword}]]`;

@@ -11,7 +11,18 @@ export function checkKabiseh(jy: number): boolean {
 }
 
 export function dateToJalali(date: Date): TJalali {
-	return toJalaali(date);
+	const parts = new Intl.DateTimeFormat("en-US", {
+		timeZone: "Asia/Tehran",
+		year: "numeric",
+		month: "numeric",
+		day: "numeric",
+	}).formatToParts(date);
+
+	const year = Number(parts.find((p) => p.type === "year")!.value);
+	const month = Number(parts.find((p) => p.type === "month")!.value);
+	const day = Number(parts.find((p) => p.type === "day")!.value);
+
+	return toJalaali(year, month, day);
 }
 
 export function jalaliToDate(jy: number, jm: number, jd: number): Date {
@@ -28,7 +39,9 @@ export function gregorianToJalali(gy: number, gm: number, gd: number): TJalali {
 	return { jy, jm, jd };
 }
 
-export function jalaliMonthLength(jy: number, jm: number): number {
+export function jalaliMonthLength(jy: number, jm: number) {
+	if (jm > 12 || jm < 1) return null;
+
 	return jalaaliMonthLength(jy, jm);
 }
 
