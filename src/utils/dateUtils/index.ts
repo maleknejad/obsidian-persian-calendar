@@ -12,6 +12,7 @@ export {
 	getFirstWeekStartOfJYear, // (jy) => (first saturday in jy){jy, jm, jd}
 	jalaliToStartDayOfWeek, // ({jYear, jWeekNumber}) => (start day of week){jy, jm, jd, gy, gm, gd}
 	jalaliToEndDayOfWeek, // ({jYear, jWeekNumber}) => (end day of week){jy, jm, jd, gy, gm, gd}
+	dateToMonthName, // (Date) => String(jalali_month_name)
 } from "./jalaliUtils";
 export {
 	gregorianToDate, // (gy, gm, gd) => (Is it a valid Gregorian date?)Date|null
@@ -35,11 +36,11 @@ export {
 	jalaliDashToGregorianDash, // ("jy-jm-jd"|"jyjmjd") => String((gregorian)dayFormat)
 	gregorianDashToJalali, // ("gy-gm-gd"|"gygmgd") => {jy, jm, jd}
 	dashToDate, // ("jy-jm-jd"|"jyjmjd"|"gy-gm-gd"|"gygmgd") => Date
+	dateToDash, // (Date) => String((jalali|gregorian)dayFormat)
 	dateToJYearDash, // (Date) => String((jalali)yearFormat)
 	dateToSeasonDash, // (Date) => String(seasonFormat)
 	dateToJMonthDash, // (Date) => String((jalali)monthFormat)
 	dateToJWeekDash, // (Date) => String((jalali)weekFormat)
-	dateToJDayDash, // (Date) => String((jalali)dayFormat)
 	jalaliDashToDate, // ("jy-jm-jd"|"jyjmjd") => Date
 	gregorianDashToDate, // ("gy-gm-gd"|"gygmgd") => Date
 	dateToDaysPassedJYear, // Date => Number(days_passed_in_jy)

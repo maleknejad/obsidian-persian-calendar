@@ -9,8 +9,9 @@ import {
 	dateToJWeekNumber,
 	jalaliToStartDayOfWeek,
 	jalaliToSeason,
+	dateToGregorian,
 } from "..";
-import { dayFormat, monthFormat, seasonFormat, weekFormat } from "src/utils/format";
+import { extractMonthFormat, toDayFormat, toMonthFormat, toSeasonFormat, toWeekFormat } from "src/utils/formatters";
 import type { TDateFormat, TJalali, TWeekStart } from "src/types";
 
 export function gregorianDashToJalaliDash(
@@ -32,7 +33,7 @@ export function gregorianDashToJalaliDash(
 
 	const { jy, jm, jd } = dateToJalali(date);
 
-	return dayFormat(jy, jm, jd, { separator });
+	return toDayFormat(jy, jm, jd, { separator });
 }
 
 export function jalaliDashToGregorianDash(
@@ -50,7 +51,7 @@ export function jalaliDashToGregorianDash(
 
 	try {
 		const { gy, gm, gd } = jalaliToGregorian(jy, jm, jd);
-		return dayFormat(gy, gm, gd, { separator });
+		return toDayFormat(gy, gm, gd, { separator });
 	} catch {
 		return null;
 	}
@@ -114,6 +115,22 @@ export function dashToDate(dashDate: string, dateFormat: TDateFormat): Date | nu
 	return gregorianDashToDate(dashDate);
 }
 
+export function dateToDash(
+	date: Date,
+	dateFormat: TDateFormat,
+	option?: { separator?: string },
+): string | null {
+	const separator = option?.separator ?? "-";
+
+	if (dateFormat === "jalali") {
+		const { jy, jm, jd } = dateToJalali(date);
+		return toDayFormat(jy, jm, jd, { separator });
+	}
+
+	const { gy, gm, gd } = dateToGregorian(date);
+	return toDayFormat(gy, gm, gd, { separator });
+}
+
 export function dateToJYearDash(date: Date) {
 	const { jy } = dateToJalali(date);
 	return String(jy);
@@ -122,10 +139,10 @@ export function dateToJYearDash(date: Date) {
 export function dateToSeasonDash(date: Date, option?: { separator?: string }) {
 	const separator = option?.separator ?? "-";
 
-	const { jm } = dateToJalali(date);
+	const { jy, jm } = dateToJalali(date);
 	const season = jalaliToSeason(jm);
 
-	return seasonFormat(jm, season, { separator });
+	return toSeasonFormat(jy, season, { separator });
 }
 
 export function dateToJMonthDash(date: Date, option?: { separator?: string }) {
@@ -133,7 +150,7 @@ export function dateToJMonthDash(date: Date, option?: { separator?: string }) {
 
 	const { jy, jm } = dateToJalali(date);
 
-	return monthFormat(jy, jm, { separator });
+	return toMonthFormat(jy, jm, { separator });
 }
 
 export function dateToJWeekDash(
@@ -146,14 +163,7 @@ export function dateToJWeekDash(
 	const { jy } = dateToJalali(date);
 	const jWeekNumber = dateToJWeekNumber(date, weekStart);
 
-	return weekFormat(jy, jWeekNumber, { separator });
-}
-
-export function dateToJDayDash(date: Date, option?: { separator?: string }) {
-	const separator = option?.separator ?? "-";
-
-	const { jy, jm, jd } = dateToJalali(date);
-	return dayFormat(jy, jm, jd, { separator });
+	return toWeekFormat(jy, jWeekNumber, { separator });
 }
 
 export function dateToDaysPassedJYear(date: Date): number {
@@ -195,10 +205,10 @@ export function dateToStartDayOfWeekDash(
 	const { jy, jm, jd, gy, gm, gd } = jalaliToStartDayOfWeek({ jYear, jWeekNumber });
 
 	if (baseDate === "jalali") {
-		return dayFormat(jy, jm, jd, { separator });
+		return toDayFormat(jy, jm, jd, { separator });
 	}
 
-	return dayFormat(gy, gm, gd, { separator });
+	return toDayFormat(gy, gm, gd, { separator });
 }
 
 export function dateToEndDayOfWeekDash(
@@ -214,8 +224,15 @@ export function dateToEndDayOfWeekDash(
 	const { jy, jm, jd, gy, gm, gd } = jalaliToStartDayOfWeek({ jYear, jWeekNumber });
 
 	if (baseDate === "jalali") {
-		return dayFormat(jy, jm, jd);
+		return toDayFormat(jy, jm, jd);
 	}
 
-	return dayFormat(gy, gm, gd, { separator });
+	return toDayFormat(gy, gm, gd, { separator });
+}
+
+export function monthDashToMonthName(monthDash: string) {
+	const monthProps = extractMonthFormat(monthDash);
+	if (!monthProps) return null;
+
+	return ;
 }

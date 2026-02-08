@@ -6,7 +6,7 @@ import {
 	dateToJWeekNumber,
 	gregorianToHijri,
 } from "src/utils/dateUtils";
-import { toFaNumber } from "src/utils/format";
+import { toFaNumber } from "src/utils/formatters";
 import { GREGORIAN_MONTHS_NAME, HIJRI_MONTHS_NAME } from "src/constants";
 
 export default class CalendarState {

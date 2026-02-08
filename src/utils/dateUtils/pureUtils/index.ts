@@ -1,4 +1,4 @@
-import { JALALI_MONTHS_NAME } from "src/constants";
+import { JALALI_MONTHS_NAME, SEASONS_NAME } from "src/constants";
 import type { TGregorian, TLocal, TWeekStart } from "src/types";
 
 export function gregorianToDate(gy: number, gm: number, gd: number) {
@@ -51,8 +51,12 @@ export const weekStartNumber = (weekStart: TWeekStart): number =>
 		mon: 1,
 	})[weekStart];
 
-export function getJalaliMonthName(month: number, local: TLocal = "fa"): string {
+export function getJalaliMonthName(month: number, local: TLocal = "fa") {
 	return JALALI_MONTHS_NAME[local][month];
+}
+
+export function getSeasonName(season: number, local: TLocal = "fa") {
+	return SEASONS_NAME[local][season];
 }
 
 export function addDayDate(date: Date, days: number) {

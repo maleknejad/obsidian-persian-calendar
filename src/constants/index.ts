@@ -12,3 +12,4 @@ export {
 export { DEFAULT_SETTING } from "./settings";
 export { RELEASE_NOTES } from "./releaseNotes";
 export { DEFAULT_SOCIAL_LINKS } from "./socialLinks";
+export { isWeeklyRegex, isMonthlyRegex, isSeasonalRegex, isYearlyRegex } from "./regex";

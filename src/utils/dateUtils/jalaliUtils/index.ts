@@ -1,6 +1,7 @@
 import { toJalaali, toGregorian, jalaaliMonthLength, isValidJalaaliDate } from "jalaali-js";
-import { dateToGregorian, weekStartNumber } from "..";
+import { dateToGregorian, getJalaliMonthName, jalaliToSeason, weekStartNumber } from "..";
 import type { TJalali, TGregorian, TWeekStart, TGetDayOfWeek } from "src/types";
+import { getSeasonName } from "../pureUtils";
 
 export function checkValidJalali(jy: number, jm: number, jd: number) {
 	return isValidJalaaliDate(jy, jm, jd);
@@ -40,8 +41,6 @@ export function gregorianToJalali(gy: number, gm: number, gd: number): TJalali {
 }
 
 export function jalaliMonthLength(jy: number, jm: number) {
-	if (jm > 12 || jm < 1) return null;
-
 	return jalaaliMonthLength(jy, jm);
 }
 
@@ -149,4 +148,16 @@ export function jalaliToEndDayOfWeek(
 	targetDate.setDate(targetDate.getDate() + 6);
 
 	return { ...dateToJalali(targetDate), ...dateToGregorian(targetDate) };
+}
+
+export function dateToMonthName(date: Date) {
+	const { jm } = dateToJalali(date);
+	return getJalaliMonthName(jm);
+}
+
+export function dateToSeasonName(date: Date) {
+	const { jm } = dateToJalali(date);
+	const seasonNumber = jalaliToSeason(jm);
+
+	return getSeasonName(seasonNumber);
 }
