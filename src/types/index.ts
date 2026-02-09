@@ -107,9 +107,6 @@ export type TBuildContext = {
 	fileDate: Date | null;
 	fileName: string;
 	baseDate: TDateFormat;
-	isMonthly: boolean;
-	isSeasonal: boolean;
-	targetYear: number | null;
 };
 
 export type TMonthGridCell = TJalali & {

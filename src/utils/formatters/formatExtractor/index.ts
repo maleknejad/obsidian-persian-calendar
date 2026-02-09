@@ -1,8 +1,8 @@
 import { isMonthlyRegex, isSeasonalRegex, isWeeklyRegex } from "src/constants";
-import { isDailyRegex } from "src/constants/regex";
+import { isDailyRegex, isYearlyRegex } from "src/constants/regex";
 
-export function extractDayFormat(title: string) {
-	const match = title.match(isDailyRegex);
+export function extractDayFormat(format: string) {
+	const match = format.match(isDailyRegex);
 	if (!match) return null;
 
 	const year = Number(match[1]);
@@ -12,8 +12,8 @@ export function extractDayFormat(title: string) {
 	return { year, month, day };
 }
 
-export function extractWeekFormat(title: string) {
-	const match = title.match(isWeeklyRegex);
+export function extractWeekFormat(format: string) {
+	const match = format.match(isWeeklyRegex);
 	if (!match) return null;
 
 	const year = Number(match[1]);
@@ -22,8 +22,8 @@ export function extractWeekFormat(title: string) {
 	return { year, week };
 }
 
-export function extractMonthFormat(title: string) {
-	const match = title.match(isMonthlyRegex);
+export function extractMonthFormat(format: string) {
+	const match = format.match(isMonthlyRegex);
 
 	if (!match) return null;
 
@@ -33,14 +33,41 @@ export function extractMonthFormat(title: string) {
 	return { year, month };
 }
 
-export function extractSeasonFormat(title: string) {
-	const match = title.match(isSeasonalRegex);
+export function extractSeasonFormat(format: string) {
+	const match = format.match(isSeasonalRegex);
 	if (!match) return null;
-
-	console.log(match);
 
 	const year = Number(match[1]);
 	const season = Number(match[2]);
 
 	return { year, season };
+}
+
+export function extractYearFormat(format: string) {
+	const match = format.match(isYearlyRegex);
+	if (!match) return null;
+
+	const year = Number(match[1]);
+
+	return year;
+}
+
+export function isDayFormat(format: string) {
+	return isDailyRegex.test(format);
+}
+
+export function isWeekFormat(format: string) {
+	return isWeeklyRegex.test(format);
+}
+
+export function isMonthFormat(format: string) {
+	return isMonthlyRegex.test(format);
+}
+
+export function isSeasonFormat(format: string) {
+	return isSeasonalRegex.test(format);
+}
+
+export function isYearFormat(format: string) {
+	return isYearlyRegex.test(format);
 }

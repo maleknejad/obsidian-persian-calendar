@@ -1,3 +1,5 @@
+// todo: divide and conquer
+
 import {
 	dateToJalali,
 	gregorianToJalali,
@@ -12,6 +14,14 @@ import {
 	dateToGregorian,
 	jalaliToEndDayOfWeek,
 	jalaliToDate,
+	dateToMonthName,
+	dateToEndDayOfJMonthDate,
+	dateToStartDayOfJMonthDate,
+	dateToSeasonName,
+	getSeasonName,
+	dateToStartDayOfSeasonDate,
+	dateToEndDayOfSeasonDate,
+	checkKabiseh,
 } from "..";
 import {
 	extractMonthFormat,
@@ -20,9 +30,16 @@ import {
 	toMonthFormat,
 	toSeasonFormat,
 	toWeekFormat,
+	extractDayFormat,
+	isDayFormat,
+	isWeekFormat,
+	isMonthFormat,
+	isSeasonFormat,
+	extractSeasonFormat,
+	isYearFormat,
+	extractYearFormat,
 } from "src/utils/formatters";
 import type { TDateFormat, TJalali, TWeekStart } from "src/types";
-import { isDailyRegex, isWeeklyRegex } from "src/constants";
 
 export function gregorianDashToJalaliDash(
 	dashDate: string,
@@ -30,12 +47,12 @@ export function gregorianDashToJalaliDash(
 ): string | null {
 	const separator = option?.separator ?? "-";
 
-	const match = dashDate.match(isDailyRegex);
-	if (!match) return null;
+	const dayProps = extractDayFormat(dashDate);
+	if (!dayProps) return null;
 
-	const gy = +match[1];
-	const gm = +match[2];
-	const gd = +match[3];
+	const gy = dayProps.year;
+	const gm = dayProps.month;
+	const gd = dayProps.day;
 
 	const date = gregorianToDate(gy, gm, gd);
 
@@ -52,12 +69,12 @@ export function jalaliDashToGregorianDash(
 ): string | null {
 	const separator = option?.separator ?? "-";
 
-	const match = dashDate.match(isDailyRegex);
-	if (!match) return null;
+	const dayProps = extractDayFormat(dashDate);
+	if (!dayProps) return null;
 
-	const jy = +match[1];
-	const jm = +match[2];
-	const jd = +match[3];
+	const jy = dayProps.year;
+	const jm = dayProps.month;
+	const jd = dayProps.day;
 
 	try {
 		const { gy, gm, gd } = jalaliToGregorian(jy, jm, jd);
@@ -68,12 +85,12 @@ export function jalaliDashToGregorianDash(
 }
 
 export function jalaliDashToJalali(dashDate: string): TJalali | null {
-	const match = dashDate.match(isDailyRegex);
-	if (!match) return null;
+	const dayProps = extractDayFormat(dashDate);
+	if (!dayProps) return null;
 
-	const jy = +match[1];
-	const jm = +match[2];
-	const jd = +match[3];
+	const jy = dayProps.year;
+	const jm = dayProps.month;
+	const jd = dayProps.day;
 
 	if (!checkValidJalali(jy, jm, jd)) return null;
 
@@ -81,12 +98,12 @@ export function jalaliDashToJalali(dashDate: string): TJalali | null {
 }
 
 export function gregorianDashToJalali(dashDate: string): TJalali | null {
-	const match = dashDate.match(isDailyRegex);
-	if (!match) return null;
+	const dayProps = extractDayFormat(dashDate);
+	if (!dayProps) return null;
 
-	const gy = +match[1];
-	const gm = +match[2];
-	const gd = +match[3];
+	const gy = dayProps.year;
+	const gm = dayProps.month;
+	const gd = dayProps.day;
 
 	if (!gregorianToDate(gy, gm, gd)) return null;
 
@@ -94,12 +111,12 @@ export function gregorianDashToJalali(dashDate: string): TJalali | null {
 }
 
 export function gregorianDashToDate(dashDate: string): Date | null {
-	const match = dashDate.match(isDailyRegex);
-	if (!match) return null;
+	const dayProps = extractDayFormat(dashDate);
+	if (!dayProps) return null;
 
-	const gy = +match[1];
-	const gm = +match[2];
-	const gd = +match[3];
+	const gy = dayProps.year;
+	const gm = dayProps.month;
+	const gd = dayProps.day;
 
 	const date = gregorianToDate(gy, gm, gd);
 
@@ -109,12 +126,14 @@ export function gregorianDashToDate(dashDate: string): Date | null {
 }
 
 export function jalaliDashToDate(dashDate: string): Date | null {
-	if (!isDailyRegex.test(dashDate)) return null;
+	const dayProps = extractDayFormat(dashDate);
+	if (!dayProps) return null;
 
-	const jalali = jalaliDashToJalali(dashDate);
-	if (!jalali) return null;
+	const jy = dayProps.year;
+	const jm = dayProps.month;
+	const jd = dayProps.day;
 
-	const { gy, gm, gd } = jalaliToGregorian(jalali.jy, jalali.jm, jalali.jd);
+	const { gy, gm, gd } = jalaliToGregorian(jy, jm, jd);
 
 	return new Date(gy, gm - 1, gd);
 }
@@ -190,7 +209,7 @@ export function dashToStartDayOfWeekDash(
 ) {
 	const separator = option?.separator ?? "-";
 
-	if (isDailyRegex.test(dashDate)) {
+	if (isDayFormat(dashDate)) {
 		const date = dashToDate(dashDate, dateFormat);
 		if (!date) return;
 
@@ -206,7 +225,7 @@ export function dashToStartDayOfWeekDash(
 		return toDayFormat(gy, gm, gd, { separator });
 	}
 
-	if (isWeeklyRegex.test(dashDate)) {
+	if (isWeekFormat(dashDate)) {
 		const weekProps = extractWeekFormat(dashDate);
 		if (!weekProps) return;
 
@@ -229,7 +248,7 @@ export function dashToEndDayOfWeekDash(
 ) {
 	const separator = option?.separator ?? "-";
 
-	if (isDailyRegex.test(dashDate)) {
+	if (isDayFormat(dashDate)) {
 		const date = dashToDate(dashDate, dateFormat);
 		if (!date) return;
 
@@ -245,7 +264,7 @@ export function dashToEndDayOfWeekDash(
 		return toDayFormat(gy, gm, gd, { separator });
 	}
 
-	if (isWeeklyRegex.test(dashDate)) {
+	if (isWeekFormat(dashDate)) {
 		const weekProps = extractWeekFormat(dashDate);
 		if (!weekProps) return;
 
@@ -261,15 +280,8 @@ export function dashToEndDayOfWeekDash(
 	return null;
 }
 
-export function monthDashToMonthName(monthDash: string) {
-	const monthProps = extractMonthFormat(monthDash);
-	if (!monthProps) return null;
-
-	return;
-}
-
 export function dashToDate(dashDate: string, dateFormat: TDateFormat): Date | null {
-	if (!isDailyRegex.test(dashDate)) return null;
+	if (!isDayFormat(dashDate)) return null;
 
 	if (dateFormat === "jalali") {
 		return jalaliDashToDate(dashDate);
@@ -291,16 +303,259 @@ export function dateToJWeekDash(
 	return toWeekFormat(jy, jWeekNumber, { separator });
 }
 
-export function dashToJWeekDash(dashDate: string, dateFormat: TDateFormat): string | null {
-	if (isDailyRegex.test(dashDate)) {
+export function dashToJWeekDash(dashDate: string, dateFormat?: TDateFormat): string | null {
+	if (isDayFormat(dashDate) && dateFormat) {
 		const date = dashToDate(dashDate, dateFormat);
 		if (!date) return null;
 
 		return dateToJWeekDash(date);
 	}
 
-	if (isWeeklyRegex.test(dashDate)) {
+	if (isWeekFormat(dashDate)) {
 		return dashDate;
+	}
+
+	return null;
+}
+
+export function dashToJMonthDash(dashDate: string, dateFormat?: TDateFormat) {
+	if (isDayFormat(dashDate) && dateFormat) {
+		const date = dashToDate(dashDate, dateFormat);
+		if (!date) return null;
+
+		const { jy, jm } = dateToJalali(date);
+
+		return toMonthFormat(jy, jm);
+	}
+
+	if (isMonthFormat(dashDate)) {
+		return dashDate;
+	}
+
+	return null;
+}
+
+export function dashToJMonthName(dashDate: string, dateFormat?: TDateFormat) {
+	if (isDayFormat(dashDate) && dateFormat) {
+		const date = dashToDate(dashDate, dateFormat);
+		if (!date) return null;
+
+		return dateToMonthName(date);
+	}
+
+	if (isMonthFormat(dashDate)) {
+		const monthProps = extractMonthFormat(dashDate);
+		if (!monthProps) return null;
+
+		const date = jalaliToDate(monthProps.year, monthProps.month, 1);
+		return dateToMonthName(date);
+	}
+
+	return null;
+}
+
+export function dashToStartDayOfJMonthDash(dashDate: string, dateFormat: TDateFormat) {
+	if (isDayFormat(dashDate)) {
+		const currentDate = dashToDate(dashDate, dateFormat);
+		if (!currentDate) return null;
+
+		const startDate = dateToStartDayOfJMonthDate(currentDate);
+		return dateToDash(startDate, dateFormat);
+	}
+
+	if (isMonthFormat(dashDate)) {
+		const monthProps = extractMonthFormat(dashDate);
+		if (!monthProps) return null;
+
+		const startDate = jalaliToDate(monthProps.year, monthProps.month, 1);
+		return dateToDash(startDate, dateFormat);
+	}
+
+	return null;
+}
+
+export function dashToEndDayOfJMonthDash(dashDate: string, dateFormat: TDateFormat) {
+	if (isDayFormat(dashDate)) {
+		const currentDate = dashToDate(dashDate, dateFormat);
+		if (!currentDate) return null;
+
+		const endDate = dateToEndDayOfJMonthDate(currentDate);
+		return dateToDash(endDate, dateFormat);
+	}
+
+	if (isMonthFormat(dashDate)) {
+		const monthProps = extractMonthFormat(dashDate);
+		if (!monthProps) return null;
+
+		const day = jalaliMonthLength(monthProps.year, monthProps.month);
+
+		const endDate = jalaliToDate(monthProps.year, monthProps.month, day);
+		return dateToDash(endDate, dateFormat);
+	}
+
+	return null;
+}
+
+export function dashToSeasonName(dashDate: string, dateFormat: TDateFormat) {
+	if (isDayFormat(dashDate)) {
+		const date = dashToDate(dashDate, dateFormat);
+		if (!date) return null;
+
+		return dateToSeasonName(date);
+	}
+
+	if (isMonthFormat(dashDate)) {
+		const monthProps = extractMonthFormat(dashDate);
+		if (!monthProps) return null;
+
+		const season = jalaliToSeason(monthProps.month);
+		return getSeasonName(season);
+	}
+
+	if (isSeasonFormat(dashDate)) {
+		const seasonProps = extractSeasonFormat(dashDate);
+		if (!seasonProps) return null;
+
+		return getSeasonName(seasonProps.season);
+	}
+
+	return null;
+}
+
+export function dashToSeasonDash(dashDate: string, dateFormat: TDateFormat) {
+	if (isDayFormat(dashDate)) {
+		const date = dashToDate(dashDate, dateFormat);
+		if (!date) return null;
+
+		return dateToSeasonDash(date);
+	}
+
+	if (isMonthFormat(dashDate)) {
+		const monthProps = extractMonthFormat(dashDate);
+		if (!monthProps) return null;
+
+		const season = jalaliToSeason(monthProps.month);
+
+		return toSeasonFormat(monthProps.year, season);
+	}
+
+	if (isSeasonFormat(dashDate)) {
+		return dashDate;
+	}
+
+	return null;
+}
+
+export function dashToStartDayOfSeasonDash(dashDate: string, dateFormat: TDateFormat) {
+	if (isDayFormat(dashDate)) {
+		const date = dashToDate(dashDate, dateFormat);
+		if (!date) return null;
+
+		const startDayOfSeasonDate = dateToStartDayOfSeasonDate(date);
+		return dateToDash(startDayOfSeasonDate, dateFormat);
+	}
+
+	if (isMonthFormat(dashDate)) {
+		const monthProps = extractMonthFormat(dashDate);
+		if (!monthProps) return null;
+
+		const date = jalaliToDate(monthProps.year, monthProps.month, 1);
+
+		const startDayOfSeasonDate = dateToStartDayOfSeasonDate(date);
+		return dateToDash(startDayOfSeasonDate, dateFormat);
+	}
+
+	if (isSeasonFormat(dashDate)) {
+		const seasonProps = extractSeasonFormat(dashDate);
+		if (!seasonProps) return null;
+
+		const firstMonthOfSeason = 3 * (seasonProps.season - 1) + 1;
+		const date = jalaliToDate(seasonProps.year, firstMonthOfSeason, 1);
+
+		const startDayOfSeasonDate = dateToStartDayOfSeasonDate(date);
+		return dateToDash(startDayOfSeasonDate, dateFormat);
+	}
+
+	return null;
+}
+
+export function dashToEndDayOfSeasonDash(dashDate: string, dateFormat: TDateFormat) {
+	if (isDayFormat(dashDate)) {
+		const date = dashToDate(dashDate, dateFormat);
+		if (!date) return null;
+
+		const endDayOfSeasonDate = dateToEndDayOfSeasonDate(date);
+		return dateToDash(endDayOfSeasonDate, dateFormat);
+	}
+
+	if (isMonthFormat(dashDate)) {
+		const monthProps = extractMonthFormat(dashDate);
+		if (!monthProps) return null;
+
+		const date = jalaliToDate(monthProps.year, monthProps.month, 1);
+
+		const endDayOfSeasonDate = dateToEndDayOfSeasonDate(date);
+		return dateToDash(endDayOfSeasonDate, dateFormat);
+	}
+
+	if (isSeasonFormat(dashDate)) {
+		const seasonProps = extractSeasonFormat(dashDate);
+		if (!seasonProps) return null;
+
+		const lastMonthOfSeason = 3 * seasonProps.season;
+		const date = jalaliToDate(seasonProps.year, lastMonthOfSeason, 1);
+
+		const endDayOfSeasonDate = dateToEndDayOfSeasonDate(date);
+		return dateToDash(endDayOfSeasonDate, dateFormat);
+	}
+
+	return null;
+}
+
+export function dashToStartDayOfYearDash(dashDate: string, dateFormat: TDateFormat): string | null {
+	if (isDayFormat(dashDate)) {
+		const date = dashToDate(dashDate, dateFormat);
+		if (!date) return null;
+
+		const { jy } = dateToJalali(date);
+		const startDate = jalaliToDate(jy, 1, 1);
+
+		return dateToDash(startDate, dateFormat);
+	}
+
+	if (isYearFormat(dashDate)) {
+		const year = extractYearFormat(dashDate);
+		if (!year) return null;
+
+		const startDate = jalaliToDate(year, 1, 1);
+
+		return dateToDash(startDate, dateFormat);
+	}
+
+	return null;
+}
+
+export function dashToEndDayOfYearDash(dashDate: string, dateFormat: TDateFormat): string | null {
+	if (isDayFormat(dashDate)) {
+		const date = dashToDate(dashDate, dateFormat);
+		if (!date) return null;
+
+		const { jy } = dateToJalali(date);
+
+		const endDay = checkKabiseh(jy) ? 30 : 29;
+		const endDate = jalaliToDate(jy, 12, endDay);
+
+		return dateToDash(endDate, dateFormat);
+	}
+
+	if (isYearFormat(dashDate)) {
+		const year = extractYearFormat(dashDate);
+		if (!year) return null;
+
+		const endDay = checkKabiseh(year) ? 30 : 29;
+		const endDate = jalaliToDate(year, 12, endDay);
+
+		return dateToDash(endDate, dateFormat);
 	}
 
 	return null;
