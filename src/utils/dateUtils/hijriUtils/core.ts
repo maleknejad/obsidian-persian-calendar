@@ -1,5 +1,54 @@
-import { IRAN_HIJRI_ANCHORS, IRAN_HIJRI_MONTHS_LENGTH } from "src/constants";
+import { HIJRI_ANCHORS, HIJRI_MONTHS_LENGTH } from "src/constants";
 import type { THijri, TGregorian, TSupportedHijriYear } from "src/types";
+
+const HIJRI_MONTH_MAP: Map<number, Map<number, 29 | 30>> = buildHijriMonthMap(HIJRI_MONTHS_LENGTH);
+
+function buildHijriMonthMap(
+	raw: Record<number, readonly number[]>,
+): Map<number, Map<number, 29 | 30>> {
+	const monthMap = new Map<number, Map<number, 29 | 30>>();
+	const years = Object.keys(raw).map(Number);
+	const minYear = Math.min(...years);
+	const maxYear = Math.max(...years);
+
+	for (let hy = minYear - 20; hy <= maxYear + 20; hy++) {
+		const monthSubMap = new Map<number, 29 | 30>();
+
+		for (let hm = 1; hm <= 12; hm++) {
+			let length: 29 | 30;
+
+			const yearData = raw[hy as TSupportedHijriYear];
+			if (yearData && hm <= yearData.length) {
+				length = yearData[hm - 1] as 29 | 30;
+			} else {
+				length = computedMonthLength(hy, hm);
+			}
+
+			monthSubMap.set(hm, length);
+		}
+
+		monthMap.set(hy, monthSubMap);
+	}
+
+	return monthMap;
+}
+
+function isHijriLeapYear(hy: number): boolean {
+	const y = ((hy - 1) % 30) + 1;
+	return [2, 5, 7, 10, 13, 16, 18, 21, 24, 26, 29].includes(y);
+}
+
+function computedMonthLength(hy: number, hm: number): 29 | 30 {
+	if (hm === 12) return isHijriLeapYear(hy) ? 30 : 29;
+	return hm % 2 === 1 ? 30 : 29;
+}
+
+function getMonthLength(hy: number, hm: number): 29 | 30 {
+	const known = HIJRI_MONTH_MAP.get(hy)?.get(hm);
+	if (known) return known;
+
+	return computedMonthLength(hy, hm);
+}
 
 function gregorianToJulian(year: number, month: number, day: number): number {
 	if (month < 3) {
@@ -38,93 +87,56 @@ function julianToGregorian(julianDay: number): TGregorian {
 	return { gy, gm, gd };
 }
 
-function extrapolateMonthLength(prevLength: 29 | 30): 29 | 30 {
-	return prevLength === 29 ? 30 : 29;
-}
-
-function getPreviousMonth(hy: number, hm: number) {
-	if (hm === 1) {
-		return { hy: hy - 1, hm: 12 };
-	} else {
-		return { hy, hm: hm - 1 };
-	}
-}
-
-function getMonthLength(hy: number, hm: number): number {
-	const yearData = IRAN_HIJRI_MONTHS_LENGTH[hy as TSupportedHijriYear];
-
-	if (yearData && hm <= yearData.length) {
-		return Number(yearData[hm - 1]);
-	}
-
-	const prev = getPreviousMonth(hy, hm);
-	const prevLength = getMonthLength(prev.hy, prev.hm);
-	return extrapolateMonthLength(prevLength as 29 | 30);
-}
-
-function pickBestAnchorByJulDay(JulDay: number) {
-	let closestAnchor = IRAN_HIJRI_ANCHORS[0];
+function pickNearestAnchorByJulian(jd: number) {
+	let best = HIJRI_ANCHORS.first;
 	let minDelta = Math.abs(
-		JulDay -
-			gregorianToJulian(
-				closestAnchor.gregorian.gy,
-				closestAnchor.gregorian.gm,
-				closestAnchor.gregorian.gd,
-			),
+		jd - gregorianToJulian(best.gregorian.gy, best.gregorian.gm, best.gregorian.gd),
 	);
 
-	for (let i = 1; i < IRAN_HIJRI_ANCHORS.length; i++) {
-		const a = IRAN_HIJRI_ANCHORS[i];
-		const delta = Math.abs(
-			JulDay - gregorianToJulian(a.gregorian.gy, a.gregorian.gm, a.gregorian.gd),
-		);
-
-		if (delta < minDelta) {
-			closestAnchor = a as typeof closestAnchor;
-			minDelta = delta;
+	for (const a of [HIJRI_ANCHORS.last]) {
+		const ajd = gregorianToJulian(a.gregorian.gy, a.gregorian.gm, a.gregorian.gd);
+		const d = Math.abs(jd - ajd);
+		if (d < minDelta) {
+			best = a;
+			minDelta = d;
 		}
 	}
 
-	return closestAnchor;
+	return best;
 }
 
-function pickBestAnchorByHijri(hy: number, hm: number) {
-	let closest = IRAN_HIJRI_ANCHORS[0];
-	let minDelta = Math.abs(hy - closest.hijri.hy) * 12 + Math.abs(hm - closest.hijri.hm);
+function pickNearestAnchorByHijri(hy: number, hm: number) {
+	const first = HIJRI_ANCHORS.first;
+	const last = HIJRI_ANCHORS.last;
 
-	for (let i = 1; i < IRAN_HIJRI_ANCHORS.length; i++) {
-		const a = IRAN_HIJRI_ANCHORS[i];
-		const delta = Math.abs(hy - a.hijri.hy) * 12 + Math.abs(hm - a.hijri.hm);
-		if (delta < minDelta) {
-			closest = a as typeof closest;
-			minDelta = delta;
-		}
-	}
+	const d1 = Math.abs(hy - first.hijri.hy) * 12 + Math.abs(hm - first.hijri.hm);
+	const d2 = Math.abs(hy - last.hijri.hy) * 12 + Math.abs(hm - last.hijri.hm);
 
-	return closest;
+	return d1 <= d2 ? first : last;
 }
 
 // === main functions ===
 export function gregorianToHijri(gy: number, gm: number, gd: number): THijri {
-	const julDay = gregorianToJulian(gy, gm, gd);
+	const jd = gregorianToJulian(gy, gm, gd);
+	const anchor = pickNearestAnchorByJulian(jd);
 
-	const { gregorian, hijri } = pickBestAnchorByJulDay(julDay);
-	let { hy, hm, hd }: THijri = hijri;
+	let { hy, hm, hd } = anchor.hijri;
+	let ajd = gregorianToJulian(anchor.gregorian.gy, anchor.gregorian.gm, anchor.gregorian.gd);
 
-	const anchorJD = gregorianToJulian(gregorian.gy, gregorian.gm, gregorian.gd);
-
-	let delta = julDay - anchorJD;
+	let delta = jd - ajd;
 
 	while (delta !== 0) {
 		if (delta > 0) {
-			const monthLength = getMonthLength(hy, hm);
-			if (delta >= monthLength - hd + 1) {
-				delta -= monthLength - hd + 1;
+			const ml = getMonthLength(hy, hm);
+			const remaining = ml - hd;
+
+			if (delta > remaining) {
+				delta -= remaining + 1;
 				hd = 1;
 				hm++;
 				if (hm > 12) {
-					hy++;
 					hm = 1;
+					hy++;
 				}
 			} else {
 				hd += delta;
@@ -135,8 +147,8 @@ export function gregorianToHijri(gy: number, gm: number, gd: number): THijri {
 				delta += hd;
 				hm--;
 				if (hm < 1) {
-					hy--;
 					hm = 12;
+					hy--;
 				}
 				hd = getMonthLength(hy, hm);
 			} else {
@@ -149,14 +161,16 @@ export function gregorianToHijri(gy: number, gm: number, gd: number): THijri {
 	return { hy, hm, hd };
 }
 
-export const hijriToGregorian = (hy: number, hm: number, hd: number): TGregorian => {
-	const { hijri, gregorian } = pickBestAnchorByHijri(hy, hm);
-	let jd = gregorianToJulian(gregorian.gy, gregorian.gm, gregorian.gd);
+export function hijriToGregorian(hy: number, hm: number, hd: number): TGregorian {
+	const anchor = pickNearestAnchorByHijri(hy, hm);
+
+	let jd = gregorianToJulian(anchor.gregorian.gy, anchor.gregorian.gm, anchor.gregorian.gd);
+
+	let ay = anchor.hijri.hy;
+	let am = anchor.hijri.hm;
+	let ad = anchor.hijri.hd;
 
 	let delta = 0;
-	let ay: number = hijri.hy;
-	let am: number = hijri.hm;
-	let ad: number = hijri.hd;
 
 	if (hy > ay || (hy === ay && hm > am) || (hy === ay && hm === am && hd > ad)) {
 		while (ay < hy || (ay === hy && am < hm)) {
@@ -184,4 +198,4 @@ export const hijriToGregorian = (hy: number, hm: number, hd: number): TGregorian
 	jd += delta;
 
 	return julianToGregorian(jd);
-};
+}

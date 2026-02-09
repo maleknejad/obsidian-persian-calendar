@@ -12,8 +12,8 @@ import {
 	dateToSeasonDash,
 	dateToJWeekDash,
 	dateToJYearDash,
-	dateToJDayDash,
 	jalaliDashToGregorianDash,
+	dateToDash,
 } from "src/utils/dateUtils";
 import { WEEKDAYS_NAME } from "src/constants";
 import type { TDateFormat, TLocal } from "src/types";
@@ -125,16 +125,15 @@ export default class DateSuggester extends EditorSuggest<string> {
 				now.setDate(now.getDate() + daysFromNowToWeekday);
 			}
 
-			jDateDash = dateToJDayDash(now);
-			const gDateDash = jalaliDashToGregorianDash(jDateDash); //todo: create dateToDash function
+			const gDateDash = dateToDash(now, "gregorian") //todo: create dateToDash function
 
 			const formatSpecifier = specifier ? ` ${specifier.trim()}` : "";
 
-			if(this.dateFormat === "gregorian") {
+			if (this.dateFormat === "gregorian") {
 				return `[[${gDateDash}|${weekdayName}${formatSpecifier}]]`;
 			}
 
-			return `[[${jDateDash}|${weekdayName}${formatSpecifier}]]`;
+			return `[[${dateToDash(now, "jalali")}|${weekdayName}${formatSpecifier}]]`;
 		}
 
 		switch (keyword) {
@@ -155,11 +154,11 @@ export default class DateSuggester extends EditorSuggest<string> {
 				}[keyword];
 
 				date.setDate(date.getDate() + dateAdjustment);
-				if(this.dateFormat === "gregorian") {
-					return `[[${jalaliDashToGregorianDash(dateToJDayDash(date))}|${keyword}]]`;
+				if (this.dateFormat === "gregorian") {
+					return `[[${dateToDash(date, "gregorian")}|${keyword}]]`;
 				}
-				
-				return `[[${dateToJDayDash(date)}|${keyword}]]`;
+
+				return `[[${dateToDash(date, "jalali")}|${keyword}]]`;
 
 			case "این هفته":
 				return `[[${dateToJWeekDash(new Date())}|${keyword}]]`;

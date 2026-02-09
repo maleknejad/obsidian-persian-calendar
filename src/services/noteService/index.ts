@@ -3,12 +3,15 @@ import type { TLocal, TPathTokenContext, TSetting } from "src/types";
 import { jalaliToGregorian, jalaliMonthLength, jalaliToSeason } from "src/utils/dateUtils";
 import { createNoteModal } from "src/components/ConfirmModal";
 import { JALALI_MONTHS_NAME, SEASONS_NAME } from "src/constants";
+import type PersianCalendarPlugin from "src/main";
 
 export default class NoteService {
 	constructor(
 		private readonly app: App,
 		private readonly settings: TSetting,
+		private readonly plugin: PersianCalendarPlugin,
 	) {}
+
 	private normalizeFolderPath(path?: string | null) {
 		if (!path) return "";
 		return path.trim().replace(/^\/*|\/*$/g, "");
@@ -97,12 +100,51 @@ export default class NoteService {
 		await this.app.workspace.openLinkText(noteFile.path, "", false);
 	}
 
+	private async applyTemplateIfConfigured(
+		file: TFile,
+		noteType: "daily" | "weekly" | "monthly" | "seasonal" | "yearly",
+	): Promise<void> {
+		const templatePath = this.getTemplatePathForNoteType(noteType);
+
+		if (!templatePath || templatePath.trim() === "") {
+			return;
+		}
+
+		try {
+			const templateContent = await this.plugin.placeholder.getTemplateContent(templatePath, file);
+
+			if (templateContent !== null) {
+				await this.app.vault.modify(file, templateContent);
+			}
+		} catch (error) {
+			console.error(`Error applying template for ${noteType} note:`, error);
+		}
+	}
+
+	private getTemplatePathForNoteType(
+		noteType: "daily" | "weekly" | "monthly" | "seasonal" | "yearly",
+	): string {
+		switch (noteType) {
+			case "daily":
+				return this.settings.dailyTemplatePath || "";
+			case "weekly":
+				return this.settings.weeklyTemplatePath || "";
+			case "monthly":
+				return this.settings.monthlyTemplatePath || "";
+			case "seasonal":
+				return this.settings.seasonalTemplatePath || "";
+			default:
+				return this.settings.yearlyTemplatePath || "";
+		}
+	}
+
 	private async openOrCreateNoteWithConfirm(options: {
 		filePath: string;
 		confirmTitle: string;
 		confirmMessage: string;
+		noteType?: "daily" | "weekly" | "monthly" | "seasonal" | "yearly";
 	}) {
-		const { filePath, confirmTitle, confirmMessage } = options;
+		const { filePath, confirmTitle, confirmMessage, noteType } = options;
 
 		try {
 			let noteFile = this.app.vault.getAbstractFileByPath(filePath);
@@ -128,9 +170,15 @@ export default class NoteService {
 			const createdFile = await this.app.vault.create(filePath, "");
 
 			if (createdFile instanceof TFile) {
+				if (noteType) {
+					await this.applyTemplateIfConfigured(createdFile, noteType);
+				}
+
 				await this.openNoteInWorkspace(createdFile);
 			}
-		} catch (error) {}
+		} catch (error) {
+			console.error("Error creating note:", error);
+		}
 	}
 
 	public async getWeeksWithNotes(jy: number): Promise<number[]> {
@@ -175,7 +223,7 @@ export default class NoteService {
 		const result: number[] = [];
 		const daysInMonth = jalaliMonthLength(jy, jm);
 
-		for (let jd = 1; jd <= daysInMonth; jd++) {
+		for (let jd = 1; jd <= daysInMonth!; jd++) {
 			let fileName: string;
 
 			if (this.settings.dateFormat === "gregorian") {
@@ -218,6 +266,7 @@ export default class NoteService {
 			filePath,
 			confirmTitle: "ایجاد روزنوشت جدید",
 			confirmMessage: `روزنوشت \u202A${dateString}\u202C ایجاد شود؟`,
+			noteType: "daily",
 		});
 	}
 
@@ -230,6 +279,7 @@ export default class NoteService {
 			filePath,
 			confirmTitle: "ایجاد هفته‌نوشت جدید",
 			confirmMessage: `هفته‌نوشت هفته‌ی ${weekNumber}ام سال ${jy} ایجاد شود؟`,
+			noteType: "weekly",
 		});
 	}
 
@@ -252,6 +302,7 @@ export default class NoteService {
 			filePath,
 			confirmTitle: "ایجاد ماه‌نوشت جدید",
 			confirmMessage: `ماه‌نوشت ${jMonthName[jm]} ${jy} ایجاد شود؟`,
+			noteType: "monthly",
 		});
 	}
 
@@ -274,6 +325,7 @@ export default class NoteService {
 			filePath,
 			confirmTitle: "ایجاد فصل‌نوشت جدید",
 			confirmMessage: `فصل‌نوشت ${seasonsName[seasonNumber]} ${jy} ایجاد شود؟`,
+			noteType: "seasonal",
 		});
 	}
 
@@ -286,6 +338,7 @@ export default class NoteService {
 			filePath,
 			confirmTitle: "ایجاد سال‌نوشت جدید",
 			confirmMessage: `سال‌نوشت ${jy} ایجاد شود؟`,
+			noteType: "yearly",
 		});
 	}
 }

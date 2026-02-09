@@ -70,6 +70,10 @@ export default class GridService {
 		const { showHolidays } = this.settings;
 
 		const daysInMonth = jalaliMonthLength(jy, jm);
+		if (daysInMonth === null) {
+			return [];
+		}
+
 		const firstDayOfWeekIndex = this.calendarState.calculateFirstDayOfWeekIndex(jy, jm);
 
 		const daysFromPrevMonth =

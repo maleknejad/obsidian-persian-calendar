@@ -12,11 +12,18 @@ export {
 	getFirstWeekStartOfJYear, // (jy) => (first saturday in jy){jy, jm, jd}
 	jalaliToStartDayOfWeek, // ({jYear, jWeekNumber}) => (start day of week){jy, jm, jd, gy, gm, gd}
 	jalaliToEndDayOfWeek, // ({jYear, jWeekNumber}) => (end day of week){jy, jm, jd, gy, gm, gd}
+	dateToMonthName, // (Date) => String(jalali_month_name)
+	dateToSeasonName, // (Date) => String(season_name)
+	dateToEndDayOfJMonthDate,
+	dateToStartDayOfJMonthDate,
+	dateToEndDayOfSeasonDate,
+	dateToStartDayOfSeasonDate,
 } from "./jalaliUtils";
 export {
 	gregorianToDate, // (gy, gm, gd) => (Is it a valid Gregorian date?)Date|null
 	weekStartNumber, // ("sat" | "sun" | "mon") => Number(JS_weekday_number)
 	getJalaliMonthName, // exp: (12) => "اسفند"
+	getSeasonName, // exp: (3) => "پاییز"
 	dateToGregorian, // (Date) => {gy, gm, gd}
 	dateToWeekdayName, // (Date) => Number(weekday_name)
 	addDayDate, // (date, days) => (with days added)Date
@@ -35,17 +42,28 @@ export {
 	jalaliDashToGregorianDash, // ("jy-jm-jd"|"jyjmjd") => String((gregorian)dayFormat)
 	gregorianDashToJalali, // ("gy-gm-gd"|"gygmgd") => {jy, jm, jd}
 	dashToDate, // ("jy-jm-jd"|"jyjmjd"|"gy-gm-gd"|"gygmgd") => Date
+	dateToDash, // (Date) => String((jalali|gregorian)dayFormat)
 	dateToJYearDash, // (Date) => String((jalali)yearFormat)
 	dateToSeasonDash, // (Date) => String(seasonFormat)
 	dateToJMonthDash, // (Date) => String((jalali)monthFormat)
 	dateToJWeekDash, // (Date) => String((jalali)weekFormat)
-	dateToJDayDash, // (Date) => String((jalali)dayFormat)
 	jalaliDashToDate, // ("jy-jm-jd"|"jyjmjd") => Date
 	gregorianDashToDate, // ("gy-gm-gd"|"gygmgd") => Date
 	dateToDaysPassedJYear, // Date => Number(days_passed_in_jy)
 	dateToDaysRemainingJYear, // Date => Number(days_remaining_in_jy)
-	dateToStartDayOfWeekDash, // (Date,{baseDate}) => String((baseDate)dayFormat_for_start_day_of_week)
-	dateToEndDayOfWeekDash, // (Date,{baseDate}) => String((baseDate)dayFormat_for_end_day_of_week)
+	dashToStartDayOfWeekDash, // (Date,{baseDate}) => String((baseDate)dayFormat_for_start_day_of_week)
+	dashToEndDayOfWeekDash, // (Date,{baseDate}) => String((baseDate)dayFormat_for_end_day_of_week)
+	dashToJWeekDash,
+	dashToJMonthDash,
+	dashToJMonthName,
+	dashToEndDayOfJMonthDash,
+	dashToStartDayOfJMonthDash,
+	dashToEndDayOfSeasonDash,
+	dashToSeasonDash,
+	dashToSeasonName,
+	dashToStartDayOfSeasonDash,
+	dashToEndDayOfYearDash,
+	dashToStartDayOfYearDash,
 } from "./dashUtils";
 export {
 	dateToEvents, // (Date) => Events[]

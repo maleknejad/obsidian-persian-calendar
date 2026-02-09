@@ -1,5 +1,11 @@
 import { toJalaali, toGregorian, jalaaliMonthLength, isValidJalaaliDate } from "jalaali-js";
-import { dateToGregorian, weekStartNumber } from "..";
+import {
+	dateToGregorian,
+	getJalaliMonthName,
+	jalaliToSeason,
+	weekStartNumber,
+	getSeasonName,
+} from "..";
 import type { TJalali, TGregorian, TWeekStart, TGetDayOfWeek } from "src/types";
 
 export function checkValidJalali(jy: number, jm: number, jd: number) {
@@ -11,7 +17,18 @@ export function checkKabiseh(jy: number): boolean {
 }
 
 export function dateToJalali(date: Date): TJalali {
-	return toJalaali(date);
+	const parts = new Intl.DateTimeFormat("en-US", {
+		timeZone: "Asia/Tehran",
+		year: "numeric",
+		month: "numeric",
+		day: "numeric",
+	}).formatToParts(date);
+
+	const year = Number(parts.find((p) => p.type === "year")!.value);
+	const month = Number(parts.find((p) => p.type === "month")!.value);
+	const day = Number(parts.find((p) => p.type === "day")!.value);
+
+	return toJalaali(year, month, day);
 }
 
 export function jalaliToDate(jy: number, jm: number, jd: number): Date {
@@ -28,7 +45,7 @@ export function gregorianToJalali(gy: number, gm: number, gd: number): TJalali {
 	return { jy, jm, jd };
 }
 
-export function jalaliMonthLength(jy: number, jm: number): number {
+export function jalaliMonthLength(jy: number, jm: number) {
 	return jalaaliMonthLength(jy, jm);
 }
 
@@ -136,4 +153,44 @@ export function jalaliToEndDayOfWeek(
 	targetDate.setDate(targetDate.getDate() + 6);
 
 	return { ...dateToJalali(targetDate), ...dateToGregorian(targetDate) };
+}
+
+export function dateToMonthName(date: Date) {
+	const { jm } = dateToJalali(date);
+	return getJalaliMonthName(jm);
+}
+
+export function dateToSeasonName(date: Date) {
+	const { jm } = dateToJalali(date);
+	const seasonNumber = jalaliToSeason(jm);
+
+	return getSeasonName(seasonNumber);
+}
+
+export function dateToStartDayOfJMonthDate(date: Date) {
+	const { jy, jm } = dateToJalali(date);
+	return jalaliToDate(jy, jm, 1);
+}
+
+export function dateToEndDayOfJMonthDate(date: Date) {
+	const { jy, jm } = dateToJalali(date);
+	return jalaliToDate(jy, jm, jalaliMonthLength(jy, jm));
+}
+
+export function dateToStartDayOfSeasonDate(date: Date) {
+	const { jy, jm } = dateToJalali(date);
+	const season = jalaliToSeason(jm);
+
+	const firstMonthOfSeason = 3 * (season - 1) + 1;
+
+	return jalaliToDate(jy, firstMonthOfSeason, 1);
+}
+
+export function dateToEndDayOfSeasonDate(date: Date) {
+	const { jy, jm } = dateToJalali(date);
+	const season = jalaliToSeason(jm);
+
+	const lastMonthOfSeason = 3 * season;
+
+	return jalaliToDate(jy, lastMonthOfSeason, jalaliMonthLength(jy, jm));
 }

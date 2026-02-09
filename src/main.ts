@@ -6,11 +6,11 @@ import {
 	Editor,
 	WorkspaceLeaf,
 	TFile,
-	TAbstractFile,
 	App,
 	type PluginManifest,
 	TFolder,
 	debounce,
+	TAbstractFile,
 } from "obsidian";
 import { DateSuggester, Placeholder, NoteService } from "./services";
 import CalendarView from "./templates/CalendarView";
@@ -39,7 +39,7 @@ export default class PersianCalendarPlugin extends Plugin {
 	constructor(app: App, manifest: PluginManifest) {
 		super(app, manifest);
 		this.placeholder = new Placeholder(this);
-		this.noteService = new NoteService(this.app, this.settings);
+		this.noteService = new NoteService(this.app, this.settings, this);
 	}
 
 	async onload() {
@@ -68,30 +68,9 @@ export default class PersianCalendarPlugin extends Plugin {
 		this.checkForVersionUpdate();
 
 		this.registerEvent(
-			this.app.vault.on("modify", async (file) => {
-				if (!(file instanceof TFile)) return;
-				if (file.extension !== "md") return;
-
-				const content = await this.app.vault.read(file);
-
-				if (content.includes("{{tp_")) return;
-
-				await this.placeholder.insertPersianDate(file);
-			}),
-		);
-
-		// todo: improve this
-		this.registerEvent(
 			this.app.vault.on("create", (file: TAbstractFile) => {
 				if (file instanceof TFile && file.path.endsWith(".md")) {
 					this.handleFileUpdate();
-					const fileCreationTime = file.stat.ctime;
-					const now = Date.now();
-					const timeDiff = now - fileCreationTime;
-
-					if (timeDiff < 2000) {
-						this.placeholder.insertPersianDate(file);
-					}
 				}
 			}),
 		);

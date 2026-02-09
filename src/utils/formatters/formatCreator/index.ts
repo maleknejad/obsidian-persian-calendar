@@ -1,9 +1,9 @@
-export function dayFormat(
+export function toDayFormat(
 	year: number,
 	month: number,
 	day: number,
 	option?: { separator?: string },
-): string {
+) {
 	const separator = option?.separator ?? "-";
 
 	return `${year}${separator}${String(month).padStart(2, "0")}${separator}${String(day).padStart(
@@ -12,20 +12,20 @@ export function dayFormat(
 	)}`;
 }
 
-export function weekFormat(year: number, week: number, option?: { separator?: string }) {
+export function toWeekFormat(year: number, week: number, option?: { separator?: string }) {
 	const separator = option?.separator ?? "-";
 
-	return `${year}${separator}W${week.toString().padStart(2, "0")}`;
+	return `${year}${separator}W${week.toString()}`;
 }
 
-export function monthFormat(year: number, month: number, option?: { separator?: string }) {
+export function toMonthFormat(year: number, month: number, option?: { separator?: string }) {
 	const separator = option?.separator ?? "-";
 
 	return `${year}${separator}${month.toString().padStart(2, "0")}`;
 }
 
-export function seasonFormat(year: number, season: number, option?: { separator?: string }) {
+export function toSeasonFormat(year: number, season: number, option?: { separator?: string }) {
 	const separator = option?.separator ?? "-";
 
-	return `${year}${separator}${season.toString().padStart(2, "0")}`;
+	return `${year}${separator}S${season.toString()}`;
 }

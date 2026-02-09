@@ -6,7 +6,7 @@ import {
 	dateToJWeekNumber,
 	gregorianToHijri,
 } from "src/utils/dateUtils";
-import { toFaNumber } from "src/utils/numberConverter";
+import { toFaNumber } from "src/utils/formatters";
 import { GREGORIAN_MONTHS_NAME, HIJRI_MONTHS_NAME } from "src/constants";
 
 export default class CalendarState {
@@ -53,7 +53,7 @@ export default class CalendarState {
 
 		const daysToInclude = firstDayOfWeek;
 
-		for (let i = lastDayOfPreviousMonth - daysToInclude + 1; i <= lastDayOfPreviousMonth; i++) {
+		for (let i = lastDayOfPreviousMonth! - daysToInclude + 1; i <= lastDayOfPreviousMonth!; i++) {
 			daysFromPrevMonth.push(i);
 		}
 
@@ -86,7 +86,7 @@ export default class CalendarState {
 		const daysFromPrevMonth = this.calculateDaysFromPreviousMonth(firstDayOfWeekIndex);
 		const daysFromPrevMonthCount = daysFromPrevMonth.length;
 
-		const totalDaysInGrid = daysFromPrevMonthCount + daysInMonth;
+		const totalDaysInGrid = daysFromPrevMonthCount + daysInMonth!;
 
 		const weeks = Math.ceil(totalDaysInGrid / 7);
 
@@ -129,7 +129,7 @@ export default class CalendarState {
 	public getGeorgianMonthRange(jy: number, jm: number): string {
 		const firstDayOfMonthGeorgian = jalaliToGregorian(jy, jm, 1);
 		const lastDayOfMonthJalali = jalaliMonthLength(jy, jm);
-		const lastDayOfMonthGeorgian = jalaliToGregorian(jy, jm, lastDayOfMonthJalali);
+		const lastDayOfMonthGeorgian = jalaliToGregorian(jy, jm, lastDayOfMonthJalali!);
 
 		const startMonthName =
 			GREGORIAN_MONTHS_NAME["en"][
@@ -151,7 +151,7 @@ export default class CalendarState {
 	public getHijriMonthRange(jy: number, jm: number): string {
 		const lastDayOfMonthJalali = jalaliMonthLength(jy, jm);
 		const firstDayOfMonthGeorgian = jalaliToGregorian(jy, jm, 1);
-		const lastDayOfMonthGeorgian = jalaliToGregorian(jy, jm, lastDayOfMonthJalali);
+		const lastDayOfMonthGeorgian = jalaliToGregorian(jy, jm, lastDayOfMonthJalali!);
 
 		const startHijriDate = gregorianToHijri(
 			firstDayOfMonthGeorgian.gy,

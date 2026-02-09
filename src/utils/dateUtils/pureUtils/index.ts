@@ -1,23 +1,21 @@
-import { JALALI_MONTHS_NAME } from "src/constants";
+import { JALALI_MONTHS_NAME, SEASONS_NAME } from "src/constants";
 import type { TGregorian, TLocal, TWeekStart } from "src/types";
 
-export function gregorianToDate(gy: number, gm: number, gd: number): Date | null {
-	const utcGuess = new Date(Date.UTC(gy, gm - 1, gd));
+export function gregorianToDate(gy: number, gm: number, gd: number) {
+	const utcDate = new Date(Date.UTC(gy, gm - 1, gd));
 
 	const parts = new Intl.DateTimeFormat("en-US", {
 		timeZone: "Asia/Tehran",
 		year: "numeric",
 		month: "numeric",
 		day: "numeric",
-	}).formatToParts(utcGuess);
+	}).formatToParts(utcDate);
 
 	const get = (t: string) => Number(parts.find((p) => p.type === t)?.value);
 
-	if (get("year") !== gy || get("month") !== gm || get("day") !== gd) {
-		throw new Error("Invalid date for 'gregorianToDate'");
-	}
+	if (get("year") !== gy || get("month") !== gm || get("day") !== gd) return null;
 
-	return utcGuess;
+	return utcDate;
 }
 
 export function dateToGregorian(date: Date): TGregorian {
@@ -53,8 +51,12 @@ export const weekStartNumber = (weekStart: TWeekStart): number =>
 		mon: 1,
 	})[weekStart];
 
-export function getJalaliMonthName(month: number, local: TLocal = "fa"): string {
+export function getJalaliMonthName(month: number, local: TLocal = "fa") {
 	return JALALI_MONTHS_NAME[local][month];
+}
+
+export function getSeasonName(season: number, local: TLocal = "fa") {
+	return SEASONS_NAME[local][season];
 }
 
 export function addDayDate(date: Date, days: number) {

@@ -1,8 +1,8 @@
 import { setIcon } from "obsidian";
 import { SEASONS_NAME, WEEKDAYS_NAME } from "src/constants";
 import type { TSetting, TLocal } from "src/types";
-import { dateToEvents, jalaliMonthLength, jalaliToDate, jalaliToSeason } from "src/utils/dateUtils";
-import { toArNumber, toFaNumber } from "src/utils/numberConverter";
+import { dateToEvents, jalaliToSeason } from "src/utils/dateUtils";
+import { toArNumber, toFaNumber } from "src/utils/formatters";
 import CalendarState from "src/templates/CalendarView/CalendarState";
 import { NoteService } from "src/services";
 import CalendarNavigation from "../CalendarNavigation";
