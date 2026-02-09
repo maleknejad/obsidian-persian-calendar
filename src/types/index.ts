@@ -107,7 +107,6 @@ export type TBuildContext = {
 	fileDate: Date | null;
 	fileName: string;
 	baseDate: TDateFormat;
-	isWeekly: boolean;
 	isMonthly: boolean;
 	isSeasonal: boolean;
 	targetYear: number | null;

@@ -13,6 +13,7 @@ export {
 	jalaliToStartDayOfWeek, // ({jYear, jWeekNumber}) => (start day of week){jy, jm, jd, gy, gm, gd}
 	jalaliToEndDayOfWeek, // ({jYear, jWeekNumber}) => (end day of week){jy, jm, jd, gy, gm, gd}
 	dateToMonthName, // (Date) => String(jalali_month_name)
+	dateToSeasonName,
 } from "./jalaliUtils";
 export {
 	gregorianToDate, // (gy, gm, gd) => (Is it a valid Gregorian date?)Date|null
@@ -45,8 +46,10 @@ export {
 	gregorianDashToDate, // ("gy-gm-gd"|"gygmgd") => Date
 	dateToDaysPassedJYear, // Date => Number(days_passed_in_jy)
 	dateToDaysRemainingJYear, // Date => Number(days_remaining_in_jy)
-	dateToStartDayOfWeekDash, // (Date,{baseDate}) => String((baseDate)dayFormat_for_start_day_of_week)
-	dateToEndDayOfWeekDash, // (Date,{baseDate}) => String((baseDate)dayFormat_for_end_day_of_week)
+	dashToStartDayOfWeekDash as dateToStartDayOfWeekDash, // (Date,{baseDate}) => String((baseDate)dayFormat_for_start_day_of_week)
+	dashToEndDayOfWeekDash as dateToEndDayOfWeekDash, // (Date,{baseDate}) => String((baseDate)dayFormat_for_end_day_of_week)
+	dashToJWeekDash,
+	monthDashToMonthName,
 } from "./dashUtils";
 export {
 	dateToEvents, // (Date) => Events[]

@@ -1,4 +1,16 @@
 import { isMonthlyRegex, isSeasonalRegex, isWeeklyRegex } from "src/constants";
+import { isDailyRegex } from "src/constants/regex";
+
+export function extractDayFormat(title: string) {
+	const match = title.match(isDailyRegex);
+	if (!match) return null;
+
+	const year = Number(match[1]);
+	const month = Number(match[2]);
+	const day = Number(match[3]);
+
+	return { year, month, day };
+}
 
 export function extractWeekFormat(title: string) {
 	const match = title.match(isWeeklyRegex);

@@ -14,16 +14,16 @@ import {
 	jalaliMonthLength,
 	checkKabiseh,
 	jalaliToDate,
-	jalaliToStartDayOfWeek,
-	jalaliToEndDayOfWeek,
 	dateToJalali,
 	dateToDash,
 	dateToMonthName,
+	dateToSeasonName,
+	dashToJWeekDash,
 } from "src/utils/dateUtils";
 import type { TBuildContext, TDateFormat } from "src/types";
 import { isMonthlyRegex, isSeasonalRegex, isWeeklyRegex, isYearlyRegex } from "src/constants";
 import { extractMonthFormat, extractSeasonFormat, extractWeekFormat } from "src/utils/formatters";
-import { dateToSeasonName } from "src/utils/dateUtils/jalaliUtils";
+import { dashToEndDayOfWeekDash, dashToStartDayOfWeekDash } from "src/utils/dateUtils/dashUtils";
 
 export default class Placeholder {
 	plugin: PersianCalendarPlugin;
@@ -77,7 +77,6 @@ export default class Placeholder {
 		let fileDate = dashToDate(fileName, baseDate);
 
 		const isMonthly = isMonthlyRegex.test(fileName);
-		const isWeekly = isWeeklyRegex.test(fileName);
 		const isSeasonal = isSeasonalRegex.test(fileName);
 
 		return {
@@ -85,7 +84,6 @@ export default class Placeholder {
 			fileDate,
 			fileName,
 			baseDate,
-			isWeekly,
 			isMonthly,
 			isSeasonal,
 			targetYear: this.extractYear(fileName, fileDate),
@@ -98,7 +96,6 @@ export default class Placeholder {
 		fileDate,
 		baseDate,
 		isMonthly,
-		isWeekly,
 		isSeasonal,
 		targetYear,
 	}: TBuildContext): Map<string, unknown> {
@@ -108,9 +105,9 @@ export default class Placeholder {
 			["{{روز هفته جاری}}", dateToWeekdayName(currentDate)],
 			["{{روز هفته یادداشت}}", fileDate ? dateToWeekdayName(fileDate) : null],
 			["{{هفته جاری}}", dateToJWeekDash(currentDate)],
-			["{{هفته یادداشت}}", fileDate ? dateToJWeekDash(fileDate) : null],
-			["{{اول هفته}}", isWeekly ? this.getWeekStartDate(fileName, baseDate) : null],
-			["{{آخر هفته}}", isWeekly ? this.getWeekEndDate(fileName, baseDate) : null],
+			["{{هفته یادداشت}}", dashToJWeekDash(fileName, baseDate)],
+			["{{اول هفته}}", dashToStartDayOfWeekDash(fileName, baseDate)],
+			["{{آخر هفته}}", dashToEndDayOfWeekDash(fileName, baseDate)],
 			["{{نام ماه جاری}}", dateToMonthName(currentDate)],
 			["{{نام ماه یادداشت}}", fileDate ? dateToMonthName(fileDate) : null],
 			["{{ماه جاری}}", dateToJMonthDash(currentDate)],
@@ -143,26 +140,6 @@ export default class Placeholder {
 		if (!yearMatch) return null;
 
 		return Number(yearMatch[1]);
-	}
-
-	private getWeekStartDate(title: string, dateFormat: TDateFormat): string | null {
-		const weekProps = extractWeekFormat(title);
-		if (!weekProps) return null;
-
-		const startDay = jalaliToStartDayOfWeek({ jYear: weekProps.year, jWeekNumber: weekProps.week });
-		const startDate = jalaliToDate(startDay.jy, startDay.jm, startDay.jd);
-
-		return dateToDash(startDate, dateFormat);
-	}
-
-	private getWeekEndDate(title: string, dateFormat: TDateFormat): string | null {
-		const weekProps = extractWeekFormat(title);
-		if (!weekProps) return null;
-
-		const endDay = jalaliToEndDayOfWeek({ jYear: weekProps.year, jWeekNumber: weekProps.week });
-		const endDate = jalaliToDate(endDay.jy, endDay.jm, endDay.jd);
-
-		return dateToDash(endDate, dateFormat);
 	}
 
 	private getMonthStartDate(title: string, dateFormat: TDateFormat) {

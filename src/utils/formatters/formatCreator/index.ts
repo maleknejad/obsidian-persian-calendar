@@ -15,7 +15,7 @@ export function toDayFormat(
 export function toWeekFormat(year: number, week: number, option?: { separator?: string }) {
 	const separator = option?.separator ?? "-";
 
-	return `${year}${separator}W${week.toString().padStart(2, "0")}`;
+	return `${year}${separator}W${week.toString()}`;
 }
 
 export function toMonthFormat(year: number, month: number, option?: { separator?: string }) {
