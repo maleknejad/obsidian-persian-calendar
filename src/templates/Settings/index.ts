@@ -49,11 +49,48 @@ export default class CalendarSettings extends SettingsBase {
 		});
 
 		containerEl.createEl("h2", { text: "مسیر یادداشت‌های تقویم" });
-		this.addPathSetting(containerEl, "مسیر روزنوشت‌ها", "dailyNotesPath");
-		this.addPathSetting(containerEl, "مسیر هفته‌نوشت‌ها", "weeklyNotesPath");
-		this.addPathSetting(containerEl, "مسیر ماه‌نوشت‌ها", "monthlyNotesPath");
-		this.addPathSetting(containerEl, "مسیر فصل‌نوشت‌ها", "seasonalNotesPath");
-		this.addPathSetting(containerEl, "مسیر سال‌نوشت‌ها", "yearlyNotesPath");
+		this.addPathSetting(containerEl, "مسیر ایجاد روزنوشت‌ها", "dailyNotesPath", {
+			desc: "یادداشت‌های روزانه در این پوشه ساخته می‌شوند.",
+			mode: "folder",
+		});
+		this.addPathSetting(containerEl, "مسیر ایجاد هفته‌نوشت‌ها", "weeklyNotesPath", {
+			desc: "یادداشت‌های هفتگی در این پوشه ساخته می‌شوند.",
+			mode: "folder",
+		});
+		this.addPathSetting(containerEl, "مسیر ایجاد ماه‌نوشت‌ها", "monthlyNotesPath", {
+			desc: "یادداشت‌های ماهانه در این پوشه ساخته می‌شوند.",
+			mode: "folder",
+		});
+		this.addPathSetting(containerEl, "مسیر ایجاد فصل‌نوشت‌ها", "seasonalNotesPath", {
+			desc: "یادداشت‌های فصلی در این پوشه ساخته می‌شوند.",
+			mode: "folder",
+		});
+		this.addPathSetting(containerEl, "مسیر ایجاد سال‌نوشت‌ها", "yearlyNotesPath", {
+			desc: "یادداشت‌های سالانه در این پوشه ساخته می‌شوند.",
+			mode: "folder",
+		});
+
+		containerEl.createEl("h2", { text: "قالب یادداشت‌های تقویم" });
+		this.addPathSetting(containerEl, "قالب روزنوشت", "dailyTemplatePath", {
+			desc: "قالب روزنوشت که هنگام ایجاد یادداشت استفاده می‌شود.",
+			mode: "md-file",
+		});
+		this.addPathSetting(containerEl, "قالب هفته‌نوشت", "weeklyTemplatePath", {
+			desc: "قالب هفته‌نوشت که هنگام ایجاد یادداشت استفاده می‌شود.",
+			mode: "md-file",
+		});
+		this.addPathSetting(containerEl, "قالب ماه‌نوشت", "monthlyTemplatePath", {
+			desc: "قالب ماه‌نوشت که هنگام ایجاد یادداشت استفاده می‌شود.",
+			mode: "md-file",
+		});
+		this.addPathSetting(containerEl, "قالب فصل‌نوشت", "seasonalTemplatePath", {
+			desc: "قالب فصل‌نوشت که هنگام ایجاد یادداشت استفاده می‌شود.",
+			mode: "md-file",
+		});
+		this.addPathSetting(containerEl, "قالب سال‌نوشت", "yearlyTemplatePath", {
+			desc: "قالب سال‌نوشت که هنگام ایجاد یادداشت استفاده می‌شود.",
+			mode: "md-file",
+		});
 
 		containerEl.createEl("h2", { text: "تقویم‌های مکمل" });
 		this.addToggleSetting(containerEl, {

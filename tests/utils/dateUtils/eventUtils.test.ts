@@ -1,3 +1,5 @@
+// todo: improve this
+
 import { describe, it, expect, beforeEach } from "vitest";
 import { dateToEvents, dashToEvents, checkHoliday } from "src/utils/dateUtils/eventUtils";
 import type { TEventObject, TShowEvents } from "src/types";
@@ -27,7 +29,6 @@ describe("eventUtils", () => {
 
 	it("dateToEvents", () => {
 		const events = dateToEvents(date, showEventsOption);
-		console.log(expectedEvents);
 
 		expect(events).toEqual(expectedEvents);
 	});

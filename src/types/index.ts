@@ -93,6 +93,12 @@ export type TSetting = {
 	monthlyNotesPath: string;
 	seasonalNotesPath: string;
 	yearlyNotesPath: string;
+	// template folder path
+	dailyTemplatePath: string;
+	weeklyTemplatePath: string;
+	monthlyTemplatePath: string;
+	seasonalTemplatePath: string;
+	yearlyTemplatePath: string;
 	// show events
 	showIRGovernmentEvents: boolean;
 	showIRAncientEvents: boolean;

@@ -1,6 +1,6 @@
 import { App, PluginSettingTab, Setting as ObsidianSettings } from "obsidian";
 import PersianCalendarPlugin from "src/main";
-import FolderSuggest from "./FolderSuggest";
+import PathSuggest from "./PathSuggest";
 import type { TDateFormat, TSetting, TBoolSettingKeys } from "src/types";
 
 export abstract class SettingsBase extends PluginSettingTab {
@@ -11,18 +11,29 @@ export abstract class SettingsBase extends PluginSettingTab {
 		this.plugin = plugin;
 	}
 
-	protected addPathSetting(containerEl: HTMLElement, name: string, settingKey: keyof TSetting) {
-		new ObsidianSettings(containerEl).setName(name).addText((text) => {
-			text
-				.setPlaceholder("")
-				.setValue(this.plugin.settings[settingKey] as string)
-				.onChange(async (value) => {
-					(this.plugin.settings[settingKey] as string) = value;
-					await this.plugin.saveSettings();
-				});
+	protected addPathSetting(
+		containerEl: HTMLElement,
+		name: string,
+		settingKey: keyof TSetting,
+		opts?: {
+			desc?: string;
+			mode?: "folder" | "file" | "md-file";
+		},
+	) {
+		new ObsidianSettings(containerEl)
+			.setName(name)
+			.setDesc(opts?.desc ?? "")
+			.addText((text) => {
+				text
+					.setPlaceholder("")
+					.setValue(this.plugin.settings[settingKey] as string)
+					.onChange(async (value) => {
+						(this.plugin.settings[settingKey] as string) = value;
+						await this.plugin.saveSettings();
+					});
 
-			new FolderSuggest(this.app, text.inputEl);
-		});
+				new PathSuggest(this.app, text.inputEl, opts?.mode ?? "folder");
+			});
 	}
 
 	protected addToggleSetting(

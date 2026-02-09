@@ -27,7 +27,7 @@ export default class CalendarView extends View {
 
 		this.calendarState = new CalendarState();
 
-		this.notesService = new NoteService(this.app, this.settings);
+		this.notesService = new NoteService(this.app, this.settings, this.plugin);
 
 		this.calendarRenderer = new CalendarRenderer(
 			this.containerEl,

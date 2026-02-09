@@ -39,6 +39,26 @@ export default class Placeholder {
 		this.plugin = plugin;
 	}
 
+	public async getTemplateContent(templatePath: string, targetFile: TFile): Promise<string | null> {
+		if (!templatePath || templatePath.trim() === "") {
+			return null;
+		}
+
+		const templateFile = this.plugin.app.vault.getAbstractFileByPath(templatePath);
+
+		if (!templateFile || !(templateFile instanceof TFile)) {
+			return null;
+		}
+
+		try {
+			const templateContent = await this.plugin.app.vault.read(templateFile);
+			const processedContent = await this.processPlaceholders(targetFile, templateContent);
+			return processedContent;
+		} catch (error) {
+			return null;
+		}
+	}
+
 	public async insertPersianDate(file: TFile) {
 		const fileContent = await this.plugin.app.vault.read(file);
 		const updatedContent = await this.processPlaceholders(file, fileContent);
