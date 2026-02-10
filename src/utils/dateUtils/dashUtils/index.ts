@@ -22,6 +22,7 @@ import {
 	dateToStartDayOfSeasonDate,
 	dateToEndDayOfSeasonDate,
 	checkKabiseh,
+	dateToHijri,
 } from "..";
 import {
 	extractMonthFormat,
@@ -148,6 +149,11 @@ export function dateToDash(
 	if (dateFormat === "jalali") {
 		const { jy, jm, jd } = dateToJalali(date);
 		return toDayFormat(jy, jm, jd, { separator });
+	}
+
+	if (dateFormat === "hijri") {
+		const { hy, hm, hd } = dateToHijri(date);
+		return toDayFormat(hy, hm, hd, { separator });
 	}
 
 	const { gy, gm, gd } = dateToGregorian(date);

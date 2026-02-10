@@ -5,6 +5,7 @@
 	max-width: 600px;
 	padding: 0 5px;
 	width: 100%;
+	overflow: auto;
 }
 
 .persian-calendar__content {
