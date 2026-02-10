@@ -2,6 +2,12 @@ import type { TReleaseNote } from "src/types";
 
 //! ترتیب مهمه - جدیدترین ورژن ابتدا قرار میگیره
 export const RELEASE_NOTES: TReleaseNote[] = [
+		{
+		version: "4.1.1",
+		changes: [
+			"عبارات معنادار جدید: {{تاریخ شمسی یادداشت}} {{مناسبت جاری}} {{مناسبت یادداشت}}",
+		],
+	},
 	{
 		version: "4.1.0",
 		changes: [

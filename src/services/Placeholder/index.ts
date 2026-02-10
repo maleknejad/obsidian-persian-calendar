@@ -27,6 +27,7 @@ import {
 	dashToEndDayOfSeasonDash,
 	dashToEndDayOfYearDash,
 	dashToStartDayOfYearDash,
+	dateToEvents,
 } from "src/utils/dateUtils";
 import type { TBuildContext } from "src/types";
 import { extractYearFormat } from "src/utils/formatters";
@@ -126,7 +127,9 @@ export default class Placeholder {
 			["{{فصل جاری}}", dateToSeasonDash(currentDate)],
 			["{{سال جاری}}", dateToJYearDash(currentDate)],
 			["{{روزهای گذشته}}", dateToDaysPassedJYear(currentDate)],
+			["{{مناسبت جاری}}", eventsToString(dateToEvents(currentDate, this.plugin.settings))],
 			["{{روزهای باقیمانده}}", dateToDaysRemainingJYear(currentDate)],
+			["{{تاریخ شمسی یادداشت}}", fileDate ? dateToDash(fileDate, "jalali") : null],
 			["{{تاریخ یادداشت}}", fileDate ? dateToDash(fileDate, baseDate) : null],
 			["{{روز هفته یادداشت}}", fileDate ? dateToWeekdayName(fileDate) : null],
 			["{{اول سال}}", dashToStartDayOfYearDash(fileName, baseDate)],
@@ -135,7 +138,7 @@ export default class Placeholder {
 			["{{هفته یادداشت}}", dashToJWeekDash(fileName, baseDate)],
 			["{{اول هفته}}", dashToStartDayOfWeekDash(fileName, baseDate)],
 			["{{آخر هفته}}", dashToEndDayOfWeekDash(fileName, baseDate)],
-			["{{مناسبت}}", eventsToString(dashToEvents(fileName, baseDate, this.plugin.settings))],
+			["{{مناسبت یادداشت}}", eventsToString(dashToEvents(fileName, baseDate, this.plugin.settings))],
 			["{{نام ماه یادداشت}}", dashToJMonthName(fileName, baseDate)],
 			["{{ماه یادداشت}}", dashToJMonthDash(fileName, baseDate)],
 			["{{اول ماه}}", dashToStartDayOfJMonthDash(fileName, baseDate)],
