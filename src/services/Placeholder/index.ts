@@ -118,7 +118,9 @@ export default class Placeholder {
 		baseDate,
 	}: TBuildContext): Map<string, unknown> {
 		return new Map<string, unknown>([
-			["{{تاریخ جاری}}", dateToDash(currentDate, "jalali")],
+			["{{تاریخ شمسی جاری}}", dateToDash(currentDate, "jalali")],
+			["{{تاریخ میلادی جاری}}", dateToDash(currentDate, "gregorian")],
+			["{{تاریخ قمری جاری}}", dateToDash(currentDate, "hijri")],
 			["{{روز هفته جاری}}", dateToWeekdayName(currentDate)],
 			["{{هفته جاری}}", dateToJWeekDash(currentDate)],
 			["{{نام ماه جاری}}", dateToMonthName(currentDate)],
