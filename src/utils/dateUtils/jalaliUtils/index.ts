@@ -194,3 +194,8 @@ export function dateToEndDayOfSeasonDate(date: Date) {
 
 	return jalaliToDate(jy, lastMonthOfSeason, jalaliMonthLength(jy, jm));
 }
+
+export function dateToDayOfMonth(date: Date) {
+	const { jd } = dateToJalali(date);
+	return jd;
+}

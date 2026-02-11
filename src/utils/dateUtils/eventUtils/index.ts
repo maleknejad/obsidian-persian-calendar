@@ -97,5 +97,5 @@ export function eventsToString(events: TEventObjectWithoutDate[] | null) {
 		return "هیچ مناسبتی برای این روز ثبت نشده است.";
 	}
 
-	return events.map(({ title, holiday }) => "* " + title + (holiday ? " (تعطیل)" : "")).join("\n");
+	return events.map(({ title, holiday }) => "- " + title + (holiday ? " (تعطیل)" : "")).join("\n");
 }

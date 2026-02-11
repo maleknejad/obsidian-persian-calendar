@@ -28,6 +28,7 @@ import {
 	dashToEndDayOfYearDash,
 	dashToStartDayOfYearDash,
 	dateToEvents,
+	dateToDayOfMonth,
 } from "src/utils/dateUtils";
 import type { TBuildContext } from "src/types";
 import { extractYearFormat } from "src/utils/formatters";
@@ -126,6 +127,10 @@ export default class Placeholder {
 			["{{نام ماه جاری}}", dateToMonthName(currentDate)],
 			["{{ماه جاری}}", dateToJMonthDash(currentDate)],
 			["{{نام فصل جاری}}", dateToSeasonName(currentDate)],
+
+			["{{روز ماه جاری}}", dateToDayOfMonth(currentDate)],
+			["{{روز ماه یادداشت}}", fileDate ? dateToDayOfMonth(fileDate) : null],
+
 			["{{فصل جاری}}", dateToSeasonDash(currentDate)],
 			["{{سال جاری}}", dateToJYearDash(currentDate)],
 			["{{روزهای گذشته}}", dateToDaysPassedJYear(currentDate)],

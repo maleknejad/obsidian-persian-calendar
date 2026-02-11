@@ -14,6 +14,7 @@ export {
 	jalaliToEndDayOfWeek, // ({jYear, jWeekNumber}) => (end day of week){jy, jm, jd, gy, gm, gd}
 	dateToMonthName, // (Date) => String(jalali_month_name)
 	dateToSeasonName, // (Date) => String(season_name)
+	dateToDayOfMonth, // (Date) => Number(day_of_month)
 	dateToEndDayOfJMonthDate,
 	dateToStartDayOfJMonthDate,
 	dateToEndDayOfSeasonDate,
