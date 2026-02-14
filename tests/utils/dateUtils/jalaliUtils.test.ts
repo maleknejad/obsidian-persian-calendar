@@ -1,4 +1,4 @@
-// todo: improve this
+// TODO: improve this
 
 import { describe, it, expect } from "vitest";
 import {

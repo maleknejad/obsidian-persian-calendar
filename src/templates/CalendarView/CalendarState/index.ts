@@ -119,13 +119,13 @@ export default class CalendarState {
 		return weekNumbers;
 	}
 
-	//todo: move to dateUtils
+	//TODO: move to dateUtils
 	public isToday(jy: number, jm: number, jd: number): boolean {
 		const today = dateToJalali(new Date());
 		return today.jy === jy && today.jm === jm && today.jd === jd;
 	}
 
-	//todo: move to dateUtils
+	//TODO: move to dateUtils
 	public getGeorgianMonthRange(jy: number, jm: number): string {
 		const firstDayOfMonthGeorgian = jalaliToGregorian(jy, jm, 1);
 		const lastDayOfMonthJalali = jalaliMonthLength(jy, jm);
@@ -147,7 +147,7 @@ export default class CalendarState {
 		}
 	}
 
-	//todo: move to dateUtils
+	//TODO: move to dateUtils
 	public getHijriMonthRange(jy: number, jm: number): string {
 		const lastDayOfMonthJalali = jalaliMonthLength(jy, jm);
 		const firstDayOfMonthGeorgian = jalaliToGregorian(jy, jm, 1);

@@ -8,7 +8,6 @@ import type PersianCalendarPlugin from "src/main";
 export default class NoteService {
 	constructor(
 		private readonly app: App,
-		private readonly settings: TSetting,
 		private readonly plugin: PersianCalendarPlugin,
 	) {}
 
@@ -126,15 +125,15 @@ export default class NoteService {
 	): string {
 		switch (noteType) {
 			case "daily":
-				return this.settings.dailyTemplatePath || "";
+				return this.plugin.settings.dailyTemplatePath || "";
 			case "weekly":
-				return this.settings.weeklyTemplatePath || "";
+				return this.plugin.settings.weeklyTemplatePath || "";
 			case "monthly":
-				return this.settings.monthlyTemplatePath || "";
+				return this.plugin.settings.monthlyTemplatePath || "";
 			case "seasonal":
-				return this.settings.seasonalTemplatePath || "";
+				return this.plugin.settings.seasonalTemplatePath || "";
 			default:
-				return this.settings.yearlyTemplatePath || "";
+				return this.plugin.settings.yearlyTemplatePath || "";
 		}
 	}
 
@@ -154,7 +153,7 @@ export default class NoteService {
 				return;
 			}
 
-			if (this.settings.askForCreateNote) {
+			if (this.plugin.settings.askForCreateNote) {
 				const shouldCreate = await createNoteModal(this.app, {
 					title: confirmTitle,
 					message: confirmMessage,
@@ -182,7 +181,7 @@ export default class NoteService {
 	}
 
 	public async getWeeksWithNotes(jy: number): Promise<number[]> {
-		const notesLocation = this.settings.weeklyNotesPath;
+		const notesLocation = this.plugin.settings.weeklyNotesPath;
 		const result: number[] = [];
 
 		for (let weekNumber = 1; weekNumber <= 53; weekNumber++) {
@@ -199,7 +198,7 @@ export default class NoteService {
 	}
 
 	public async getSeasonsWithNotes(jy: number): Promise<number[]> {
-		const notesLocation = this.settings.seasonalNotesPath;
+		const notesLocation = this.plugin.settings.seasonalNotesPath;
 		const result: number[] = [];
 
 		for (let seasonNumber = 1; seasonNumber <= 4; seasonNumber++) {
@@ -219,14 +218,14 @@ export default class NoteService {
 	}
 
 	public async getDaysWithNotes(jy: number, jm: number): Promise<number[]> {
-		const notesLocation = this.settings.dailyNotesPath;
+		const notesLocation = this.plugin.settings.dailyNotesPath;
 		const result: number[] = [];
 		const daysInMonth = jalaliMonthLength(jy, jm);
 
 		for (let jd = 1; jd <= daysInMonth!; jd++) {
 			let fileName: string;
 
-			if (this.settings.dateFormat === "gregorian") {
+			if (this.plugin.settings.dateFormat === "gregorian") {
 				const { gy, gm, gd } = jalaliToGregorian(jy, jm, jd);
 				fileName = `${gy}-${gm.toString().padStart(2, "0")}-${gd.toString().padStart(2, "0")}.md`;
 			} else {
@@ -251,12 +250,12 @@ export default class NoteService {
 	public async openOrCreateDailyNote(jy: number, jm: number, jd: number) {
 		let dateString = `${jy}-${jm.toString().padStart(2, "0")}-${jd.toString().padStart(2, "0")}`;
 
-		if (this.settings.dateFormat === "gregorian") {
+		if (this.plugin.settings.dateFormat === "gregorian") {
 			const { gy, gm, gd } = jalaliToGregorian(jy, jm, jd);
 			dateString = `${gy}-${gm.toString().padStart(2, "0")}-${gd.toString().padStart(2, "0")}`;
 		}
 
-		const notesLocation = this.settings.dailyNotesPath;
+		const notesLocation = this.plugin.settings.dailyNotesPath;
 		const filePath = this.buildNotePath(notesLocation, `${dateString}.md`, {
 			jy,
 			jm,
@@ -272,7 +271,7 @@ export default class NoteService {
 
 	public async openOrCreateWeeklyNote(jy: number, weekNumber: number) {
 		const fileName = `${jy}-W${weekNumber}.md`;
-		const notesLocation = this.settings.weeklyNotesPath;
+		const notesLocation = this.plugin.settings.weeklyNotesPath;
 		const filePath = this.buildNotePath(notesLocation, fileName, { jy });
 
 		await this.openOrCreateNoteWithConfirm({
@@ -285,7 +284,7 @@ export default class NoteService {
 
 	public async openOrCreateMonthlyNote(jy: number, jm: number, local: TLocal = "fa") {
 		const fileName = `${jy}-${jm.toString().padStart(2, "0")}.md`;
-		const notesLocation = this.settings.monthlyNotesPath;
+		const notesLocation = this.plugin.settings.monthlyNotesPath;
 		const filePath = this.buildNotePath(
 			notesLocation,
 			fileName,
@@ -308,7 +307,7 @@ export default class NoteService {
 
 	public async openOrCreateSeasonalNote(jy: number, seasonNumber: number, local: TLocal = "fa") {
 		const fileName = `${jy}-S${seasonNumber}.md`;
-		const notesLocation = this.settings.seasonalNotesPath;
+		const notesLocation = this.plugin.settings.seasonalNotesPath;
 		const filePath = this.buildNotePath(
 			notesLocation,
 			fileName,
@@ -331,7 +330,7 @@ export default class NoteService {
 
 	public async openOrCreateYearlyNote(jy: number) {
 		const fileName = `${jy}.md`;
-		const notesLocation = this.settings.yearlyNotesPath;
+		const notesLocation = this.plugin.settings.yearlyNotesPath;
 		const filePath = this.buildNotePath(notesLocation, fileName, { jy });
 
 		await this.openOrCreateNoteWithConfirm({

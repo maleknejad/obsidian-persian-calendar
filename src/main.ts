@@ -1,4 +1,4 @@
-// todo: cleanup
+// TODO: cleanup
 
 import {
 	Plugin,
@@ -34,21 +34,21 @@ export default class PersianCalendarPlugin extends Plugin {
 	pluginsettingstab: Settings | undefined;
 	plugin: PersianCalendarPlugin = this;
 	view: CalendarView | undefined;
-	noteService: NoteService;
+	noteService!: NoteService;
 
 	constructor(app: App, manifest: PluginManifest) {
 		super(app, manifest);
 		this.placeholder = new Placeholder(this);
-		this.noteService = new NoteService(this.app, this.settings, this);
 	}
 
 	async onload() {
 		await this.loadSettings();
 
+		this.noteService = new NoteService(this.app, this);
+
 		this.registerView(
 			"persian-calendar",
-			(leaf: WorkspaceLeaf) =>
-				(this.view = new CalendarView(leaf, this.app, this.settings, this.plugin)),
+			(leaf: WorkspaceLeaf) => (this.view = new CalendarView(leaf, this.app, this)),
 		);
 
 		if (this.app.workspace.getLeavesOfType("persian-calendar").length === 0) {
@@ -196,7 +196,7 @@ export default class PersianCalendarPlugin extends Plugin {
 		});
 	}
 
-	// todo: change this
+	// TODO: change this
 	public convertDate(editor: Editor, lineIndex: number, textLine: string) {
 		const dateRegex = /\b(\d{4})-?(\d{2})-?(\d{2})\b/g;
 

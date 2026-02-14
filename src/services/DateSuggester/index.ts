@@ -125,7 +125,7 @@ export default class DateSuggester extends EditorSuggest<string> {
 				now.setDate(now.getDate() + daysFromNowToWeekday);
 			}
 
-			const gDateDash = dateToDash(now, "gregorian") //todo: create dateToDash function
+			const gDateDash = dateToDash(now, "gregorian") //TODO: create dateToDash function
 
 			const formatSpecifier = specifier ? ` ${specifier.trim()}` : "";
 

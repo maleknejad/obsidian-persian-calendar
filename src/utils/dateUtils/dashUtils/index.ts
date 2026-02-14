@@ -1,4 +1,4 @@
-// todo: divide and conquer
+// TODO: divide and conquer
 
 import {
 	dateToJalali,
