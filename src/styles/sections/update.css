@@ -1,11 +1,17 @@
 .persian-calendar__update-header {
 	width: 100%;
 	display: flex;
-	justify-content: center;
+	flex-direction: column;
+	align-items: center;
+}
+.persian-calendar__update-header p {
+	font-size: 18px;
+	font-weight: 800;
+	margin-top: 5px;
 }
 .persian-calendar__update-header svg {
-	width: 80px;
-	height: 80px;
+	width: 60px;
+	height: 60px;
 }
 
 .persian-calendar__update-version {
