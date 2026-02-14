@@ -46,6 +46,14 @@ export default class PersianCalendarPlugin extends Plugin {
 
 		this.noteService = new NoteService(this.app, this);
 
+		this.app.workspace.onLayoutReady(async () => {
+			if (this.settings.openDailyNoteOnStartup) {
+				const now = new Date();
+				const { jy, jm, jd } = dateToJalali(now);
+				await this.noteService.openOrCreateDailyNote(jy, jm, jd);
+			}
+		});
+
 		this.registerView(
 			"persian-calendar",
 			(leaf: WorkspaceLeaf) => (this.view = new CalendarView(leaf, this.app, this)),

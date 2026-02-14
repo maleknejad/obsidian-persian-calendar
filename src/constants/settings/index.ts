@@ -4,6 +4,7 @@ export const DEFAULT_SETTING: TSetting = {
 	versionUpdate: true,
 	dateFormat: "gregorian",
 	askForCreateNote: true,
+	openDailyNoteOnStartup: false,
 	showSeasonalNotes: true,
 	showHolidays: true,
 	weekendDays: "thursday-friday",
