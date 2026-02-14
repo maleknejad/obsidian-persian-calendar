@@ -6,7 +6,7 @@ export const DEFAULT_SETTING: TSetting = {
 	askForCreateNote: true,
 	showSeasonalNotes: true,
 	showHolidays: true,
-	weekendDays: "friday",
+	weekendDays: "thursday-friday",
 	showGeorgianDates: true,
 	showHijriDates: true,
 	dailyNotesPath: "Journal/jYYYY/روزنوشت",

@@ -29,9 +29,12 @@ import {
 	dashToStartDayOfYearDash,
 	dateToEvents,
 	dateToDayOfMonth,
+	dateToDaysPassedSeason,
+	dateToDaysRemainingSeason,
+	dateToDaysPassedJMonth,
+	dateToDaysRemainingJMonth,
 } from "src/utils/dateUtils";
 import type { TBuildContext } from "src/types";
-import { extractYearFormat } from "src/utils/formatters";
 
 export default class Placeholder {
 	plugin: PersianCalendarPlugin;
@@ -130,8 +133,8 @@ export default class Placeholder {
 			["{{روز ماه جاری}}", dateToDayOfMonth(currentDate)],
 			["{{فصل جاری}}", dateToSeasonDash(currentDate)],
 			["{{مناسبت جاری}}", eventsToString(dateToEvents(currentDate, this.plugin.settings))],
-			["{{روزهای گذشته}}", dateToDaysPassedJYear(currentDate)],
-			["{{روزهای باقیمانده}}", dateToDaysRemainingJYear(currentDate)],
+			["{{روزهای گذشته سال}}", fileDate ? dateToDaysPassedJYear(fileDate) : null],
+			["{{روزهای باقیمانده سال}}", fileDate ? dateToDaysRemainingJYear(fileDate) : null],
 			["{{روز ماه یادداشت}}", fileDate ? dateToDayOfMonth(fileDate) : null],
 			["{{تاریخ شمسی یادداشت}}", fileDate ? dateToDash(fileDate, "jalali") : null],
 			["{{تاریخ میلادی یادداشت}}", fileDate ? dateToDash(fileDate, "gregorian") : null],
@@ -156,6 +159,10 @@ export default class Placeholder {
 			["{{فصل یادداشت}}", dashToSeasonDash(fileName, baseDate)],
 			["{{اول فصل}}", dashToStartDayOfSeasonDash(fileName, baseDate)],
 			["{{آخر فصل}}", dashToEndDayOfSeasonDash(fileName, baseDate)],
+			["{{روزهای گذشته فصل}}", fileDate ? dateToDaysPassedSeason(fileDate) : null],
+			["{{روزهای باقیمانده فصل}}", fileDate ? dateToDaysRemainingSeason(fileDate) : null],
+			["{{روزهای گذشته ماه}}", fileDate ? dateToDaysPassedJMonth(fileDate) : null],
+			["{{روزهای باقیمانده ماه}}", fileDate ? dateToDaysRemainingJMonth(fileDate) : null],
 		]);
 	}
 }

@@ -83,7 +83,7 @@ export type TSetting = {
 	showSeasonalNotes: boolean;
 	// show holidays
 	showHolidays: boolean;
-	weekendDays: string;
+	weekendDays: "thursday-friday" | "friday" | "friday-saturday";
 	// show dates
 	showGeorgianDates: boolean;
 	showHijriDates: boolean;
