@@ -12,7 +12,6 @@ import {
 	dateToSeasonDash,
 	dateToJWeekDash,
 	dateToJYearDash,
-	jalaliDashToGregorianDash,
 	dateToDash,
 } from "src/utils/dateUtils";
 import { WEEKDAYS_NAME } from "src/constants";
