@@ -5,12 +5,12 @@ import CalendarView from "src/templates/CalendarView";
 export default class EventManager {
 	constructor(private plugin: PersianCalendarPlugin) {}
 
-	registerEvents(): void {
+	registerEvents() {
 		this.registerFileCreateEvent();
 		this.registerFileDeleteEvent();
 	}
 
-	private registerFileCreateEvent(): void {
+	private registerFileCreateEvent() {
 		this.plugin.registerEvent(
 			this.plugin.app.vault.on("create", (file: TAbstractFile) => {
 				if (file instanceof TFile && file.path.endsWith(".md")) {
@@ -20,7 +20,7 @@ export default class EventManager {
 		);
 	}
 
-	private registerFileDeleteEvent(): void {
+	private registerFileDeleteEvent() {
 		this.plugin.registerEvent(
 			this.plugin.app.vault.on("delete", (file) => {
 				if ((file instanceof TFile && file.path.endsWith(".md")) || file instanceof TFolder) {
@@ -30,7 +30,7 @@ export default class EventManager {
 		);
 	}
 
-	private handleFileUpdate(): void {
+	private handleFileUpdate() {
 		const debouncedRefresh = debounce(() => {
 			const leaves = this.plugin.app.workspace.getLeavesOfType("persian-calendar");
 

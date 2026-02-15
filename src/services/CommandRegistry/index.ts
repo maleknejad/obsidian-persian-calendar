@@ -13,7 +13,7 @@ import RTLNotice from "src/components/RTLNotice";
 export default class CommandRegistry {
 	constructor(private plugin: PersianCalendarPlugin) {}
 
-	registerAllCommands(): void {
+	registerAllCommands() {
 		this.registerReplacePlaceholders();
 		this.registerDailyNoteCommands();
 		this.registerPeriodicNoteCommands();
@@ -21,7 +21,7 @@ export default class CommandRegistry {
 		this.registerDateConversionCommand();
 	}
 
-	private registerReplacePlaceholders(): void {
+	private registerReplacePlaceholders() {
 		this.plugin.addCommand({
 			id: "replace-persian-placeholders",
 			name: "Replace Placeholders - جایگزینی عبارات معنادار در این یادداشت",
@@ -34,7 +34,7 @@ export default class CommandRegistry {
 		});
 	}
 
-	private registerDailyNoteCommands(): void {
+	private registerDailyNoteCommands() {
 		this.plugin.addCommand({
 			id: "open-todays-daily-note",
 			name: "Today - باز کردن روزنوشت امروز",
@@ -60,7 +60,7 @@ export default class CommandRegistry {
 		});
 	}
 
-	private registerPeriodicNoteCommands(): void {
+	private registerPeriodicNoteCommands() {
 		this.plugin.addCommand({
 			id: "open-this-weeks-note",
 			name: "Weekly - باز کردن هفته‌نوشت این هفته",
@@ -102,7 +102,7 @@ export default class CommandRegistry {
 		});
 	}
 
-	private registerCalendarViewCommand(): void {
+	private registerCalendarViewCommand() {
 		this.plugin.addCommand({
 			id: "open-persian-calendar-view",
 			name: "Open Persian Calendar View - باز کردن تقویم فارسی",
@@ -112,7 +112,7 @@ export default class CommandRegistry {
 		});
 	}
 
-	private registerDateConversionCommand(): void {
+	private registerDateConversionCommand() {
 		this.plugin.addCommand({
 			id: "convert-date",
 			name: "Convert Date Format - تبدیل تاریخ بین شمسی و میلادی",
@@ -134,12 +134,12 @@ export default class CommandRegistry {
 		});
 	}
 
-	private async openNoteForDate(date: Date): Promise<void> {
+	private async openNoteForDate(date: Date) {
 		const { jy, jm, jd } = dateToJalali(date);
 		await this.plugin.noteService.openOrCreateDailyNote(jy, jm, jd);
 	}
 
-	private convertDate(editor: Editor, lineIndex: number, textLine: string): void {
+	private convertDate(editor: Editor, lineIndex: number, textLine: string) {
 		const dateRegex = /\b(\d{4})-?(\d{2})-?(\d{2})\b/g;
 
 		const newLine = textLine.replace(dateRegex, (full, y, m, d) => {

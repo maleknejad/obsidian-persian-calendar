@@ -74,13 +74,13 @@ export default class PersianCalendarPlugin extends Plugin {
 		await this.versionChecker.checkForVersionUpdate();
 	}
 
-	private initializeServices(): void {
+	private initializeServices() {
 		this.commandRegistry = new CommandRegistry(this);
 		this.eventManager = new EventManager(this);
 		this.versionChecker = new VersionChecker(this);
 	}
 
-	private handleStartup(): void {
+	private handleStartup() {
 		this.app.workspace.onLayoutReady(async () => {
 			if (this.settings.openDailyNoteOnStartup) {
 				const now = new Date();

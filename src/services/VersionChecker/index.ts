@@ -3,7 +3,7 @@ import type PersianCalendarPlugin from "src/main";
 export default class VersionChecker {
 	constructor(private plugin: PersianCalendarPlugin) {}
 
-	async checkForVersionUpdate(): Promise<void> {
+	async checkForVersionUpdate() {
 		const currentVersion = this.plugin.manifest.version;
 		const lastSeenVersion = this.plugin.settings.lastSeenVersion;
 
@@ -27,14 +27,14 @@ export default class VersionChecker {
 	private async updateVersionIfChanged(
 		currentVersion: string,
 		lastSeenVersion: string | undefined,
-	): Promise<void> {
+	) {
 		if (lastSeenVersion !== currentVersion) {
 			this.plugin.settings.lastSeenVersion = currentVersion;
 			await this.plugin.saveSettings();
 		}
 	}
 
-	private async handleFirstRun(currentVersion: string): Promise<void> {
+	private async handleFirstRun(currentVersion: string) {
 		const { getReleaseNotesForVersion, isReleaseNote } = await import("src/utils/release");
 
 		if (!isReleaseNote(currentVersion)) {
@@ -52,10 +52,7 @@ export default class VersionChecker {
 		}).open();
 	}
 
-	private async handleVersionChange(
-		currentVersion: string,
-		lastSeenVersion: string,
-	): Promise<void> {
+	private async handleVersionChange(currentVersion: string, lastSeenVersion: string) {
 		const {
 			getReleaseNotesBetweenVersions,
 			getLatestReleaseNotes,

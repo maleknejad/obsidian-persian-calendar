@@ -77,7 +77,7 @@ export default class CalendarHeaderRender {
 		const todayButton = navContainerEl.createEl("span", { cls: "persian-calendar__go-today" });
 		todayButton.textContent = "امروز";
 		todayButton.addEventListener("click", () => {
-			void this.navigation.goToToday();
+			this.navigation.goToToday();
 		});
 
 		const nextMonthArrow = navContainerEl.createEl("span", {

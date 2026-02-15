@@ -102,7 +102,7 @@ export default class NoteService {
 	private async applyTemplateIfConfigured(
 		file: TFile,
 		noteType: "daily" | "weekly" | "monthly" | "seasonal" | "yearly",
-	): Promise<void> {
+	) {
 		const templatePath = this.getTemplatePathForNoteType(noteType);
 
 		if (!templatePath || templatePath.trim() === "") {

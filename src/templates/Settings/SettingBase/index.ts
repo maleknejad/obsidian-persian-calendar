@@ -67,7 +67,7 @@ export abstract class SettingsBase extends PluginSettingTab {
 			defaultValue: Omit<TDateFormat, "hijri">;
 			refresh?: boolean;
 		},
-	): void {
+	) {
 		new ObsidianSettings(containerEl)
 			.setName(opts.name)
 			.setDesc(opts.desc ?? "")
