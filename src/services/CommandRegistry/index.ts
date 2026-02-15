@@ -1,6 +1,5 @@
 import { Editor, MarkdownView } from "obsidian";
 import type PersianCalendarPlugin from "src/main";
-import CalendarView from "src/templates/CalendarView";
 import {
 	dateToJalali,
 	dateToJWeekNumber,
@@ -108,7 +107,7 @@ export default class CommandRegistry {
 			id: "open-persian-calendar-view",
 			name: "Open Persian Calendar View - باز کردن تقویم فارسی",
 			callback: async () => {
-				await CalendarView.activateView(this.plugin);
+				await this.plugin.activateView();
 			},
 		});
 	}

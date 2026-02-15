@@ -1,4 +1,4 @@
-import { Plugin, App, type PluginManifest } from "obsidian";
+import { Plugin, App, type PluginManifest, WorkspaceLeaf } from "obsidian";
 import { DateSuggester, Placeholder, NoteService } from "./services";
 import CalendarView from "./templates/CalendarView";
 import Settings from "./templates/Settings";
@@ -36,7 +36,7 @@ export default class PersianCalendarPlugin extends Plugin {
 		this.registerView("persian-calendar", (leaf) => new CalendarView(leaf, this.app, this));
 
 		if (this.app.workspace.getLeavesOfType("persian-calendar").length === 0) {
-			await CalendarView.activateView(this);
+			await this.activateView();
 		}
 
 		super.onload();
@@ -77,11 +77,39 @@ export default class PersianCalendarPlugin extends Plugin {
 		await this.saveData(this.settings);
 	}
 
+	async activateView(): Promise<WorkspaceLeaf | null> {
+		const existingLeaves = this.app.workspace.getLeavesOfType("persian-calendar");
+
+		if (existingLeaves.length > 0) {
+			this.app.workspace.revealLeaf(existingLeaves[0]);
+			return existingLeaves[0];
+		}
+
+		const leaf =
+			this.app.workspace.getRightLeaf(false) ??
+			this.app.workspace.getRightLeaf(true) ??
+			this.app.workspace.getLeaf("tab");
+
+		await leaf.setViewState({
+			type: "persian-calendar",
+			active: true,
+		});
+
+		this.app.workspace.revealLeaf(leaf);
+		return leaf;
+	}
+
 	refreshViews() {
-		CalendarView.refreshAllViews(this);
+		const leaves = this.app.workspace.getLeavesOfType("persian-calendar");
+
+		leaves.forEach((leaf) => {
+			if (leaf.view instanceof CalendarView) {
+				leaf.view.render();
+			}
+		});
 	}
 
 	onunload() {
-		CalendarView.detachAllViews(this);
+		this.app.workspace.getLeavesOfType("persian-calendar").forEach((leaf) => leaf.detach());
 	}
 }
