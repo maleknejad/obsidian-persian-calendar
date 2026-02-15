@@ -1,18 +1,25 @@
 import { Plugin, App, type PluginManifest, WorkspaceLeaf } from "obsidian";
-import { DateSuggester, Placeholder, NoteService } from "./services";
+import {
+	DateSuggester,
+	Placeholder,
+	NoteService,
+	CommandRegistry,
+	EventManager,
+	VersionChecker,
+} from "./services";
 import CalendarView from "./templates/CalendarView";
 import Settings from "./templates/Settings";
 import { DEFAULT_SETTING } from "./constants";
 import { dateToJalali } from "./utils/dateUtils";
 import type { TSetting } from "./types";
-import { CommandRegistry, EventManager, VersionChecker } from "./services";
+import RTLNotice from "./components/RTLNotice";
 
 export default class PersianCalendarPlugin extends Plugin {
 	// Core properties
 	settings: TSetting = DEFAULT_SETTING;
 	noteService!: NoteService;
 	placeholder: Placeholder;
-	dateSuggester: DateSuggester | undefined;
+	dateSuggester?: DateSuggester;
 
 	// Managers
 	commandRegistry!: CommandRegistry;
@@ -25,35 +32,49 @@ export default class PersianCalendarPlugin extends Plugin {
 	}
 
 	async onload() {
-		this.initializeManagers();
+		// Initialize services
+		this.initializeServices();
 
+		// Load settings
 		await this.loadSettings();
 
+		// Initialize note service
 		this.noteService = new NoteService(this.app, this);
 
+		// Handle startup operations
 		this.handleStartup();
 
+		// Register calendar view
 		this.registerView("persian-calendar", (leaf) => new CalendarView(leaf, this.app, this));
 
-		if (this.app.workspace.getLeavesOfType("persian-calendar").length === 0) {
-			await this.activateView();
-		}
+		// Activate view if not already active
+		this.app.workspace.onLayoutReady(async () => {
+			if (this.app.workspace.getLeavesOfType("persian-calendar").length === 0) {
+				await this.activateView();
+			}
+		});
 
+		// Call parent onload
 		super.onload();
 
-		this.registerEditorSuggest(new DateSuggester(this));
+		// Register editor suggester
 		this.dateSuggester = new DateSuggester(this);
+		this.registerEditorSuggest(this.dateSuggester);
 
+		// Register events
 		this.eventManager.registerEvents();
 
+		// Register settings tab
 		this.addSettingTab(new Settings(this.app, this));
 
+		// Register commands
 		this.commandRegistry.registerAllCommands();
 
+		// Check for version updates
 		await this.versionChecker.checkForVersionUpdate();
 	}
 
-	private initializeManagers(): void {
+	private initializeServices(): void {
 		this.commandRegistry = new CommandRegistry(this);
 		this.eventManager = new EventManager(this);
 		this.versionChecker = new VersionChecker(this);
@@ -85,10 +106,21 @@ export default class PersianCalendarPlugin extends Plugin {
 			return existingLeaves[0];
 		}
 
-		const leaf =
-			this.app.workspace.getRightLeaf(false) ??
-			this.app.workspace.getRightLeaf(true) ??
-			this.app.workspace.getLeaf("tab");
+		try {
+			const rightLeaf = this.app.workspace.getRightLeaf(false);
+			if (rightLeaf) {
+				await rightLeaf.setViewState({
+					type: "persian-calendar",
+					active: true,
+				});
+				this.app.workspace.revealLeaf(rightLeaf);
+				return rightLeaf;
+			}
+		} catch (e) {
+			RTLNotice("خطا در باز کردن نمای تقویم.");
+		}
+
+		const leaf = this.app.workspace.getLeaf("split", "vertical");
 
 		await leaf.setViewState({
 			type: "persian-calendar",
