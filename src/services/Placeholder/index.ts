@@ -35,6 +35,8 @@ import {
 	dateToDaysRemainingJMonth,
 } from "src/utils/dateUtils";
 import type { TBuildContext } from "src/types";
+import RTLNotice from "src/components/RTLNotice";
+import { extractYearFormat } from "src/utils/formatters";
 
 export default class Placeholder {
 	plugin: PersianCalendarPlugin;
@@ -70,6 +72,7 @@ export default class Placeholder {
 
 		if (updatedContent !== fileContent) {
 			await this.plugin.app.vault.modify(file, updatedContent);
+			RTLNotice("عبارات معنادار با موفقیت جایگزین شد.");
 		}
 	}
 
@@ -138,30 +141,30 @@ export default class Placeholder {
 			["{{تاریخ میلادی یادداشت}}", fileDate ? dateToDash(fileDate, "gregorian") : null],
 			["{{تاریخ قمری یادداشت}}", fileDate ? dateToDash(fileDate, "hijri") : null],
 			["{{روز هفته یادداشت}}", fileDate ? dateToWeekdayName(fileDate) : null],
-			["{{سال یادداشت}}", fileDate ? dateToJYearDash(fileDate) : null],
+			["{{سال یادداشت}}", fileDate ? dateToJYearDash(fileDate) : extractYearFormat(fileName)],
 			[
 				"{{روزهای گذشته سال}}",
 				fileDate ? dateToDaysPassedJYear(fileDate) : dateToDaysPassedJYear(currentDate),
 			],
 			[
 				"{{روزهای باقیمانده سال}}",
-				fileDate ? dateToDaysRemainingJYear(fileDate) : dateToDaysPassedJYear(currentDate),
+				fileDate ? dateToDaysRemainingJYear(fileDate) : dateToDaysRemainingJYear(currentDate),
 			],
 			[
 				"{{روزهای گذشته فصل}}",
-				fileDate ? dateToDaysPassedSeason(fileDate) : dateToDaysPassedJYear(currentDate),
+				fileDate ? dateToDaysPassedSeason(fileDate) : dateToDaysPassedSeason(currentDate),
 			],
 			[
 				"{{روزهای باقیمانده فصل}}",
-				fileDate ? dateToDaysRemainingSeason(fileDate) : dateToDaysPassedJYear(currentDate),
+				fileDate ? dateToDaysRemainingSeason(fileDate) : dateToDaysRemainingSeason(currentDate),
 			],
 			[
 				"{{روزهای گذشته ماه}}",
-				fileDate ? dateToDaysPassedJMonth(fileDate) : dateToDaysPassedJYear(currentDate),
+				fileDate ? dateToDaysPassedJMonth(fileDate) : dateToDaysPassedJMonth(currentDate),
 			],
 			[
 				"{{روزهای باقیمانده ماه}}",
-				fileDate ? dateToDaysRemainingJMonth(fileDate) : dateToDaysPassedJYear(currentDate),
+				fileDate ? dateToDaysRemainingJMonth(fileDate) : dateToDaysRemainingJMonth(currentDate),
 			],
 			["{{اول سال}}", dashToStartDayOfYearDash(fileName, baseDate)],
 			["{{آخر سال}}", dashToEndDayOfYearDash(fileName, baseDate)],
