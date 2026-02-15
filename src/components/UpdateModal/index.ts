@@ -17,12 +17,11 @@ export class UpdateModal extends Modal {
 		contentEl.empty();
 		contentEl.addClass("persian-calendar");
 
-		const headerEl = contentEl.createEl("span", { cls: "persian-calendar__update-header" });
+		const headerEl = contentEl.createEl("div", { cls: "persian-calendar__update-header" });
 		setIcon(headerEl, "calendar-heart");
 
-		contentEl.createEl("h1", {
+		headerEl.createEl("p", {
 			text: "Persian Calendar",
-			cls: "persian-calendar__update-header",
 		});
 
 		SocialLinks(contentEl);

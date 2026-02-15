@@ -29,8 +29,13 @@ import {
 	dashToStartDayOfYearDash,
 	dateToEvents,
 	dateToDayOfMonth,
+	dateToDaysPassedSeason,
+	dateToDaysRemainingSeason,
+	dateToDaysPassedJMonth,
+	dateToDaysRemainingJMonth,
 } from "src/utils/dateUtils";
 import type { TBuildContext } from "src/types";
+import RTLNotice from "src/components/RTLNotice";
 import { extractYearFormat } from "src/utils/formatters";
 
 export default class Placeholder {
@@ -67,6 +72,7 @@ export default class Placeholder {
 
 		if (updatedContent !== fileContent) {
 			await this.plugin.app.vault.modify(file, updatedContent);
+			RTLNotice("عبارات معنادار با موفقیت جایگزین شد.");
 		}
 	}
 
@@ -130,17 +136,39 @@ export default class Placeholder {
 			["{{روز ماه جاری}}", dateToDayOfMonth(currentDate)],
 			["{{فصل جاری}}", dateToSeasonDash(currentDate)],
 			["{{مناسبت جاری}}", eventsToString(dateToEvents(currentDate, this.plugin.settings))],
-			["{{روزهای گذشته}}", dateToDaysPassedJYear(currentDate)],
-			["{{روزهای باقیمانده}}", dateToDaysRemainingJYear(currentDate)],
 			["{{روز ماه یادداشت}}", fileDate ? dateToDayOfMonth(fileDate) : null],
 			["{{تاریخ شمسی یادداشت}}", fileDate ? dateToDash(fileDate, "jalali") : null],
 			["{{تاریخ میلادی یادداشت}}", fileDate ? dateToDash(fileDate, "gregorian") : null],
 			["{{تاریخ قمری یادداشت}}", fileDate ? dateToDash(fileDate, "hijri") : null],
 			["{{روز هفته یادداشت}}", fileDate ? dateToWeekdayName(fileDate) : null],
+			["{{سال یادداشت}}", fileDate ? dateToJYearDash(fileDate) : extractYearFormat(fileName)],
+			[
+				"{{روزهای گذشته سال}}",
+				fileDate ? dateToDaysPassedJYear(fileDate) : dateToDaysPassedJYear(currentDate),
+			],
+			[
+				"{{روزهای باقیمانده سال}}",
+				fileDate ? dateToDaysRemainingJYear(fileDate) : dateToDaysRemainingJYear(currentDate),
+			],
+			[
+				"{{روزهای گذشته فصل}}",
+				fileDate ? dateToDaysPassedSeason(fileDate) : dateToDaysPassedSeason(currentDate),
+			],
+			[
+				"{{روزهای باقیمانده فصل}}",
+				fileDate ? dateToDaysRemainingSeason(fileDate) : dateToDaysRemainingSeason(currentDate),
+			],
+			[
+				"{{روزهای گذشته ماه}}",
+				fileDate ? dateToDaysPassedJMonth(fileDate) : dateToDaysPassedJMonth(currentDate),
+			],
+			[
+				"{{روزهای باقیمانده ماه}}",
+				fileDate ? dateToDaysRemainingJMonth(fileDate) : dateToDaysRemainingJMonth(currentDate),
+			],
 			["{{اول سال}}", dashToStartDayOfYearDash(fileName, baseDate)],
 			["{{آخر سال}}", dashToEndDayOfYearDash(fileName, baseDate)],
 			["{{سال جاری}}", dateToJYearDash(currentDate)],
-			["{{سال یادداشت}}", fileDate ? dateToJYearDash(fileDate) : null],
 			["{{هفته یادداشت}}", dashToJWeekDash(fileName, baseDate)],
 			["{{اول هفته}}", dashToStartDayOfWeekDash(fileName, baseDate)],
 			["{{آخر هفته}}", dashToEndDayOfWeekDash(fileName, baseDate)],

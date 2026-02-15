@@ -12,30 +12,24 @@ export default class CalendarView extends View {
 	lastCheckedDate: TJalali = dateToJalali(new Date());
 	plugin: PersianCalendarPlugin;
 	settings: TSetting;
-
 	private calendarNavigation: CalendarNavigation;
 	private calendarState: CalendarState;
 	private notesService: NoteService;
 	private calendarRenderer: CalendarRenderer;
 
-	constructor(leaf: WorkspaceLeaf, app: App, settings: TSetting, plugin: PersianCalendarPlugin) {
+	constructor(leaf: WorkspaceLeaf, app: App, plugin: PersianCalendarPlugin) {
 		super(leaf);
-
 		this.app = app;
-		this.settings = settings;
+		this.settings = plugin.settings;
 		this.plugin = plugin;
-
 		this.calendarState = new CalendarState();
-
-		this.notesService = new NoteService(this.app, this.settings, this.plugin);
-
+		this.notesService = new NoteService(this.app, this.plugin);
 		this.calendarRenderer = new CalendarRenderer(
 			this.containerEl,
 			this.calendarState,
 			this.notesService,
 			this.settings,
 		);
-
 		this.calendarNavigation = new CalendarNavigation(
 			this.calendarState,
 			this.calendarRenderer.render,
@@ -80,10 +74,8 @@ export default class CalendarView extends View {
 
 	private startDailyCheckInterval() {
 		this.stopDailyCheckInterval();
-
 		this.dailyCheckInterval = window.setInterval(() => {
 			const today = dateToJalali(new Date());
-
 			if (
 				today.jy !== this.lastCheckedDate.jy ||
 				today.jm !== this.lastCheckedDate.jm ||

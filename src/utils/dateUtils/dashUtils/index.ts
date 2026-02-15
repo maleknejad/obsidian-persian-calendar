@@ -1,4 +1,4 @@
-// todo: divide and conquer
+// TODO: divide and conquer
 
 import {
 	dateToJalali,
@@ -7,7 +7,6 @@ import {
 	checkValidJalali,
 	gregorianToDate,
 	jalaliMonthLength,
-	getDaysInJalaliYear,
 	dateToJWeekNumber,
 	jalaliToStartDayOfWeek,
 	jalaliToSeason,
@@ -180,32 +179,6 @@ export function dateToJMonthDash(date: Date, option?: { separator?: string }) {
 	const { jy, jm } = dateToJalali(date);
 
 	return toMonthFormat(jy, jm, { separator });
-}
-
-export function dateToDaysPassedJYear(date: Date): number {
-	const { jy, jm, jd } = dateToJalali(date);
-
-	let daysPassed = 0;
-
-	for (let month = 1; month < jm; month++) {
-		daysPassed += jalaliMonthLength(jy, month)!;
-	}
-
-	return daysPassed + jd;
-}
-
-export function dateToDaysRemainingJYear(date: Date): number {
-	const { jy, jm, jd } = dateToJalali(date);
-
-	let daysPassed = 0;
-
-	for (let month = 1; month < jm; month++) {
-		daysPassed += jalaliMonthLength(jy, month)!;
-	}
-
-	daysPassed += jd;
-
-	return getDaysInJalaliYear(jy) - daysPassed;
 }
 
 export function dashToStartDayOfWeekDash(

@@ -12,7 +12,6 @@ import {
 	dateToSeasonDash,
 	dateToJWeekDash,
 	dateToJYearDash,
-	jalaliDashToGregorianDash,
 	dateToDash,
 } from "src/utils/dateUtils";
 import { WEEKDAYS_NAME } from "src/constants";
@@ -125,7 +124,7 @@ export default class DateSuggester extends EditorSuggest<string> {
 				now.setDate(now.getDate() + daysFromNowToWeekday);
 			}
 
-			const gDateDash = dateToDash(now, "gregorian") //todo: create dateToDash function
+			const gDateDash = dateToDash(now, "gregorian")
 
 			const formatSpecifier = specifier ? ` ${specifier.trim()}` : "";
 

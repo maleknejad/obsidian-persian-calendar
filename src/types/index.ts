@@ -73,17 +73,19 @@ export type TBoolSettingKeys = Extract<
 	| "showIRIslamEvents"
 	| "showGlobalEvents"
 	| "askForCreateNote"
+	| "openDailyNoteOnStartup"
 >;
 
 export type TSetting = {
 	lastSeenVersion?: string;
 	versionUpdate: boolean;
 	askForCreateNote: boolean;
+	openDailyNoteOnStartup: boolean;
 	dateFormat: TDateFormat;
 	showSeasonalNotes: boolean;
 	// show holidays
 	showHolidays: boolean;
-	weekendDays: string;
+	weekendDays: "thursday-friday" | "friday" | "friday-saturday";
 	// show dates
 	showGeorgianDates: boolean;
 	showHijriDates: boolean;

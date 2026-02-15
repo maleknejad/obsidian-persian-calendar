@@ -42,6 +42,12 @@ export default class CalendarSettings extends SettingsBase {
 			refresh: true,
 		});
 		this.addToggleSetting(containerEl, {
+			name: "باز کردن خودکار روزنوشت امروز هنگام راه‌اندازی برنامه",
+			desc: "با فعال‌سازی این گزینه هنگام راه‌اندازی ابسیدین به یادداشت روزنوشت امروز منتقل می‌شوید.",
+			key: "openDailyNoteOnStartup",
+			refresh: true,
+		});
+		this.addToggleSetting(containerEl, {
 			name: "نمایش فصل‌ها در تقویم",
 			desc: "آیا مایلید فصل‌ها نمایش داده شود؟",
 			key: "showSeasonalNotes",

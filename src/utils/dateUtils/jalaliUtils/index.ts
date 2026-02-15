@@ -199,3 +199,75 @@ export function dateToDayOfMonth(date: Date) {
 	const { jd } = dateToJalali(date);
 	return jd;
 }
+
+export function dateToDaysPassedJYear(date: Date) {
+	const { jy, jm, jd } = dateToJalali(date);
+
+	let daysPassed = 0;
+
+	for (let month = 1; month < jm; month++) {
+		daysPassed += jalaliMonthLength(jy, month)!;
+	}
+
+	return daysPassed + jd;
+}
+
+export function dateToDaysRemainingJYear(date: Date) {
+	const { jy, jm, jd } = dateToJalali(date);
+
+	let daysPassed = 0;
+
+	for (let month = 1; month < jm; month++) {
+		daysPassed += jalaliMonthLength(jy, month)!;
+	}
+
+	daysPassed += jd;
+
+	return getDaysInJalaliYear(jy) - daysPassed;
+}
+
+export function dateToDaysPassedSeason(date: Date) {
+	const { jy, jm, jd } = dateToJalali(date);
+	const season = jalaliToSeason(jm);
+
+	const startMonth = (season - 1) * 3 + 1;
+
+	let daysPassed = 0;
+
+	for (let m = startMonth; m < jm; m++) {
+		daysPassed += jalaliMonthLength(jy, m)!;
+	}
+
+	return daysPassed + jd;
+}
+
+export function dateToDaysRemainingSeason(date: Date) {
+	const { jy, jm, jd } = dateToJalali(date);
+	const season = jalaliToSeason(jm);
+
+	const startMonth = (season - 1) * 3 + 1;
+	const endMonth = startMonth + 2;
+
+	let daysPassed = 0;
+	for (let m = startMonth; m < jm; m++) {
+		daysPassed += jalaliMonthLength(jy, m)!;
+	}
+	daysPassed += jd;
+
+	let seasonLength = 0;
+	for (let m = startMonth; m <= endMonth; m++) {
+		seasonLength += jalaliMonthLength(jy, m)!;
+	}
+
+	return seasonLength - daysPassed;
+}
+
+export function dateToDaysPassedJMonth(date: Date) {
+	const { jd } = dateToJalali(date);
+	return jd;
+}
+
+export function dateToDaysRemainingJMonth(date: Date) {
+	const { jy, jm, jd } = dateToJalali(date);
+	return jalaliMonthLength(jy, jm)! - jd;
+}

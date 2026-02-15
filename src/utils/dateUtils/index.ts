@@ -15,6 +15,12 @@ export {
 	dateToMonthName, // (Date) => String(jalali_month_name)
 	dateToSeasonName, // (Date) => String(season_name)
 	dateToDayOfMonth, // (Date) => Number(day_of_month)
+	dateToDaysPassedJYear, // Date => Number(days_passed_in_jy)
+	dateToDaysRemainingJYear, // Date => Number(days_remaining_in_jy)
+	dateToDaysPassedSeason, // Date => Number(days_passed_in_season)
+	dateToDaysRemainingSeason, // Date => Number(days_remaining_in_season)
+	dateToDaysPassedJMonth, // Date => Number(days_passed_in_jm)
+	dateToDaysRemainingJMonth, // Date => Number(days_remaining_in_jm)
 	dateToEndDayOfJMonthDate,
 	dateToStartDayOfJMonthDate,
 	dateToEndDayOfSeasonDate,
@@ -50,8 +56,6 @@ export {
 	dateToJWeekDash, // (Date) => String((jalali)weekFormat)
 	jalaliDashToDate, // ("jy-jm-jd"|"jyjmjd") => Date
 	gregorianDashToDate, // ("gy-gm-gd"|"gygmgd") => Date
-	dateToDaysPassedJYear, // Date => Number(days_passed_in_jy)
-	dateToDaysRemainingJYear, // Date => Number(days_remaining_in_jy)
 	dashToStartDayOfWeekDash, // (Date,{baseDate}) => String((baseDate)dayFormat_for_start_day_of_week)
 	dashToEndDayOfWeekDash, // (Date,{baseDate}) => String((baseDate)dayFormat_for_end_day_of_week)
 	dashToJWeekDash,

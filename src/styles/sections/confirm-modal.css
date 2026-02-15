@@ -18,3 +18,15 @@
 	background-color: var(--color-accent) !important;
 	color: var(--color-base-05) !important;
 }
+
+@media (max-width: 600px) {
+	.persian-calendar__cmodal-container {
+		flex-direction: column;
+	}
+
+	.persian-calendar__cmodal-confirm,
+	.persian-calendar__cmodal-cancel {
+		width: 100%;
+		text-align: center;
+	}
+}

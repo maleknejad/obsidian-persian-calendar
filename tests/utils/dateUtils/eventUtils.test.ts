@@ -1,4 +1,4 @@
-// todo: improve this
+// TODO: improve this
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { dateToEvents, dashToEvents, checkHoliday } from "src/utils/dateUtils/eventUtils";
