@@ -115,21 +115,17 @@ export default class CommandRegistry {
 	private registerDateConversionCommand() {
 		this.plugin.addCommand({
 			id: "convert-date",
-			name: "Convert Date Format - تبدیل تاریخ بین شمسی و میلادی",
-			checkCallback: (checking: boolean) => {
-				const editor = this.plugin.app.workspace.getActiveViewOfType(MarkdownView)?.editor;
-				if (!editor) return false;
-
+			name: "Convert Date Format - تبدیل تاریخ در این خط از یادداشت",
+			editorCallback: (editor: Editor) => {
 				const { line } = editor.getCursor();
 				const text = editor.getLine(line);
 
-				if (!/^\b\d{4}-?\d{2}-?\d{2}\b$/.test(text)) return false;
-
-				if (!checking) {
-					this.convertDate(editor, line, text);
+				if (!/\b\d{4}-?\d{2}-?\d{2}\b/.test(text)) {
+					RTLNotice("خط فعلی شامل تاریخ با الگوی YYYY-MM-DD نیست.");
+					return;
 				}
 
-				return true;
+				this.convertDate(editor, line, text);
 			},
 		});
 	}
