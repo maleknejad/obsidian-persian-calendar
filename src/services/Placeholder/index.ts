@@ -133,17 +133,39 @@ export default class Placeholder {
 			["{{روز ماه جاری}}", dateToDayOfMonth(currentDate)],
 			["{{فصل جاری}}", dateToSeasonDash(currentDate)],
 			["{{مناسبت جاری}}", eventsToString(dateToEvents(currentDate, this.plugin.settings))],
-			["{{روزهای گذشته سال}}", fileDate ? dateToDaysPassedJYear(fileDate) : null],
-			["{{روزهای باقیمانده سال}}", fileDate ? dateToDaysRemainingJYear(fileDate) : null],
 			["{{روز ماه یادداشت}}", fileDate ? dateToDayOfMonth(fileDate) : null],
 			["{{تاریخ شمسی یادداشت}}", fileDate ? dateToDash(fileDate, "jalali") : null],
 			["{{تاریخ میلادی یادداشت}}", fileDate ? dateToDash(fileDate, "gregorian") : null],
 			["{{تاریخ قمری یادداشت}}", fileDate ? dateToDash(fileDate, "hijri") : null],
 			["{{روز هفته یادداشت}}", fileDate ? dateToWeekdayName(fileDate) : null],
+			["{{سال یادداشت}}", fileDate ? dateToJYearDash(fileDate) : null],
+			[
+				"{{روزهای گذشته سال}}",
+				fileDate ? dateToDaysPassedJYear(fileDate) : dateToDaysPassedJYear(currentDate),
+			],
+			[
+				"{{روزهای باقیمانده سال}}",
+				fileDate ? dateToDaysRemainingJYear(fileDate) : dateToDaysPassedJYear(currentDate),
+			],
+			[
+				"{{روزهای گذشته فصل}}",
+				fileDate ? dateToDaysPassedSeason(fileDate) : dateToDaysPassedJYear(currentDate),
+			],
+			[
+				"{{روزهای باقیمانده فصل}}",
+				fileDate ? dateToDaysRemainingSeason(fileDate) : dateToDaysPassedJYear(currentDate),
+			],
+			[
+				"{{روزهای گذشته ماه}}",
+				fileDate ? dateToDaysPassedJMonth(fileDate) : dateToDaysPassedJYear(currentDate),
+			],
+			[
+				"{{روزهای باقیمانده ماه}}",
+				fileDate ? dateToDaysRemainingJMonth(fileDate) : dateToDaysPassedJYear(currentDate),
+			],
 			["{{اول سال}}", dashToStartDayOfYearDash(fileName, baseDate)],
 			["{{آخر سال}}", dashToEndDayOfYearDash(fileName, baseDate)],
 			["{{سال جاری}}", dateToJYearDash(currentDate)],
-			["{{سال یادداشت}}", fileDate ? dateToJYearDash(fileDate) : null],
 			["{{هفته یادداشت}}", dashToJWeekDash(fileName, baseDate)],
 			["{{اول هفته}}", dashToStartDayOfWeekDash(fileName, baseDate)],
 			["{{آخر هفته}}", dashToEndDayOfWeekDash(fileName, baseDate)],
@@ -159,10 +181,6 @@ export default class Placeholder {
 			["{{فصل یادداشت}}", dashToSeasonDash(fileName, baseDate)],
 			["{{اول فصل}}", dashToStartDayOfSeasonDash(fileName, baseDate)],
 			["{{آخر فصل}}", dashToEndDayOfSeasonDash(fileName, baseDate)],
-			["{{روزهای گذشته فصل}}", fileDate ? dateToDaysPassedSeason(fileDate) : null],
-			["{{روزهای باقیمانده فصل}}", fileDate ? dateToDaysRemainingSeason(fileDate) : null],
-			["{{روزهای گذشته ماه}}", fileDate ? dateToDaysPassedJMonth(fileDate) : null],
-			["{{روزهای باقیمانده ماه}}", fileDate ? dateToDaysRemainingJMonth(fileDate) : null],
 		]);
 	}
 }
