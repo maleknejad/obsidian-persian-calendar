@@ -120,7 +120,7 @@ export default class CommandRegistry {
 				const { line } = editor.getCursor();
 				const text = editor.getLine(line);
 
-				if (!/\b\d{4}-?\d{2}-?\d{2}\b/.test(text)) {
+				if (!/\b(\d{4})-(\d{2})-(\d{2})\b/.test(text)) {
 					RTLNotice("خط فعلی شامل تاریخ با الگوی YYYY-MM-DD نیست.");
 					return;
 				}
@@ -136,11 +136,11 @@ export default class CommandRegistry {
 	}
 
 	private convertDate(editor: Editor, lineIndex: number, textLine: string) {
-		const dateRegex = /\b(\d{4})-?(\d{2})-?(\d{2})\b/g;
+		const dateRegex = /\b(\d{4})-(\d{2})-(\d{2})\b/g;
 
 		const newLine = textLine.replace(dateRegex, (full, y, m, d) => {
 			const date = `${y}-${m}-${d}`;
-			const convert = +y > 2000 ? gregorianDashToJalaliDash : jalaliDashToGregorianDash;
+			const convert = +y > 1600 ? gregorianDashToJalaliDash : jalaliDashToGregorianDash;
 			return convert(date) ?? full;
 		});
 
