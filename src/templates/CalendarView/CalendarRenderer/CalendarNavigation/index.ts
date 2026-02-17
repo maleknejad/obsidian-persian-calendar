@@ -1,5 +1,5 @@
 import CalendarState from "src/templates/CalendarView/CalendarState";
-import { dateToJalali } from "src/utils/dateUtils";
+import { dateToJalali, todayTehran } from "src/utils/dateUtils";
 
 export default class CalendarNavigation {
 	constructor(
@@ -13,7 +13,7 @@ export default class CalendarNavigation {
 	}
 
 	public async goToToday() {
-		const { jy, jm } = dateToJalali(new Date());
+		const { jy, jm } = dateToJalali(todayTehran());
 		this.calendarState.setJState(jy, jm);
 		await this.rerender();
 	}

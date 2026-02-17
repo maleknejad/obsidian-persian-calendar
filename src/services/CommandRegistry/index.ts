@@ -7,6 +7,7 @@ import {
 	jalaliToSeason,
 	gregorianDashToJalaliDash,
 	jalaliDashToGregorianDash,
+	todayTehran,
 } from "src/utils/dateUtils";
 import RTLNotice from "src/components/RTLNotice";
 
@@ -39,7 +40,7 @@ export default class CommandRegistry {
 			id: "open-todays-daily-note",
 			name: "Today - باز کردن روزنوشت امروز",
 			callback: async () => {
-				await this.openNoteForDate(new Date());
+				await this.openNoteForDate(todayTehran());
 			},
 		});
 
@@ -47,7 +48,7 @@ export default class CommandRegistry {
 			id: "open-tomorrow-daily-note",
 			name: "Tomorrow - باز کردن روزنوشت فردا",
 			callback: async () => {
-				await this.openNoteForDate(addDayDate(new Date(), 1));
+				await this.openNoteForDate(addDayDate(todayTehran(), 1));
 			},
 		});
 
@@ -55,7 +56,7 @@ export default class CommandRegistry {
 			id: "open-yesterday-daily-note",
 			name: "Yesterday - باز کردن روزنوشت دیروز",
 			callback: async () => {
-				await this.openNoteForDate(addDayDate(new Date(), -1));
+				await this.openNoteForDate(addDayDate(todayTehran(), -1));
 			},
 		});
 	}
@@ -65,7 +66,7 @@ export default class CommandRegistry {
 			id: "open-this-weeks-note",
 			name: "Weekly - باز کردن هفته‌نوشت این هفته",
 			callback: async () => {
-				const now = new Date();
+				const now = todayTehran();
 				const { jy } = dateToJalali(now);
 				const currentWeekNumber = dateToJWeekNumber(now);
 				await this.plugin.noteService.openOrCreateWeeklyNote(jy, currentWeekNumber);
@@ -76,7 +77,7 @@ export default class CommandRegistry {
 			id: "open-current-seasonal-note",
 			name: "seasonal - باز کردن فصل نوشت این فصل",
 			callback: async () => {
-				const now = new Date();
+				const now = todayTehran();
 				const { jy, jm } = dateToJalali(now);
 				const season = jalaliToSeason(jm);
 				await this.plugin.noteService.openOrCreateSeasonalNote(jy, season);
@@ -87,7 +88,7 @@ export default class CommandRegistry {
 			id: "open-current-months-note",
 			name: "Monthly - بازکردن ماه‌نوشت این ماه",
 			callback: async () => {
-				const { jy, jm } = dateToJalali(new Date());
+				const { jy, jm } = dateToJalali(todayTehran());
 				await this.plugin.noteService.openOrCreateMonthlyNote(jy, jm);
 			},
 		});
@@ -96,7 +97,7 @@ export default class CommandRegistry {
 			id: "open-current-years-note",
 			name: "Yearly - باز کردن سال‌نوشت امسال",
 			callback: async () => {
-				const { jy } = dateToJalali(new Date());
+				const { jy } = dateToJalali(todayTehran());
 				await this.plugin.noteService.openOrCreateYearlyNote(jy);
 			},
 		});

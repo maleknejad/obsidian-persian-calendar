@@ -10,7 +10,7 @@ import {
 import CalendarView from "./templates/CalendarView";
 import Settings from "./templates/Settings";
 import { DEFAULT_SETTING } from "./constants";
-import { dateToJalali } from "./utils/dateUtils";
+import { dateToJalali, todayTehran } from "./utils/dateUtils";
 import type { TSetting } from "./types";
 import RTLNotice from "./components/RTLNotice";
 
@@ -83,7 +83,7 @@ export default class PersianCalendarPlugin extends Plugin {
 	private handleStartup() {
 		this.app.workspace.onLayoutReady(async () => {
 			if (this.settings.openDailyNoteOnStartup) {
-				const now = new Date();
+				const now = todayTehran();
 				const { jy, jm, jd } = dateToJalali(now);
 				await this.noteService.openOrCreateDailyNote(jy, jm, jd);
 			}

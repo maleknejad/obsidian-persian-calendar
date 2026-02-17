@@ -13,6 +13,7 @@ import {
 	dateToJWeekDash,
 	dateToJYearDash,
 	dateToDash,
+	todayTehran,
 } from "src/utils/dateUtils";
 import { WEEKDAYS_NAME } from "src/constants";
 import type { TDateFormat, TLocal } from "src/types";
@@ -91,8 +92,7 @@ export default class DateSuggester extends EditorSuggest<string> {
 	}
 
 	getFormattedDateLink(keyword: string, date: Date, local: TLocal = "fa") {
-		const now = new Date();
-		let jDateDash = "";
+		const now = todayTehran();
 
 		const weekdaysName = WEEKDAYS_NAME[local];
 
@@ -124,7 +124,7 @@ export default class DateSuggester extends EditorSuggest<string> {
 				now.setDate(now.getDate() + daysFromNowToWeekday);
 			}
 
-			const gDateDash = dateToDash(now, "gregorian")
+			const gDateDash = dateToDash(now, "gregorian");
 
 			const formatSpecifier = specifier ? ` ${specifier.trim()}` : "";
 
@@ -160,61 +160,61 @@ export default class DateSuggester extends EditorSuggest<string> {
 				return `[[${dateToDash(date, "jalali")}|${keyword}]]`;
 
 			case "این هفته":
-				return `[[${dateToJWeekDash(new Date())}|${keyword}]]`;
+				return `[[${dateToJWeekDash(todayTehran())}|${keyword}]]`;
 
 			case "هفته قبل":
 				return `[[${dateToJWeekDash(
-					new Date(new Date().setDate(new Date().getDate() - 7)),
+					new Date(todayTehran().setDate(todayTehran().getDate() - 7)),
 				)}|${keyword}]]`;
 
 			case "هفته بعد":
 				return `[[${dateToJWeekDash(
-					new Date(new Date().setDate(new Date().getDate() + 7)),
+					new Date(todayTehran().setDate(todayTehran().getDate() + 7)),
 				)}|${keyword}]]`;
 
 			case "این ماه":
-				return `[[${dateToJMonthDash(new Date())}|${keyword}]]`;
+				return `[[${dateToJMonthDash(todayTehran())}|${keyword}]]`;
 
 			case "ماه قبل":
 				return `[[${dateToJMonthDash(
-					new Date(new Date().setMonth(new Date().getMonth() - 1)),
+					new Date(todayTehran().setMonth(todayTehran().getMonth() - 1)),
 				)}|${keyword}]]`;
 
 			case "ماه بعد":
 				return `[[${dateToJMonthDash(
-					new Date(new Date().setMonth(new Date().getMonth() + 1)),
+					new Date(todayTehran().setMonth(todayTehran().getMonth() + 1)),
 				)}|${keyword}]]`;
 
 			case "این فصل":
-				return `[[${dateToSeasonDash(new Date())}|${keyword}]]`;
+				return `[[${dateToSeasonDash(todayTehran())}|${keyword}]]`;
 
 			case "فصل قبل":
 				return `[[${dateToSeasonDash(
-					new Date(new Date().setMonth(new Date().getMonth() - 3)),
+					new Date(todayTehran().setMonth(todayTehran().getMonth() - 3)),
 				)}|${keyword}]]`;
 
 			case "فصل بعد":
 				return `[[${dateToSeasonDash(
-					new Date(new Date().setMonth(new Date().getMonth() + 3)),
+					new Date(todayTehran().setMonth(todayTehran().getMonth() + 3)),
 				)}|${keyword}]]`;
 
 			case "امسال":
-				return `[[${dateToJYearDash(new Date())}|${keyword}]]`;
+				return `[[${dateToJYearDash(todayTehran())}|${keyword}]]`;
 
 			case "سال قبل":
 				return `[[${dateToJYearDash(
-					new Date(new Date().setFullYear(new Date().getFullYear() - 1)),
+					new Date(todayTehran().setFullYear(todayTehran().getFullYear() - 1)),
 				)}|${keyword}]]`;
 
 			case "سال بعد":
 				return `[[${dateToJYearDash(
-					new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
+					new Date(todayTehran().setFullYear(todayTehran().getFullYear() + 1)),
 				)}|${keyword}]]`;
 		}
 	}
 
 	selectSuggestion(value: string, evt: MouseEvent | KeyboardEvent) {
-		const now = new Date();
+		const now = todayTehran();
 		const linkText = this.getFormattedDateLink(value, now); // Ensures linkText is always a string
 
 		const activeView = this.plugin.app.workspace.getActiveViewOfType(MarkdownView);

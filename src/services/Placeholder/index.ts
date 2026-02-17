@@ -33,6 +33,7 @@ import {
 	dateToDaysRemainingSeason,
 	dateToDaysPassedJMonth,
 	dateToDaysRemainingJMonth,
+	todayTehran,
 } from "src/utils/dateUtils";
 import type { TBuildContext } from "src/types";
 import RTLNotice from "src/components/RTLNotice";
@@ -111,7 +112,7 @@ export default class Placeholder {
 		let fileDate = dashToDate(fileName, baseDate);
 
 		return {
-			currentDate: new Date(),
+			currentDate: todayTehran(),
 			fileDate,
 			fileName,
 			baseDate,

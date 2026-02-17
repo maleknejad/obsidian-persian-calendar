@@ -1,6 +1,7 @@
 import { HIJRI_ANCHORS, HIJRI_MONTHS_LENGTH } from "src/constants";
 import type { THijri, TGregorian, TSupportedHijriYear } from "src/types";
 
+//? --- Core ---
 const HIJRI_MONTH_MAP: Map<number, Map<number, 29 | 30>> = buildHijriMonthMap(HIJRI_MONTHS_LENGTH);
 
 function buildHijriMonthMap(
@@ -115,7 +116,7 @@ function pickNearestAnchorByHijri(hy: number, hm: number) {
 	return d1 <= d2 ? first : last;
 }
 
-// === main functions ===
+//? --- Main ---
 export function gregorianToHijri(gy: number, gm: number, gd: number): THijri {
 	const jd = gregorianToJulian(gy, gm, gd);
 	const anchor = pickNearestAnchorByJulian(jd);

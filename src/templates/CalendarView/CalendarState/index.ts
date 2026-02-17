@@ -5,6 +5,7 @@ import {
 	jalaliMonthLength,
 	dateToJWeekNumber,
 	gregorianToHijri,
+	todayTehran,
 } from "src/utils/dateUtils";
 import { toFaNumber } from "src/utils/formatters";
 import { GREGORIAN_MONTHS_NAME, HIJRI_MONTHS_NAME } from "src/constants";
@@ -18,7 +19,7 @@ export default class CalendarState {
 			this.jYearState = initial.jYear;
 			this.jMonthState = initial.jMonth;
 		} else {
-			const today = dateToJalali(new Date());
+			const today = dateToJalali(todayTehran());
 
 			this.jYearState = today.jy;
 			this.jMonthState = today.jm;
@@ -121,7 +122,7 @@ export default class CalendarState {
 
 	//TODO: move to dateUtils
 	public isToday(jy: number, jm: number, jd: number): boolean {
-		const today = dateToJalali(new Date());
+		const today = dateToJalali(todayTehran());
 		return today.jy === jy && today.jm === jm && today.jd === jd;
 	}
 

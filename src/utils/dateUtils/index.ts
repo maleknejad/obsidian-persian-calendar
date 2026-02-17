@@ -35,7 +35,9 @@ export {
 	dateToWeekdayName, // (Date) => Number(weekday_name)
 	addDayDate, // (date, days) => (with days added)Date
 	jalaliToSeason, // (jm) => Number(season)
-} from "./pureUtils";
+	getWeekdayTehran,
+	todayTehran,
+} from "./gregorianUtils";
 export {
 	gregorianToHijri, // (gy, gm, gd) => {hy, hm, hd}
 	hijriToGregorian, // (hy, hm, hd) => {gy, gm, gd}
@@ -69,7 +71,7 @@ export {
 	dashToStartDayOfSeasonDash,
 	dashToEndDayOfYearDash,
 	dashToStartDayOfYearDash,
-} from "./dashUtils";
+} from "./dashUtils/index";
 export {
 	dateToEvents, // (Date) => Events[]
 	dashToEvents, // ("jy-jm-jd"|"jyjmjd"|"gy-gm-gd"|"gygmgd") => Events[]

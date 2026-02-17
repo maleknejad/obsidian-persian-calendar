@@ -43,6 +43,6 @@
 		"vitest": "^4.0.18"
 	},
 	"dependencies": {
-		"jalaali-js": "^1.2.8"
+		"@internationalized/date": "^3.11.0"
 	}
 }

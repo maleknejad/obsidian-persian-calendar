@@ -8,7 +8,7 @@ import {
 	dateToWeekdayName,
 	addDayDate,
 	jalaliToSeason,
-} from "src/utils/dateUtils/pureUtils";
+} from "src/utils/dateUtils/gregorianUtils";
 
 describe("pureUtils", () => {
 	it("gregorianToDate", () => {

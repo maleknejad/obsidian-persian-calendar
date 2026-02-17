@@ -1,7 +1,7 @@
 import { WorkspaceLeaf, App, View } from "obsidian";
 import PersianCalendarPlugin from "src/main";
 import { NoteService } from "src/services";
-import { dateToJalali } from "src/utils/dateUtils";
+import { dateToJalali, todayTehran } from "src/utils/dateUtils";
 import CalendarNavigation from "./CalendarRenderer/CalendarNavigation";
 import CalendarState from "./CalendarState";
 import CalendarRenderer from "./CalendarRenderer";
@@ -9,7 +9,7 @@ import type { TSetting, TJalali } from "src/types";
 
 export default class CalendarView extends View {
 	dailyCheckInterval: number | undefined;
-	lastCheckedDate: TJalali = dateToJalali(new Date());
+	lastCheckedDate: TJalali = dateToJalali(todayTehran());
 	plugin: PersianCalendarPlugin;
 	settings: TSetting;
 	private calendarNavigation: CalendarNavigation;
@@ -75,7 +75,7 @@ export default class CalendarView extends View {
 	private startDailyCheckInterval() {
 		this.stopDailyCheckInterval();
 		this.dailyCheckInterval = window.setInterval(() => {
-			const today = dateToJalali(new Date());
+			const today = dateToJalali(todayTehran());
 			if (
 				today.jy !== this.lastCheckedDate.jy ||
 				today.jm !== this.lastCheckedDate.jm ||
