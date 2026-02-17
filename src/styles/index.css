@@ -9,10 +9,10 @@
 @import "./sections/day.css";
 @import "./sections/tooltip.css";
 @import "./sections/settings.css";
-@import "./sections/update.css";
 
 /* components */
 @import "./sections/social-links.css";
+@import "./sections/update.css";
 @import "./sections/confirm-modal.css";
 
 /* responsive */
