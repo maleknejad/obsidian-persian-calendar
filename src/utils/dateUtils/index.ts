@@ -46,33 +46,6 @@ export {
 	dateToHijri, // (Date) => {hy, hm, hd}
 } from "./hijriUtils";
 export {
-	gregorianDashToJalaliDash, // ("gy-gm-gd"|"gygmgd") => String((jalali)dayFormat)
-	jalaliDashToJalali, // ("jy-jm-jd"|"jyjmjd") => {jy,jm,jd}
-	jalaliDashToGregorianDash, // ("jy-jm-jd"|"jyjmjd") => String((gregorian)dayFormat)
-	gregorianDashToJalali, // ("gy-gm-gd"|"gygmgd") => {jy, jm, jd}
-	dashToDate, // ("jy-jm-jd"|"jyjmjd"|"gy-gm-gd"|"gygmgd") => Date
-	dateToDash, // (Date) => String((jalali|gregorian)dayFormat)
-	dateToJYearDash, // (Date) => String((jalali)yearFormat)
-	dateToSeasonDash, // (Date) => String(seasonFormat)
-	dateToJMonthDash, // (Date) => String((jalali)monthFormat)
-	dateToJWeekDash, // (Date) => String((jalali)weekFormat)
-	jalaliDashToDate, // ("jy-jm-jd"|"jyjmjd") => Date
-	gregorianDashToDate, // ("gy-gm-gd"|"gygmgd") => Date
-	dashToStartDayOfWeekDash, // (Date,{baseDate}) => String((baseDate)dayFormat_for_start_day_of_week)
-	dashToEndDayOfWeekDash, // (Date,{baseDate}) => String((baseDate)dayFormat_for_end_day_of_week)
-	dashToJWeekDash,
-	dashToJMonthDash,
-	dashToJMonthName,
-	dashToEndDayOfJMonthDash,
-	dashToStartDayOfJMonthDash,
-	dashToEndDayOfSeasonDash,
-	dashToSeasonDash,
-	dashToSeasonName,
-	dashToStartDayOfSeasonDash,
-	dashToEndDayOfYearDash,
-	dashToStartDayOfYearDash,
-} from "./dashUtils/index";
-export {
 	dateToEvents, // (Date) => Events[]
 	dashToEvents, // ("jy-jm-jd"|"jyjmjd"|"gy-gm-gd"|"gygmgd") => Events[]
 	checkHoliday, // (Date) => (is holiday?)true|false

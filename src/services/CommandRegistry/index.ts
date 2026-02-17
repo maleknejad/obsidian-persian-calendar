@@ -1,14 +1,13 @@
-import { Editor, MarkdownView } from "obsidian";
+import { Editor } from "obsidian";
 import type PersianCalendarPlugin from "src/main";
 import {
 	dateToJalali,
 	dateToJWeekNumber,
 	addDayDate,
 	jalaliToSeason,
-	gregorianDashToJalaliDash,
-	jalaliDashToGregorianDash,
 	todayTehran,
 } from "src/utils/dateUtils";
+import { gregorianDashToJalaliDash, jalaliDashToGregorianDash } from "src/utils/dashUtils";
 import RTLNotice from "src/components/RTLNotice";
 
 export default class CommandRegistry {

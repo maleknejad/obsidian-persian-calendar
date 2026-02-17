@@ -8,7 +8,7 @@ import {
 	gregorianToDate,
 	gregorianToJalali,
 	jalaliToGregorian,
-} from "../..";
+} from "src/utils/dateUtils";
 
 export function dashToDate(dashDate: string, dateFormat: TDateFormat): Date | null {
 	if (!isDayFormat(dashDate)) return null;

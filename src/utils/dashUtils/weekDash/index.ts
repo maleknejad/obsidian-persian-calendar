@@ -1,13 +1,12 @@
 import type { TDateFormat, TWeekStart } from "src/types";
 import {
-	dashToDate,
 	dateToJalali,
 	dateToJWeekNumber,
 	jalaliToDate,
 	jalaliToStartDayOfWeek,
-	dateToDash,
 	jalaliToEndDayOfWeek,
-} from "../..";
+} from "src/utils/dateUtils";
+import { dashToDate, dateToDash } from "src/utils/dashUtils";
 import {
 	extractWeekFormat,
 	isDayFormat,

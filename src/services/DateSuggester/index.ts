@@ -7,14 +7,14 @@ import {
 	type EditorSuggestContext,
 } from "obsidian";
 import PersianCalendarPlugin from "src/main";
+import { todayTehran } from "src/utils/dateUtils";
 import {
 	dateToJMonthDash,
 	dateToSeasonDash,
 	dateToJWeekDash,
 	dateToJYearDash,
 	dateToDash,
-	todayTehran,
-} from "src/utils/dateUtils";
+} from "src/utils/dashUtils";
 import { WEEKDAYS_NAME } from "src/constants";
 import type { TDateFormat, TLocal } from "src/types";
 

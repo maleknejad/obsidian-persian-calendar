@@ -6,7 +6,8 @@ import type {
 	TShowEvents,
 	TEventObjectWithoutDate,
 } from "src/types";
-import { dashToDate, dateToGregorian, dateToHijri, dateToJalali } from "..";
+import { dateToGregorian, dateToHijri, dateToJalali } from "..";
+import { dashToDate } from "src/utils/dashUtils";
 
 const JALALI_EVENT_MAP: TMonthMap = buildEventMap(JALALI_EVENTS);
 const HIJRI_EVENT_MAP: TMonthMap = buildEventMap(HIJRI_EVENTS);

@@ -5,15 +5,14 @@ import {
 	toMonthFormat,
 } from "src/utils/formatters";
 import {
-	dashToDate,
-	dateToDash,
 	dateToEndDayOfJMonthDate,
 	dateToJalali,
 	dateToMonthName,
 	dateToStartDayOfJMonthDate,
 	jalaliMonthLength,
 	jalaliToDate,
-} from "../..";
+} from "src/utils/dateUtils";
+import { dashToDate, dateToDash } from "src/utils/dashUtils";
 import type { TDateFormat } from "src/types";
 
 export function dateToJMonthDash(date: Date, option?: { separator?: string }) {
