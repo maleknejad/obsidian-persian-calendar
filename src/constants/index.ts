@@ -8,6 +8,7 @@ export {
 	GREGORIAN_MONTHS_NAME,
 	HIJRI_MONTHS_NAME,
 	WEEKDAYS_NAME,
+	DATE_SUGGESTER,
 } from "./dateNames";
 export { DEFAULT_SETTING } from "./settings";
 export { RELEASE_NOTES } from "./releaseNotes";

@@ -1,3 +1,4 @@
+import type { EditorSuggestContext } from "obsidian";
 import type { HIJRI_MONTHS_LENGTH } from "src/constants";
 
 // jalali = هجری شمسی/خورشیدی
@@ -128,6 +129,12 @@ export type TMonthGridCell = TJalali & {
 	isToday: boolean;
 	isWeekend: boolean;
 	isHoliday: boolean;
+};
+
+export type TSuggestProvider = {
+	trigger: RegExp;
+	getSuggestions: (query: string) => string[];
+	onSelect: (value: string, ctx: EditorSuggestContext) => string;
 };
 
 export type TReleaseNote = {

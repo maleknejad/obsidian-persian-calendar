@@ -37,7 +37,7 @@ import {
 	dashToEndDayOfYearDash,
 	dashToStartDayOfYearDash,
 } from "src/utils/dashUtils";
-import type { TBuildContext } from "src/types";
+import type { TBuildContext, TDateFormat, TSuggestProvider } from "src/types";
 import RTLNotice from "src/components/RTLNotice";
 import { extractYearFormat } from "src/utils/formatters";
 
@@ -49,22 +49,36 @@ export default class Placeholder {
 		this.plugin = plugin;
 	}
 
+	public toProvider(): TSuggestProvider {
+		return {
+			trigger: /\{\{[^}]*$/,
+			getSuggestions: (query: string) =>
+				this.getAllPlaceholderKeys().filter((key) =>
+					key.replace(/^\{\{|\}\}$/g, "").includes(query),
+				),
+			onSelect: (value: string) => value,
+		};
+	}
+
+	public getAllPlaceholderKeys(file?: TFile): string[] {
+		const activeFile = file ?? this.plugin.app.workspace.getActiveFile();
+		const context = activeFile
+			? this.buildContext(activeFile)
+			: { currentDate: todayTehran(), fileDate: null, fileName: "", baseDate: "" as TDateFormat };
+
+		return Array.from(this.getPlaceholderMap(context).keys());
+	}
+
 	public async getTemplateContent(templatePath: string, targetFile: TFile): Promise<string | null> {
-		if (!templatePath || templatePath.trim() === "") {
-			return null;
-		}
+		if (!templatePath?.trim()) return null;
 
 		const templateFile = this.plugin.app.vault.getAbstractFileByPath(templatePath);
-
-		if (!templateFile || !(templateFile instanceof TFile)) {
-			return null;
-		}
+		if (!templateFile || !(templateFile instanceof TFile)) return null;
 
 		try {
 			const templateContent = await this.plugin.app.vault.read(templateFile);
-			const processedContent = await this.processPlaceholders(targetFile, templateContent);
-			return processedContent;
-		} catch (error) {
+			return this.processPlaceholders(targetFile, templateContent);
+		} catch {
 			return null;
 		}
 	}
@@ -91,16 +105,13 @@ export default class Placeholder {
 		const context = this.buildContext(file);
 		if (!context) return content;
 
-		const placeholders = this.getPlaceholderMap(context);
-
 		let result = content;
-		for (const [placeholder, value] of placeholders.entries()) {
-			if (!content.includes(placeholder)) continue;
+		for (const [placeholder, value] of this.getPlaceholderMap(context).entries()) {
+			if (!result.includes(placeholder)) continue;
 
 			const resolvedValue = typeof value === "function" ? await value() : value;
 			if (resolvedValue != null) {
-				const pattern = this.getOrCreatePattern(placeholder);
-				result = result.replace(pattern, resolvedValue);
+				result = result.replace(this.getOrCreatePattern(placeholder), resolvedValue);
 			}
 		}
 
@@ -111,11 +122,9 @@ export default class Placeholder {
 		const fileName = file.basename;
 		const baseDate = this.plugin.settings.dateFormat;
 
-		let fileDate = dashToDate(fileName, baseDate);
-
 		return {
 			currentDate: todayTehran(),
-			fileDate,
+			fileDate: dashToDate(fileName, baseDate),
 			fileName,
 			baseDate,
 		};
@@ -127,6 +136,9 @@ export default class Placeholder {
 		fileDate,
 		baseDate,
 	}: TBuildContext): Map<string, unknown> {
+		const fromFile = <T>(fn: (d: Date) => T): T | null => (fileDate ? fn(fileDate) : null);
+		const fromFileOrToday = <T>(fn: (d: Date) => T): T => fn(fileDate ?? currentDate);
+
 		return new Map<string, unknown>([
 			["{{تاریخ شمسی جاری}}", dateToDash(currentDate, "jalali")],
 			["{{تاریخ میلادی جاری}}", dateToDash(currentDate, "gregorian")],
@@ -139,52 +151,37 @@ export default class Placeholder {
 			["{{روز ماه جاری}}", dateToDayOfMonth(currentDate)],
 			["{{فصل جاری}}", dateToSeasonDash(currentDate)],
 			["{{مناسبت جاری}}", eventsToString(dateToEvents(currentDate, this.plugin.settings))],
-			["{{روز ماه یادداشت}}", fileDate ? dateToDayOfMonth(fileDate) : null],
-			["{{تاریخ شمسی یادداشت}}", fileDate ? dateToDash(fileDate, "jalali") : null],
-			["{{تاریخ میلادی یادداشت}}", fileDate ? dateToDash(fileDate, "gregorian") : null],
-			["{{تاریخ قمری یادداشت}}", fileDate ? dateToDash(fileDate, "hijri") : null],
-			["{{روز هفته یادداشت}}", fileDate ? dateToWeekdayName(fileDate) : null],
-			["{{سال یادداشت}}", fileDate ? dateToJYearDash(fileDate) : extractYearFormat(fileName)],
-			[
-				"{{روزهای گذشته سال}}",
-				fileDate ? dateToDaysPassedJYear(fileDate) : dateToDaysPassedJYear(currentDate),
-			],
-			[
-				"{{روزهای باقیمانده سال}}",
-				fileDate ? dateToDaysRemainingJYear(fileDate) : dateToDaysRemainingJYear(currentDate),
-			],
-			[
-				"{{روزهای گذشته فصل}}",
-				fileDate ? dateToDaysPassedSeason(fileDate) : dateToDaysPassedSeason(currentDate),
-			],
-			[
-				"{{روزهای باقیمانده فصل}}",
-				fileDate ? dateToDaysRemainingSeason(fileDate) : dateToDaysRemainingSeason(currentDate),
-			],
-			[
-				"{{روزهای گذشته ماه}}",
-				fileDate ? dateToDaysPassedJMonth(fileDate) : dateToDaysPassedJMonth(currentDate),
-			],
-			[
-				"{{روزهای باقیمانده ماه}}",
-				fileDate ? dateToDaysRemainingJMonth(fileDate) : dateToDaysRemainingJMonth(currentDate),
-			],
-			["{{اول سال}}", dashToStartDayOfYearDash(fileName, baseDate)],
-			["{{آخر سال}}", dashToEndDayOfYearDash(fileName, baseDate)],
 			["{{سال جاری}}", dateToJYearDash(currentDate)],
-			["{{هفته یادداشت}}", dashToJWeekDash(fileName, baseDate)],
-			["{{اول هفته}}", dashToStartDayOfWeekDash(fileName, baseDate)],
-			["{{آخر هفته}}", dashToEndDayOfWeekDash(fileName, baseDate)],
+
+			["{{روز ماه یادداشت}}", fromFile(dateToDayOfMonth)],
+			["{{تاریخ شمسی یادداشت}}", fromFile((d) => dateToDash(d, "jalali"))],
+			["{{تاریخ میلادی یادداشت}}", fromFile((d) => dateToDash(d, "gregorian"))],
+			["{{تاریخ قمری یادداشت}}", fromFile((d) => dateToDash(d, "hijri"))],
+			["{{روز هفته یادداشت}}", fromFile(dateToWeekdayName)],
+			["{{سال یادداشت}}", fileDate ? dateToJYearDash(fileDate) : extractYearFormat(fileName)],
 			[
 				"{{مناسبت یادداشت}}",
 				eventsToString(dashToEvents(fileName, baseDate, this.plugin.settings)),
 			],
 			["{{نام ماه یادداشت}}", dashToJMonthName(fileName, baseDate)],
 			["{{ماه یادداشت}}", dashToJMonthDash(fileName, baseDate)],
-			["{{اول ماه}}", dashToStartDayOfJMonthDash(fileName, baseDate)],
-			["{{آخر ماه}}", dashToEndDayOfJMonthDash(fileName, baseDate)],
 			["{{نام فصل یادداشت}}", dashToSeasonName(fileName, baseDate)],
 			["{{فصل یادداشت}}", dashToSeasonDash(fileName, baseDate)],
+			["{{هفته یادداشت}}", dashToJWeekDash(fileName, baseDate)],
+
+			["{{روزهای گذشته سال}}", fromFileOrToday(dateToDaysPassedJYear)],
+			["{{روزهای باقیمانده سال}}", fromFileOrToday(dateToDaysRemainingJYear)],
+			["{{روزهای گذشته فصل}}", fromFileOrToday(dateToDaysPassedSeason)],
+			["{{روزهای باقیمانده فصل}}", fromFileOrToday(dateToDaysRemainingSeason)],
+			["{{روزهای گذشته ماه}}", fromFileOrToday(dateToDaysPassedJMonth)],
+			["{{روزهای باقیمانده ماه}}", fromFileOrToday(dateToDaysRemainingJMonth)],
+
+			["{{اول سال}}", dashToStartDayOfYearDash(fileName, baseDate)],
+			["{{آخر سال}}", dashToEndDayOfYearDash(fileName, baseDate)],
+			["{{اول هفته}}", dashToStartDayOfWeekDash(fileName, baseDate)],
+			["{{آخر هفته}}", dashToEndDayOfWeekDash(fileName, baseDate)],
+			["{{اول ماه}}", dashToStartDayOfJMonthDash(fileName, baseDate)],
+			["{{آخر ماه}}", dashToEndDayOfJMonthDash(fileName, baseDate)],
 			["{{اول فصل}}", dashToStartDayOfSeasonDash(fileName, baseDate)],
 			["{{آخر فصل}}", dashToEndDayOfSeasonDash(fileName, baseDate)],
 		]);

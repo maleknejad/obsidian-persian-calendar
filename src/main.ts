@@ -13,6 +13,7 @@ import { DEFAULT_SETTING } from "./constants";
 import { dateToJalali, todayTehran } from "./utils/dateUtils";
 import type { TSetting } from "./types";
 import RTLNotice from "./components/RTLNotice";
+import Suggestion from "./services/Suggestion";
 
 export default class PersianCalendarPlugin extends Plugin {
 	// Core properties
@@ -59,7 +60,9 @@ export default class PersianCalendarPlugin extends Plugin {
 
 		// Register editor suggester
 		this.dateSuggester = new DateSuggester(this);
-		this.registerEditorSuggest(this.dateSuggester);
+		this.registerEditorSuggest(
+			new Suggestion(this.app, [this.dateSuggester.toProvider(), this.placeholder.toProvider()]),
+		);
 
 		// Register events
 		this.eventManager.registerEvents();

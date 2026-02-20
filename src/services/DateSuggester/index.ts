@@ -1,11 +1,3 @@
-import {
-	EditorSuggest,
-	Editor,
-	MarkdownView,
-	type EditorPosition,
-	type EditorSuggestTriggerInfo,
-	type EditorSuggestContext,
-} from "obsidian";
 import PersianCalendarPlugin from "src/main";
 import { todayTehran } from "src/utils/dateUtils";
 import {
@@ -15,215 +7,103 @@ import {
 	dateToJYearDash,
 	dateToDash,
 } from "src/utils/dashUtils";
-import { WEEKDAYS_NAME } from "src/constants";
-import type { TDateFormat, TLocal } from "src/types";
+import { DATE_SUGGESTER, WEEKDAYS_NAME } from "src/constants";
+import type { TDateFormat, TLocal, TSuggestProvider } from "src/types";
 
-export default class DateSuggester extends EditorSuggest<string> {
+export default class DateSuggester {
 	plugin: PersianCalendarPlugin;
 	dateFormat: Omit<TDateFormat, "hijri">;
 
 	constructor(plugin: PersianCalendarPlugin) {
-		super(plugin.app);
 		this.plugin = plugin;
 		this.dateFormat = plugin.settings.dateFormat;
 	}
 
-	onTrigger(cursor: EditorPosition, editor: Editor): EditorSuggestTriggerInfo | null {
-		const line = editor.getLine(cursor.line);
-		const atIndex = line.lastIndexOf("@", cursor.ch);
-		if (atIndex !== -1 && atIndex < cursor.ch) {
-			return {
-				start: { line: cursor.line, ch: atIndex },
-				end: cursor,
-				query: line.substring(atIndex + 1, cursor.ch),
-			};
-		}
-		return null;
+	private makeLink(dash: string | null, label: string): string {
+		if (dash == null) return label;
+		return `[[${dash}|${label}]]`;
 	}
 
-	getSuggestions(context: EditorSuggestContext): string[] | Promise<string[]> {
-		const query = context.query.toLowerCase();
-		const suggestions = [
-			"امروز",
-			"فردا",
-			"دیروز",
-			"پریروز",
-			"پس‌فردا",
-			"شنبه",
-			"شنبه بعد",
-			"شنبه قبل",
-			"یکشنبه",
-			"یکشنبه بعد",
-			"یکشنبه قبل",
-			"دوشنبه",
-			"دوشنبه بعد",
-			"دوشنبه قبل",
-			"سه‌شنبه",
-			"سه‌شنبه بعد",
-			"سه‌شنبه قبل",
-			"چهارشنبه",
-			"چهارشنبه بعد",
-			"چهارشنبه قبل",
-			"پنج‌شنبه",
-			"پنج‌شنبه بعد",
-			"پنج‌شنبه قبل",
-			"جمعه",
-			"جمعه بعد",
-			"جمعه قبل",
-			"این هفته",
-			"هفته قبل",
-			"هفته بعد",
-			"این ماه",
-			"ماه قبل",
-			"ماه بعد",
-			"این فصل",
-			"فصل قبل",
-			"فصل بعد",
-			"امسال",
-			"سال قبل",
-			"سال بعد",
-		];
-		return suggestions.filter((suggestion) => suggestion.startsWith(query));
+	private dateToDashByFormat(date: Date) {
+		return dateToDash(date, this.dateFormat === "gregorian" ? "gregorian" : "jalali");
 	}
 
-	renderSuggestion(value: string, el: HTMLElement) {
-		const suggestionSpan = el.createSpan();
-		suggestionSpan.textContent = value.charAt(0).toUpperCase() + value.slice(1);
+	private adjustedDate(base: Date, days = 0, months = 0, years = 0): Date {
+		const d = new Date(base);
+		if (days) d.setDate(d.getDate() + days);
+		if (months) d.setMonth(d.getMonth() + months);
+		if (years) d.setFullYear(d.getFullYear() + years);
+		return d;
 	}
 
-	getFormattedDateLink(keyword: string, date: Date, local: TLocal = "fa") {
+	getFormattedDateLink(keyword: string, date: Date, local: TLocal = "fa"): string {
 		const now = todayTehran();
+		const ERROR_LINK = "تاریخ شناسایی نشد";
 
 		const weekdaysName = WEEKDAYS_NAME[local];
-
 		const regex = /(دوشنبه|یکشنبه|سه‌شنبه|چهارشنبه|پنج‌شنبه|شنبه|جمعه)( بعد| قبل)?/;
 		const match = keyword.match(regex);
 
 		if (match) {
-			const weekdayName = match[1];
-			const specifier = match[2] || "";
-
+			const [, weekdayName, specifier = ""] = match;
 			const weekdayEntry = Object.entries(weekdaysName).find(([, name]) => name === weekdayName);
+			if (!weekdayEntry) return ERROR_LINK;
 
-			if (!weekdayEntry) {
-				return "[تاریخ شناسایی نشد! برای مشاهده راهنما کلیک کنید](https://github.com/maleknejad/obsidian-persian-calendar)";
-			}
+			const weekdayIndex = Number(weekdayEntry[0]);
+			const todayIndex = now.getDay() === 6 ? 1 : now.getDay() + 2;
+			const daysOffset = (weekdayIndex - todayIndex + 7) % 7;
+			const extraWeeks = specifier.includes("بعد") ? 7 : specifier.includes("قبل") ? -7 : 0;
 
-			const weekdayIndex = Number(weekdayEntry[0]); // 1..7
-			const currentDayOfWeek = now.getDay(); // 0..6 (Sun..Sat)
+			now.setDate(now.getDate() + daysOffset + extraWeeks);
 
-			const todayIndex = currentDayOfWeek === 6 ? 1 : currentDayOfWeek + 2;
-
-			const daysFromNowToWeekday = (weekdayIndex - todayIndex + 7) % 7;
-
-			if (specifier.includes("بعد")) {
-				now.setDate(now.getDate() + daysFromNowToWeekday + 7);
-			} else if (specifier.includes("قبل")) {
-				now.setDate(now.getDate() + daysFromNowToWeekday - 7);
-			} else {
-				now.setDate(now.getDate() + daysFromNowToWeekday);
-			}
-
-			const gDateDash = dateToDash(now, "gregorian");
-
-			const formatSpecifier = specifier ? ` ${specifier.trim()}` : "";
-
-			if (this.dateFormat === "gregorian") {
-				return `[[${gDateDash}|${weekdayName}${formatSpecifier}]]`;
-			}
-
-			return `[[${dateToDash(now, "jalali")}|${weekdayName}${formatSpecifier}]]`;
+			const label = weekdayName + (specifier ? ` ${specifier.trim()}` : "");
+			return this.makeLink(this.dateToDashByFormat(now), label);
 		}
 
-		switch (keyword) {
-			default:
-				return "[تاریخ شناسایی نشد! برای مشاهده راهنما کلیک کنید](https://github.com/maleknejad/obsidian-persian-calendar) ";
-
-			case "امروز":
-			case "فردا":
-			case "دیروز":
-			case "پریروز":
-			case "پس‌فردا":
-				const dateAdjustment = {
-					امروز: 0,
-					فردا: 1,
-					دیروز: -1,
-					پریروز: -2,
-					پس‌فردا: 2,
-				}[keyword];
-
-				date.setDate(date.getDate() + dateAdjustment);
-				if (this.dateFormat === "gregorian") {
-					return `[[${dateToDash(date, "gregorian")}|${keyword}]]`;
-				}
-
-				return `[[${dateToDash(date, "jalali")}|${keyword}]]`;
-
-			case "این هفته":
-				return `[[${dateToJWeekDash(todayTehran())}|${keyword}]]`;
-
-			case "هفته قبل":
-				return `[[${dateToJWeekDash(
-					new Date(todayTehran().setDate(todayTehran().getDate() - 7)),
-				)}|${keyword}]]`;
-
-			case "هفته بعد":
-				return `[[${dateToJWeekDash(
-					new Date(todayTehran().setDate(todayTehran().getDate() + 7)),
-				)}|${keyword}]]`;
-
-			case "این ماه":
-				return `[[${dateToJMonthDash(todayTehran())}|${keyword}]]`;
-
-			case "ماه قبل":
-				return `[[${dateToJMonthDash(
-					new Date(todayTehran().setMonth(todayTehran().getMonth() - 1)),
-				)}|${keyword}]]`;
-
-			case "ماه بعد":
-				return `[[${dateToJMonthDash(
-					new Date(todayTehran().setMonth(todayTehran().getMonth() + 1)),
-				)}|${keyword}]]`;
-
-			case "این فصل":
-				return `[[${dateToSeasonDash(todayTehran())}|${keyword}]]`;
-
-			case "فصل قبل":
-				return `[[${dateToSeasonDash(
-					new Date(todayTehran().setMonth(todayTehran().getMonth() - 3)),
-				)}|${keyword}]]`;
-
-			case "فصل بعد":
-				return `[[${dateToSeasonDash(
-					new Date(todayTehran().setMonth(todayTehran().getMonth() + 3)),
-				)}|${keyword}]]`;
-
-			case "امسال":
-				return `[[${dateToJYearDash(todayTehran())}|${keyword}]]`;
-
-			case "سال قبل":
-				return `[[${dateToJYearDash(
-					new Date(todayTehran().setFullYear(todayTehran().getFullYear() - 1)),
-				)}|${keyword}]]`;
-
-			case "سال بعد":
-				return `[[${dateToJYearDash(
-					new Date(todayTehran().setFullYear(todayTehran().getFullYear() + 1)),
-				)}|${keyword}]]`;
+		const dayOffsets: Record<string, number> = {
+			امروز: 0,
+			فردا: 1,
+			دیروز: -1,
+			پریروز: -2,
+			پس‌فردا: 2,
+		};
+		if (keyword in dayOffsets) {
+			return this.makeLink(
+				this.dateToDashByFormat(this.adjustedDate(date, dayOffsets[keyword])),
+				keyword,
+			);
 		}
+
+		type PeriodConfig = { fn: (d: Date) => string; days?: number; months?: number; years?: number };
+		const periodMap: Record<string, PeriodConfig> = {
+			"این هفته": { fn: dateToJWeekDash },
+			"هفته قبل": { fn: dateToJWeekDash, days: -7 },
+			"هفته بعد": { fn: dateToJWeekDash, days: 7 },
+			"این ماه": { fn: dateToJMonthDash },
+			"ماه قبل": { fn: dateToJMonthDash, months: -1 },
+			"ماه بعد": { fn: dateToJMonthDash, months: 1 },
+			"این فصل": { fn: dateToSeasonDash },
+			"فصل قبل": { fn: dateToSeasonDash, months: -3 },
+			"فصل بعد": { fn: dateToSeasonDash, months: 3 },
+			امسال: { fn: dateToJYearDash },
+			"سال قبل": { fn: dateToJYearDash, years: -1 },
+			"سال بعد": { fn: dateToJYearDash, years: 1 },
+		};
+
+		const period = periodMap[keyword];
+		if (period) {
+			const { fn, days, months, years } = period;
+			return this.makeLink(fn(this.adjustedDate(now, days, months, years)), keyword);
+		}
+
+		return ERROR_LINK;
 	}
 
-	selectSuggestion(value: string, evt: MouseEvent | KeyboardEvent) {
-		const now = todayTehran();
-		const linkText = this.getFormattedDateLink(value, now); // Ensures linkText is always a string
-
-		const activeView = this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
-		if (activeView) {
-			const editor = activeView.editor;
-			if (this.context && this.context.start && this.context.end) {
-				editor.replaceRange(linkText, this.context.start, this.context.end);
-			}
-		}
-		this.close();
+	public toProvider(): TSuggestProvider {
+		return {
+			trigger: /@[^@\s]*$/,
+			getSuggestions: (query: string) => DATE_SUGGESTER.filter((s) => s.startsWith(query)),
+			onSelect: (value: string) => this.getFormattedDateLink(value, todayTehran()),
+		};
 	}
 }

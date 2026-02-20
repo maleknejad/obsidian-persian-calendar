@@ -2,6 +2,12 @@ import type { TReleaseNote } from "src/types";
 
 //! ترتیب مهمه - جدیدترین ورژن ابتدا قرار میگیره
 export const RELEASE_NOTES: TReleaseNote[] = [
+		{
+		version: "4.3.5",
+		changes: [
+			"",
+		],
+	},
 	{
 		version: "4.3.0",
 		changes: [
