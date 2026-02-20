@@ -7,7 +7,7 @@ import {
 	dateToJYearDash,
 	dateToDash,
 } from "src/utils/dashUtils";
-import { DATE_SUGGESTER, WEEKDAYS_NAME } from "src/constants";
+import { SMART_DATE_LINKS, WEEKDAYS_NAME } from "src/constants";
 import type { TDateFormat, TLocal, TSuggestProvider } from "src/types";
 
 export default class SmartDateLinker {
@@ -102,7 +102,7 @@ export default class SmartDateLinker {
 	public toProvider(): TSuggestProvider {
 		return {
 			trigger: /@[^@\s]*$/,
-			getSuggestions: (query: string) => DATE_SUGGESTER.filter((s) => s.startsWith(query)),
+			getSuggestions: (query: string) => SMART_DATE_LINKS.filter((s) => s.startsWith(query)),
 			onSelect: (value: string) => this.getFormattedDateLink(value, todayTehran()),
 		};
 	}

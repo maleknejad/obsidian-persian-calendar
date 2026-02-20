@@ -129,7 +129,7 @@ export const WEEKDAYS_NAME: Record<TLocal, Record<number, string>> = {
 	},
 } as const;
 
-export const DATE_SUGGESTER = [
+export const SMART_DATE_LINKS = [
 	"امروز",
 	"فردا",
 	"دیروز",
