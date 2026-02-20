@@ -1,7 +1,7 @@
 //? Syncs the plugin version using "manifest.json" as the source of truth.
 //? Updates package.json and versions.json accordingly.
 
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import path from "node:path";
 
 const root = process.cwd();
@@ -10,39 +10,41 @@ const manifestPath = path.join(root, "manifest.json");
 const versionsPath = path.join(root, "versions.json");
 const packagePath = path.join(root, "package.json");
 
-const manifestRaw = readFileSync(manifestPath, "utf8");
-const manifest = JSON.parse(manifestRaw);
-
-const targetVersion = manifest.version;
-const minAppVersion = manifest.minAppVersion;
-
-if (!targetVersion) {
-	throw new Error("manifest.json is missing 'version' field.");
+function readJson(file) {
+	if (!existsSync(file)) {
+		throw new Error(`Missing file: ${file}`);
+	}
+	return JSON.parse(readFileSync(file, "utf8"));
 }
-if (!minAppVersion) {
-	throw new Error("manifest.json is missing 'minAppVersion' field.");
+
+function writeJson(file, data, indent = 2) {
+	writeFileSync(file, JSON.stringify(data, null, indent) + "\n", "utf8");
 }
+
+// manifest.json
+const manifest = readJson(manifestPath);
+
+const { version: targetVersion, minAppVersion } = manifest;
+
+if (!targetVersion) throw new Error("manifest.json is missing 'version' field.");
+if (!minAppVersion) throw new Error("manifest.json is missing 'minAppVersion' field.");
+
+console.log(`Target version: ${targetVersion}`);
+console.log(`Min app version: ${minAppVersion}`);
 
 // package.json
-const packageRaw = readFileSync(packagePath, "utf8");
-const packageJson = JSON.parse(packageRaw);
-
+const packageJson = readJson(packagePath);
 if (packageJson.version !== targetVersion) {
 	packageJson.version = targetVersion;
-	writeFileSync(packagePath, JSON.stringify(packageJson, null, 2) + "\n", "utf8");
-	console.log(`package.json version → ${targetVersion}`);
+	writeJson(packagePath, packageJson, 2);
+	console.log("package.json synced");
 } else {
-	console.log("package.json is already in sync with manifest.");
+	console.log("package.json already synced");
 }
 
 // versions.json
-const versionsRaw = readFileSync(versionsPath, "utf8");
-const versions = JSON.parse(versionsRaw);
-
-if (versions[targetVersion] !== minAppVersion) {
-	versions[targetVersion] = minAppVersion;
-	writeFileSync(versionsPath, JSON.stringify(versions, null, "\t") + "\n", "utf8");
-	console.log(`versions.json → ${targetVersion}: ${minAppVersion}`);
-} else {
-	console.log("versions.json is already up to date for this version.");
-}
+const newVersions = {
+	[targetVersion]: minAppVersion,
+};
+writeJson(versionsPath, newVersions, "\t");
+console.log("versions.json replaced with latest version");
