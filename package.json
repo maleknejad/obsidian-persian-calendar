@@ -1,6 +1,6 @@
 {
   "name": "obsidian-persian-calendar",
-  "version": "4.3.5",
+  "version": "4.4.0",
   "description": "This tool lets you see events, add and organize notes from daily to yearly on the Persian calendar, use templates with placeholders, and works with all Obsidian daily plugins.",
   "main": "main.js",
   "scripts": {
