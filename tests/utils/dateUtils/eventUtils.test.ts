@@ -1,7 +1,7 @@
 // TODO: improve this
 
 import { describe, it, expect, beforeEach } from "vitest";
-import { dateToEvents, dashToEvents, checkHoliday } from "src/utils/dateUtils/eventUtils";
+import { dateToEvents, dashToEvents, checkHoliday } from "src/utils/eventUtils";
 import type { TEventObject, TShowEvents } from "src/types";
 
 describe("eventUtils", () => {

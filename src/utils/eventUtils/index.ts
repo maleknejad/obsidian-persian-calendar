@@ -6,7 +6,7 @@ import type {
 	TShowEvents,
 	TEventObjectWithoutDate,
 } from "src/types";
-import { dateToGregorian, dateToHijri, dateToJalali } from "..";
+import { dateToGregorian, dateToHijri, dateToJalali } from "src/utils/dateUtils";
 import { dashToDate } from "src/utils/dashUtils";
 
 const JALALI_EVENT_MAP: TMonthMap = buildEventMap(JALALI_EVENTS);
@@ -33,6 +33,7 @@ function buildEventMap(events: TEventObject[]): TMonthMap {
 	return monthMap;
 }
 
+// (Date) => Events[]
 export function dateToEvents(date: Date, option: TShowEvents = {}): TEventObjectWithoutDate[] {
 	const {
 		showIRGovernmentEvents = false,
@@ -69,6 +70,7 @@ export function dateToEvents(date: Date, option: TShowEvents = {}): TEventObject
 	return events.map(({ month, day, ...rest }: TEventObject) => rest);
 }
 
+// (Date) => (is holiday?)true|false
 export function checkHoliday(date: Date): boolean {
 	// برای چک کردن تعطیلی، لازمه همه‌اشون بررسی بشه
 	const option = {
@@ -82,6 +84,7 @@ export function checkHoliday(date: Date): boolean {
 	return events.some((event) => event.holiday === true);
 }
 
+// ("jy-jm-jd"|"jyjmjd"|"gy-gm-gd"|"gygmgd") => Events[]
 export function dashToEvents(
 	dashDate: string,
 	dateFormat: TDateFormat,
@@ -93,6 +96,7 @@ export function dashToEvents(
 	return dateToEvents(date, option);
 }
 
+// (Events[]) => String(Events[])
 export function eventsToString(events: TEventObjectWithoutDate[] | null) {
 	if (!events) {
 		return "هیچ مناسبتی برای این روز ثبت نشده است.";

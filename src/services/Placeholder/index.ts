@@ -4,11 +4,8 @@ import {
 	dateToWeekdayName,
 	dateToDaysPassedJYear,
 	dateToDaysRemainingJYear,
-	dashToEvents,
-	eventsToString,
 	dateToMonthName,
 	dateToSeasonName,
-	dateToEvents,
 	dateToDayOfMonth,
 	dateToDaysPassedSeason,
 	dateToDaysRemainingSeason,
@@ -16,6 +13,11 @@ import {
 	dateToDaysRemainingJMonth,
 	todayTehran,
 } from "src/utils/dateUtils";
+import {
+	dashToEvents,
+	eventsToString,
+	dateToEvents,
+} from "src/utils/eventUtils";
 import {
 	dateToJWeekDash,
 	dateToJMonthDash,

@@ -45,9 +45,3 @@ export {
 	jalaliToHijri, // (jy, jm, jd) => {hy, hm, hd}
 	dateToHijri, // (Date) => {hy, hm, hd}
 } from "./hijriUtils";
-export {
-	dateToEvents, // (Date) => Events[]
-	dashToEvents, // ("jy-jm-jd"|"jyjmjd"|"gy-gm-gd"|"gygmgd") => Events[]
-	checkHoliday, // (Date) => (is holiday?)true|false
-	eventsToString, // (Events[]) => String(Events[])
-} from "./eventUtils";

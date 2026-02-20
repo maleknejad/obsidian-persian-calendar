@@ -4,8 +4,8 @@ import {
 	jalaliToDate,
 	jalaliToGregorian,
 	jalaliToHijri,
-	checkHoliday,
 } from "src/utils/dateUtils";
+import { checkHoliday } from "src/utils/eventUtils";
 import type { TSetting, TMonthGridCell } from "src/types";
 
 export default class GridService {
