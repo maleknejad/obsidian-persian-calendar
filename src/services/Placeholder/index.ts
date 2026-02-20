@@ -49,17 +49,6 @@ export default class Placeholder {
 		this.plugin = plugin;
 	}
 
-	public toProvider(): TSuggestProvider {
-		return {
-			trigger: /\{\{[^}]*$/,
-			getSuggestions: (query: string) =>
-				this.getAllPlaceholderKeys().filter((key) =>
-					key.replace(/^\{\{|\}\}$/g, "").includes(query),
-				),
-			onSelect: (value: string) => value,
-		};
-	}
-
 	public getAllPlaceholderKeys(file?: TFile): string[] {
 		const activeFile = file ?? this.plugin.app.workspace.getActiveFile();
 		const context = activeFile
@@ -185,5 +174,16 @@ export default class Placeholder {
 			["{{اول فصل}}", dashToStartDayOfSeasonDash(fileName, baseDate)],
 			["{{آخر فصل}}", dashToEndDayOfSeasonDash(fileName, baseDate)],
 		]);
+	}
+
+	public toProvider(): TSuggestProvider {
+		return {
+			trigger: /\{\{[^}]*$/,
+			getSuggestions: (query: string) =>
+				this.getAllPlaceholderKeys().filter((key) =>
+					key.replace(/^\{\{|\}\}$/g, "").includes(query),
+				),
+			onSelect: (value: string) => value,
+		};
 	}
 }
