@@ -29,7 +29,7 @@ function stripImports(css) {
 function resolveImportPath(parentFilePath, importPath) {
 	if (!importPath.startsWith(".")) {
 		throw new Error(
-			`Only relative @import paths are supported (in ${path.relative(
+			`✖ Only relative @import paths are supported (in ${path.relative(
 				projectRoot,
 				parentFilePath,
 			)}, got: ${importPath})`,
@@ -41,7 +41,7 @@ function resolveImportPath(parentFilePath, importPath) {
 
 	if (relativePathFromRoot.startsWith("..") || path.isAbsolute(relativePathFromRoot)) {
 		throw new Error(
-			`@import path must stay within project root (in ${path.relative(
+			`✖ @import path must stay within project root (in ${path.relative(
 				projectRoot,
 				parentFilePath,
 			)}, got: ${importPath})`,
@@ -82,7 +82,7 @@ async function build() {
 	const directImports = extractImportPaths(entryContent);
 
 	if (directImports.length === 0) {
-		throw new Error(`No @import statements found in ${path.relative(projectRoot, entryPath)}`);
+		throw new Error(`✖ No @import statements found in ${path.relative(projectRoot, entryPath)}`);
 	}
 
 	const seenFiles = new Set();
@@ -131,14 +131,14 @@ async function build() {
 		await fs.writeFile(outputPath, finalCSS, "utf8");
 	}
 
-	console.log('Built minify "styles.css" => successfully');
+	console.log('✔ Built minify "styles.css"');
 }
 
 function startWatch() {
 	const stylesDir = path.join(projectRoot, "src", "styles");
 
 	console.log(
-		`Watching "${path.relative(projectRoot, stylesDir)}" (and all subdirectories) for CSS changes... (press Ctrl+C to stop)`,
+		`✔ Watching "${path.relative(projectRoot, stylesDir)}" (and all subdirectories) for CSS changes... (press Ctrl+C to stop)`,
 	);
 
 	let timer = null;
@@ -147,11 +147,11 @@ function startWatch() {
 		if (timer) clearTimeout(timer);
 
 		timer = setTimeout(async () => {
-			console.log("Change detected in CSS files, rebuilding...");
+			console.log("✔ Change detected in CSS files, rebuilding...");
 			try {
 				await build();
 			} catch (err) {
-				console.error("Build failed in watch mode:", err);
+				console.error("✖ Build failed in watch mode:", err);
 			}
 		}, 150);
 	};
@@ -174,7 +174,7 @@ function startWatch() {
 			triggerBuild();
 		})
 		.on("error", (error) => {
-			console.error("Watcher error:", error);
+			console.error("✖ Watcher error:", error);
 		});
 }
 

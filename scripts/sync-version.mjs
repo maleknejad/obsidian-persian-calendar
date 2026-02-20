@@ -12,7 +12,7 @@ const packagePath = path.join(root, "package.json");
 
 function readJson(file) {
 	if (!existsSync(file)) {
-		throw new Error(`Missing file: ${file}`);
+		throw new Error(`✖ Missing file: ${file}`);
 	}
 	return JSON.parse(readFileSync(file, "utf8"));
 }
@@ -26,20 +26,20 @@ const manifest = readJson(manifestPath);
 
 const { version: targetVersion, minAppVersion } = manifest;
 
-if (!targetVersion) throw new Error("manifest.json is missing 'version' field.");
-if (!minAppVersion) throw new Error("manifest.json is missing 'minAppVersion' field.");
+if (!targetVersion) throw new Error("✖ manifest.json is missing 'version' field.");
+if (!minAppVersion) throw new Error("✖ manifest.json is missing 'minAppVersion' field.");
 
-console.log(`Target version: ${targetVersion}`);
-console.log(`Min app version: ${minAppVersion}`);
+console.log(`✔ Target version: ${targetVersion}`);
+console.log(`✔ Min app version: ${minAppVersion}`);
 
 // package.json
 const packageJson = readJson(packagePath);
 if (packageJson.version !== targetVersion) {
 	packageJson.version = targetVersion;
 	writeJson(packagePath, packageJson, 2);
-	console.log("package.json synced");
+	console.log("✔ package.json synced");
 } else {
-	console.log("package.json already synced");
+	console.log("✔ package.json already synced");
 }
 
 // versions.json
@@ -47,4 +47,4 @@ const newVersions = {
 	[targetVersion]: minAppVersion,
 };
 writeJson(versionsPath, newVersions, "\t");
-console.log("versions.json replaced with latest version");
+console.log("✔ versions.json replaced with latest version");
