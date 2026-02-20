@@ -1,4 +1,4 @@
-export { default as NoteSuggester } from "./NoteSuggester";
+export { default as SmartDateLinker } from "./SmartDateLinker";
 export { default as NoteService } from "./NoteService";
 export { default as Placeholder } from "./Placeholder";
 export { default as VersionChecker } from "./VersionChecker";

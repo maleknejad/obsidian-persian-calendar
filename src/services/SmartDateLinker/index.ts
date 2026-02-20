@@ -10,7 +10,7 @@ import {
 import { DATE_SUGGESTER, WEEKDAYS_NAME } from "src/constants";
 import type { TDateFormat, TLocal, TSuggestProvider } from "src/types";
 
-export default class NoteSuggester {
+export default class SmartDateLinker {
 	plugin: PersianCalendarPlugin;
 	dateFormat: Omit<TDateFormat, "hijri">;
 

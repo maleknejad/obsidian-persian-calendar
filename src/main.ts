@@ -1,6 +1,6 @@
 import { Plugin, App, type PluginManifest, WorkspaceLeaf } from "obsidian";
 import {
-	NoteSuggester,
+	SmartDateLinker,
 	Placeholder,
 	NoteService,
 	CommandRegistry,
@@ -20,7 +20,7 @@ export default class PersianCalendarPlugin extends Plugin {
 	settings: TSetting = DEFAULT_SETTING;
 	noteService!: NoteService;
 	placeholder: Placeholder;
-	dateSuggester?: NoteSuggester;
+	dateSuggester?: SmartDateLinker;
 
 	// Managers
 	commandRegistry!: CommandRegistry;
@@ -59,7 +59,7 @@ export default class PersianCalendarPlugin extends Plugin {
 		super.onload();
 
 		// Register editor suggester
-		this.dateSuggester = new NoteSuggester(this);
+		this.dateSuggester = new SmartDateLinker(this);
 		this.registerEditorSuggest(
 			new Suggestion(this.app, [this.dateSuggester.toProvider(), this.placeholder.toProvider()]),
 		);

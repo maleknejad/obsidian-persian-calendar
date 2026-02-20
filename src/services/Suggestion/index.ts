@@ -20,11 +20,10 @@ export default class Suggestion extends EditorSuggest<string> {
 	}
 
 	renderSuggestion(value: string, el: HTMLElement): void {
-		const container = el.createDiv({ cls: "persian-calendar__suggest" });
+		const container = el.createDiv();
 
 		container.createDiv({
 			text: value,
-			cls: "persian-calendar__suggest-title",
 		});
 	}
 
