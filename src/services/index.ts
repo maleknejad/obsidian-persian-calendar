@@ -1,4 +1,4 @@
-export { default as DateSuggester } from "./DateSuggester";
+export { default as NoteSuggester } from "./NoteSuggester";
 export { default as NoteService } from "./NoteService";
 export { default as Placeholder } from "./Placeholder";
 export { default as VersionChecker } from "./VersionChecker";
