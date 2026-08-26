@@ -3,18 +3,18 @@ import type { TReleaseNote } from "src/types";
 //! ترتیب مهمه - جدیدترین ورژن ابتدا قرار میگیره
 export const RELEASE_NOTES: TReleaseNote[] = [
 	{
-		version: "4.8.5",
+		version: "4.8.6",
 		changes: {
 			fa: [
 				"برطرف کردن باگ تغییر زبان",
-				"تغییر عنوان دکمه‌ای «امروز» به «ماه جاری» برای توصیف بهتر عملکرد آن",
+				"تغییر عنوان دکمه‌ای «امروز» به «اکنون» برای توصیف بهتر عملکرد آن",
 				"نمایش بهتر خطاهای مربوط به مسیردهی پویا",
 				"برطرف کردن باگ مربوط به مسیردهی داینامیک YYYY/jQQ",
 				"بهبود پلاگین طبق پیشنهادات جدید Obsidian Scorecard",
 			],
 			en: [
 				"Fix the language-switching bug",
-				"Rename the “Today” button to “Current month” to better describe its functionality",
+				'Rename the "Today" button to "Current" to better describe its functionality',
 				"Improve the display of dynamic path resolution errors",
 				"Fix the dynamic YYYY/jQQ path resolution bug",
 				"Improve the plugin based on the latest Obsidian Scorecard recommendations",
