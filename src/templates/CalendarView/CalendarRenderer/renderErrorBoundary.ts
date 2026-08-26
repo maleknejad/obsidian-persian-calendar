@@ -1,19 +1,13 @@
+import { Notice } from "src/components";
 import { t } from "src/languages";
 import { DatePatternFormatError } from "src/utils/dateEngine";
 
-/**
- * Runs `fn`, catching any error so a failure in one render stage (e.g. the
- * body grid) doesn't take down stages that already rendered successfully
- * (e.g. the header). On failure, logs the full error for developers and
- * renders a clear, localized, user-facing explanation in `containerEl`
- * instead of leaving the calendar silently blank.
- */
 export function safeRender(containerEl: HTMLElement, label: string, fn: () => void): boolean {
 	try {
 		fn();
 		return true;
 	} catch (error) {
-		console.error(`[Persian Calendar] Failed to render ${label}:`, error);
+		Notice(`[Persian Calendar] Failed to render ${label}: ${error}`);
 		renderCalendarError(containerEl, error);
 		return false;
 	}

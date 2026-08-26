@@ -20,27 +20,9 @@ export default class NotePathBuilder {
 		return path.trim().replace(/^\/*|\/*$/g, "");
 	}
 
-	/**
-	 * Normalizes a partial date context so that every dynamic-path token can
-	 * resolve, regardless of which calendar system it belongs to.
-	 *
-	 * Callers (daily/weekly/monthly/seasonal/yearly note builders) only know
-	 * a date in one calendar system directly. Since Gregorian, Jalali, and
-	 * season are all derivable from one another, we cross-derive whichever
-	 * fields are missing so that a path like `YYYY/jQQ` (Gregorian year +
-	 * Jalali season) can be resolved even when the caller only supplied
-	 * Jalali fields (or vice versa). Without this, a mixed-calendar pattern
-	 * silently fails to format (see `DatePatternFormatError`) because the
-	 * field it needs was never populated.
-	 */
 	public buildEngineContext(parts: TDateEngineContext): TDateEngineContext {
 		let { gy, gm, gd, jy, jm, jd, week, season } = parts;
 
-		// A season pins down its first Jalali month (season 1 -> Farvardin,
-		// 2 -> Tir, 3 -> Mehr, 4 -> Dey). If only the season was supplied
-		// (e.g. building a seasonal note's path), anchor to that month/day so
-		// the cross-derivation below can still produce Gregorian and Jalali
-		// month/day fields for mixed-calendar patterns.
 		if (jm === undefined && season !== undefined) {
 			jm = 3 * (season - 1) + 1;
 			jd ??= 1;
