@@ -75,14 +75,14 @@
 	pointer-events: none;
 }
 
-.persian-calendar__datepicker .persian-calendar__go-today {
+.persian-calendar__datepicker .persian-calendar__go-current {
 	flex: 1;
 	font-size: 13px;
 	padding: 6px 16px;
 	color: var(--persian-calendar-color-primary);
 }
 
-.persian-calendar__datepicker .persian-calendar__go-today:hover {
+.persian-calendar__datepicker .persian-calendar__go-current:hover {
 	background-color: var(--persian-calendar-color-primary);
 	color: var(--persian-calendar-color-static);
 }

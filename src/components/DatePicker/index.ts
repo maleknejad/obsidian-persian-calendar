@@ -255,12 +255,12 @@ export default class DatePicker extends Modal {
 			this.setOutputMode("gregorian");
 		};
 
-		const todayButton = footer.createEl("button", {
-			text: t("today"),
-			cls: "persian-calendar__go-today",
+		const currentButton = footer.createEl("button", {
+			text: t("current"),
+			cls: "persian-calendar__go-current",
 		});
-		todayButton.onclick = () => {
-			this.goToToday();
+		currentButton.onclick = () => {
+			this.goToCurrent();
 		};
 	}
 
@@ -282,7 +282,7 @@ export default class DatePicker extends Modal {
 		this.close();
 	}
 
-	private goToToday() {
+	private goToCurrent() {
 		const today = dateToJalali(todayTehran());
 		this.currentJalali = { jy: today.jy, jm: today.jm, jd: today.jd };
 		this.render();

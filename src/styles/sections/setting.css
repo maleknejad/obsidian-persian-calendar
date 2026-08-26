@@ -6,6 +6,12 @@
 	text-align: center;
 }
 
+.persian-calendar__setting-banner .setting-item.setting-item-heading {
+	border: none;
+	justify-content: center;
+	padding: 0 0 8px;
+}
+
 .persian-calendar__setting-input--invalid {
 	border-color: var(--persian-calendar-color-red);
 }

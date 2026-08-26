@@ -1,5 +1,5 @@
 {
-	"today": "Today",
+	"current": "Current",
 	"command": {
 		"replace": "Replace Placeholders",
 		"insert": "Insert & Convert Date",
@@ -215,6 +215,15 @@
 		"success": {
 			"placeholder": "Meaningful phrases replaced successfully",
 			"refreshView": "Calendar view updated"
+		}
+	},
+	"calendarView": {
+		"renderError": {
+			"title": "The calendar could not be displayed correctly",
+			"patternBody": "One of the dynamic note-path patterns could not be resolved.",
+			"patternLabel": "Pattern:",
+			"tokenLabel": "Unresolvable pattern:",
+			"hint": "Go to the plugin settings and check your note path patterns."
 		}
 	}
 }

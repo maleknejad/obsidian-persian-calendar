@@ -12,9 +12,9 @@ node_modules
 *.map
 
 # Don't include the compiled files in the repo.
-main.js
-styles.css
-data.json
+/main.js
+/styles.css
+/data.json
 
 # Exclude macOS Finder (System Explorer) View States
 .DS_Store

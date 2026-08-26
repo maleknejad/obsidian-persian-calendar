@@ -144,9 +144,10 @@ export default class PersianCalendarPlugin extends Plugin {
 				gap: "6px",
 			});
 
-			const btn = activeDocument.createElement("button");
-			btn.className = "persian-calendar__datepicker-button persian-calendar";
-			btn.type = "button";
+			const btn = field.createEl("button", {
+				cls: "persian-calendar__datepicker-button persian-calendar",
+				attr: { type: "button" },
+			});
 
 			setIcon(btn, "calendar-heart");
 
@@ -169,8 +170,6 @@ export default class PersianCalendarPlugin extends Plugin {
 					input.dispatchEvent(new Event("change", { bubbles: true }));
 				}).open();
 			};
-
-			field.appendChild(btn);
 		});
 	}
 

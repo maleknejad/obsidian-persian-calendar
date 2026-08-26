@@ -12,19 +12,17 @@ export default class Tooltip {
 		let wrapper = activeDocument.querySelector<HTMLElement>(this.tooltipWrapperSelector);
 
 		if (!wrapper) {
-			wrapper = activeDocument.createElement("div");
-			wrapper.className = "persian-calendar persian-calendar--tooltip-wrapper";
-			activeDocument.body.appendChild(wrapper);
+			wrapper = activeDocument.body.createDiv({
+				cls: "persian-calendar persian-calendar--tooltip-wrapper",
+			});
 		}
 
 		const dir = local === "fa" ? "rtl" : "ltr";
-		wrapper.setAttribute("dir", dir);
+		wrapper.setAttr("dir", dir);
 
 		let tooltip = wrapper.querySelector<HTMLElement>(this.tooltipSelector);
 		if (!tooltip) {
-			tooltip = activeDocument.createElement("div");
-			tooltip.className = "persian-calendar__tooltip";
-			wrapper.appendChild(tooltip);
+			tooltip = wrapper.createDiv({ cls: "persian-calendar__tooltip" });
 		}
 
 		return { wrapper, tooltip };
@@ -33,18 +31,14 @@ export default class Tooltip {
 	public showTooltip(e: MouseEvent | TouchEvent, events: EventType[], local: TLocale) {
 		const { tooltip } = this.getOrCreateTooltip(local);
 
-		while (tooltip.firstChild) {
-			tooltip.removeChild(tooltip.firstChild);
-		}
+		tooltip.empty();
 
 		for (const event of events) {
-			const eventDiv = activeDocument.createElement("div");
-			eventDiv.className = "persian-calendar__tooltip-event";
+			const cls = ["persian-calendar__tooltip-event"];
 			if (event.isHolidayInIran) {
-				eventDiv.classList.add("persian-calendar__day--holiday");
+				cls.push("persian-calendar__day--holiday");
 			}
-			eventDiv.textContent = event.title[local];
-			tooltip.appendChild(eventDiv);
+			tooltip.createDiv({ cls, text: event.title[local] });
 		}
 
 		let x: number | undefined;

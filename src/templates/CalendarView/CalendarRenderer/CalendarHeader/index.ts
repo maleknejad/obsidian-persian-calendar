@@ -98,9 +98,9 @@ export default class CalendarHeaderRender {
 			this.navigation.changeMonth("prev");
 		});
 
-		const todayButton = navContainerEl.createEl("span", { cls: "persian-calendar__go-today" });
-		todayButton.textContent = t("today");
-		todayButton.addEventListener("click", () => {
+		const currentButton = navContainerEl.createEl("span", { cls: "persian-calendar__go-current" });
+		currentButton.textContent = t("current");
+		currentButton.addEventListener("click", () => {
 			void this.navigation.goToToday();
 		});
 

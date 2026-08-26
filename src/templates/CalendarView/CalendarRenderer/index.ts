@@ -5,6 +5,7 @@ import type CalendarState from "../CalendarState";
 import CalendarBodyRender from "./CalendarBody";
 import CalendarHeaderRender from "./CalendarHeader";
 import CalendarNavigation from "./CalendarNavigation";
+import { safeRender } from "./renderErrorBoundary";
 
 export default class CalendarRenderer {
 	private readonly headerRenderer: CalendarHeaderRender;
@@ -46,13 +47,23 @@ export default class CalendarRenderer {
 		containerEl.addClass("persian-calendar", "persian-calendar__calendar");
 		containerEl.setAttr("dir", "rtl");
 
-		this.headerRenderer.render(containerEl);
+		// Each stage is guarded independently: a date/path resolution error in
+		// (for example) the seasonal-notes row must not also wipe out an
+		// already-rendered header, and must never leave the view silently
+		// blank. See `safeRender` / `renderErrorBoundary`.
+		safeRender(containerEl, "header", () => {
+			this.headerRenderer.render(containerEl);
+		});
 
 		if (this.setting.showSeasonalNotes) {
-			this.bodyRenderer.renderSeasonalNotesRow(containerEl, this.setting.language);
+			safeRender(containerEl, "seasonalNotes", () => {
+				this.bodyRenderer.renderSeasonalNotesRow(containerEl, this.setting.language);
+			});
 		}
 
-		const contentDiv = containerEl.createEl("div", { cls: "persian-calendar__content" });
-		this.bodyRenderer.renderContent(contentDiv, this.setting.language);
+		safeRender(containerEl, "body", () => {
+			const contentDiv = containerEl.createEl("div", { cls: "persian-calendar__content" });
+			this.bodyRenderer.renderContent(contentDiv, this.setting.language);
+		});
 	}
 }

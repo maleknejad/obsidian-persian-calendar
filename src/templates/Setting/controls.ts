@@ -72,8 +72,8 @@ export function addDropdown<K extends StringKey>(
 		});
 
 		dropdown.setValue(controller.get(key)).onChange(async (value) => {
-			await controller.set(key, value as TSetting[K], { refresh: opts.refresh });
 			opts.onSelect?.(value);
+			await controller.set(key, value as TSetting[K], { refresh: opts.refresh });
 		});
 	});
 

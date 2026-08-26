@@ -24,7 +24,7 @@
 	opacity: 1;
 }
 
-.persian-calendar__go-today {
+.persian-calendar__go-current {
 	background-color: color-mix(in srgb, var(--persian-calendar-color-primary) 10%, transparent);
 	border: 1.5px solid var(--persian-calendar-color-primary);
 	border-radius: 10px;
@@ -37,7 +37,7 @@
 	transition-duration: var(--persian-calendar-duration);
 	transition-property: all;
 }
-.persian-calendar__go-today:hover {
+.persian-calendar__go-current:hover {
 	background-color: var(--persian-calendar-color-primary);
 	color: var(--persian-calendar-color-static);
 }

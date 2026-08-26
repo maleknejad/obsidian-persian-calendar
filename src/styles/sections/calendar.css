@@ -8,6 +8,36 @@
 	overflow: auto;
 }
 
+.persian-calendar__render-error {
+	border: 1px solid var(--persian-calendar-color-red);
+	border-radius: 8px;
+	margin: 8px 0;
+	padding: 12px;
+	text-align: start;
+}
+
+.persian-calendar__render-error-title {
+	color: var(--persian-calendar-color-red);
+	font-weight: 600;
+	margin-bottom: 4px;
+}
+
+.persian-calendar__render-error-body {
+	margin-bottom: 4px;
+}
+
+.persian-calendar__render-error-line {
+	color: var(--color-base-70);
+	font-family: var(--font-monospace);
+	font-size: var(--font-ui-smaller);
+}
+
+.persian-calendar__render-error-hint {
+	color: var(--color-base-70);
+	font-size: var(--font-ui-smaller);
+	margin-top: 6px;
+}
+
 .persian-calendar__content {
 	border-top: 1px dashed var(--persian-calendar-color-base-1);
 	grid-column-gap: var(--persian-calendar-spacing-sm);
