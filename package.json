@@ -1,72 +1,66 @@
 {
-  "name": "obsidian-persian-calendar",
-  "version": "4.8.7",
-  "description": "Persian/Jalali calendar integration featuring dynamic note paths, placeholders, API access, and event display.",
-  "license": "GPL-3.0-only",
-  "main": "main.js",
-  "author": {
-    "name": "Hossein Maleknejad",
-    "url": "http://karfekr.ir"
-  },
-  "contributors": [
-    {
-      "name": "Sina Moraddar",
-      "url": "https://github.com/sinamoraddar"
-    },
-    {
-      "name": "Muhammadhussein Ammari",
-      "url": "https://github.com/xmha97"
-    },
-    {
-      "name": "Alireza Mohammadzadeh Nedamani",
-      "url": "https://nedamani.ir"
-    }
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/karfekr/obsidian-persian-calendar.git"
-  },
-  "bugs": {
-    "url": "https://github.com/karfekr/obsidian-persian-calendar/issues"
-  },
-  "homepage": "https://github.com/karfekr/obsidian-persian-calendar#readme",
-  "keywords": [
-    "obsidian",
-    "plugin",
-    "persian",
-    "jalali",
-    "calendar"
-  ],
-  "scripts": {
-    "lint": "biome check --write .",
-    "clean": "node scripts/clean.mjs",
-    "version": "node scripts/sync-version.mjs",
-    "dev": "node esbuild.config.mjs && node scripts/build-styles.mjs --watch",
-    "build": "pnpm run clean && pnpm run build:style && node esbuild.config.mjs production && tsc -noEmit -skipLibCheck",
-    "build:style": "node scripts/build-styles.mjs",
-    "test": "vitest",
-    "prepare": "simple-git-hooks"
-  },
-  "dependencies": {
-    "@internationalized/date": "^3.12.3",
-    "persian-holidays": "^1.5.5"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "^2.5.10",
-    "@types/node": "^26.3.0",
-    "chokidar": "^5.0.0",
-    "cssnano": "^8.0.8",
-    "esbuild": "0.28.1",
-    "obsidian": "^1.13.1",
-    "postcss": "^8.5.26",
-    "simple-git-hooks": "^2.13.1",
-    "tslib": "2.8.1",
-    "typescript": "^7.0.2",
-    "vitest": "^4.1.11"
-  },
-  "packageManager": "pnpm@11.24.0+sha512.bd27e345e976dcb0be0b7a1228217b049a817e21b1f355c90dbe7dc46671895a8bc1e6d06c24554505ea93ea0b45f489a27ec1bfbc8de6a9659fca0f16fa0000",
-  "simple-git-hooks": {
-    "pre-commit": "pnpm run lint",
-    "pre-push": "pnpm run build && pnpm run test"
-  }
+	"name": "obsidian-persian-calendar",
+	"version": "4.8.7",
+	"description": "Persian/Jalali calendar integration featuring dynamic note paths, placeholders, API access, and event display.",
+	"license": "GPL-3.0-only",
+	"main": "main.js",
+	"author": {
+		"name": "Hossein Maleknejad",
+		"url": "http://karfekr.ir"
+	},
+	"contributors": [
+		{
+			"name": "Sina Moraddar",
+			"url": "https://github.com/sinamoraddar"
+		},
+		{
+			"name": "Muhammadhussein Ammari",
+			"url": "https://github.com/xmha97"
+		},
+		{
+			"name": "Alireza Mohammadzadeh Nedamani",
+			"url": "https://nedamani.ir"
+		}
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/karfekr/obsidian-persian-calendar.git"
+	},
+	"bugs": {
+		"url": "https://github.com/karfekr/obsidian-persian-calendar/issues"
+	},
+	"homepage": "https://github.com/karfekr/obsidian-persian-calendar#readme",
+	"keywords": ["obsidian", "plugin", "persian", "jalali", "calendar"],
+	"scripts": {
+		"lint": "biome check --write .",
+		"clean": "node scripts/clean.mjs",
+		"version": "node scripts/sync-version.mjs",
+		"dev": "node esbuild.config.mjs && node scripts/build-styles.mjs --watch",
+		"build": "pnpm run clean && pnpm run build:style && node esbuild.config.mjs production && tsc -noEmit -skipLibCheck",
+		"build:style": "node scripts/build-styles.mjs",
+		"test": "vitest",
+		"prepare": "simple-git-hooks"
+	},
+	"dependencies": {
+		"@internationalized/date": "^3.12.3",
+		"persian-holidays": "^1.5.5"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.5.10",
+		"@types/node": "^26.3.0",
+		"chokidar": "^5.0.0",
+		"cssnano": "^8.0.8",
+		"esbuild": "0.28.1",
+		"obsidian": "^1.13.1",
+		"postcss": "^8.5.26",
+		"simple-git-hooks": "^2.13.1",
+		"tslib": "2.8.1",
+		"typescript": "^7.0.2",
+		"vitest": "^4.1.11"
+	},
+	"packageManager": "pnpm@11.24.0+sha512.bd27e345e976dcb0be0b7a1228217b049a817e21b1f355c90dbe7dc46671895a8bc1e6d06c24554505ea93ea0b45f489a27ec1bfbc8de6a9659fca0f16fa0000",
+	"simple-git-hooks": {
+		"pre-commit": "pnpm run lint",
+		"pre-push": "pnpm run build && pnpm run test"
+	}
 }

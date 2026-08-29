@@ -8,10 +8,6 @@ export function safeRender(containerEl: HTMLElement, label: string, fn: () => vo
 		fn();
 		return true;
 	} catch (error) {
-		// Full technical detail (including the real Error object/stack) for
-		// developers, plus a toast so the user notices even if the calendar
-		// view isn't the one currently focused.
-		console.error(`[Persian Calendar] Failed to render ${label}:`, error);
 		Notice(`[Persian Calendar] Failed to render ${label}: ${error}`);
 		renderCalendarError(containerEl, error);
 		return false;
