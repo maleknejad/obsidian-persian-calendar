@@ -1,5 +1,6 @@
 import type { NoteService } from "src/services";
 import type { TSetting } from "src/types";
+import { addClasses } from "src/utils/dom";
 
 import type CalendarState from "../CalendarState";
 import CalendarBodyRender from "./CalendarBody";
@@ -42,10 +43,10 @@ export default class CalendarRenderer {
 
 	public render() {
 		const containerEl = this.containerEl;
-		containerEl.empty();
+		containerEl.replaceChildren();
 
-		containerEl.addClass("persian-calendar", "persian-calendar__calendar");
-		containerEl.setAttr("dir", "rtl");
+		addClasses(containerEl, ["persian-calendar", "persian-calendar__calendar"]);
+		containerEl.setAttribute("dir", "rtl");
 
 		// Each stage is guarded independently: a date/path resolution error in
 		// (for example) the seasonal-notes row must not also wipe out an
@@ -62,7 +63,9 @@ export default class CalendarRenderer {
 		}
 
 		safeRender(containerEl, "body", () => {
-			const contentDiv = containerEl.createEl("div", { cls: "persian-calendar__content" });
+			const contentDiv = document.createElement("div");
+			addClasses(contentDiv, "persian-calendar__content");
+			containerEl.appendChild(contentDiv);
 			this.bodyRenderer.renderContent(contentDiv, this.setting.language);
 		});
 	}

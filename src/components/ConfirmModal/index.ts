@@ -16,27 +16,32 @@ class ConfirmModal extends Modal {
 
 	onOpen() {
 		const { contentEl } = this;
-		contentEl.empty();
+		contentEl.replaceChildren();
 
-		this.modalEl.addClass("persian-calendar");
-		this.modalEl.setAttr("dir", getDirection());
+		this.modalEl.classList.add("persian-calendar");
+		this.modalEl.setAttribute("dir", getDirection());
 
-		contentEl.createEl("h2", { text: this.titleText });
-		contentEl.createEl("p", { text: this.messageText });
+		const heading = document.createElement("h2");
+		heading.textContent = this.titleText;
+		contentEl.appendChild(heading);
 
-		const buttons = contentEl.createEl("div", {
-			cls: "persian-calendar__cmodal-container",
-		});
+		const message = document.createElement("p");
+		message.textContent = this.messageText;
+		contentEl.appendChild(message);
 
-		const cancelBtn = buttons.createEl("button", {
-			text: t("modal.confirmModal.cancelBtn"),
-			cls: "persian-calendar__cmodal-cancel",
-		});
+		const buttons = document.createElement("div");
+		buttons.classList.add("persian-calendar__cmodal-container");
+		contentEl.appendChild(buttons);
 
-		const confirmBtn = buttons.createEl("button", {
-			text: t("modal.confirmModal.confirmBtn"),
-			cls: "persian-calendar__cmodal-confirm",
-		});
+		const cancelBtn = document.createElement("button");
+		cancelBtn.textContent = t("modal.confirmModal.cancelBtn");
+		cancelBtn.classList.add("persian-calendar__cmodal-cancel");
+		buttons.appendChild(cancelBtn);
+
+		const confirmBtn = document.createElement("button");
+		confirmBtn.textContent = t("modal.confirmModal.confirmBtn");
+		confirmBtn.classList.add("persian-calendar__cmodal-confirm");
+		buttons.appendChild(confirmBtn);
 
 		confirmBtn.onclick = () => {
 			this.resolve(true);
@@ -50,7 +55,7 @@ class ConfirmModal extends Modal {
 	}
 
 	onClose() {
-		this.contentEl.empty();
+		this.contentEl.replaceChildren();
 	}
 }
 

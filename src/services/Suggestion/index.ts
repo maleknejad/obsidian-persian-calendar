@@ -14,11 +14,12 @@ export default class Suggestion extends EditorSuggest<string> {
 	}
 
 	renderSuggestion(value: string, el: HTMLElement): void {
-		const container = el.createEl("div");
+		const container = document.createElement("div");
+		el.appendChild(container);
 
-		container.createEl("div", {
-			text: value,
-		});
+		const inner = document.createElement("div");
+		inner.textContent = value;
+		container.appendChild(inner);
 	}
 
 	onTrigger(cursor: EditorPosition, editor: Editor): EditorSuggestContext | null {

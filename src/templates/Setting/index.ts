@@ -4,6 +4,7 @@ import SocialLinks from "src/components/SocialLinks";
 import { getDirection, onLocalChange, t } from "src/languages";
 import type PersianCalendarPlugin from "src/main";
 import type { SectionContext } from "src/types";
+import { addClasses } from "src/utils/dom";
 import { SettingsController } from "./SettingsController";
 import { SECTION_REGISTRY } from "./sections/registry";
 
@@ -32,18 +33,18 @@ export default class CalendarSettingTab extends PluginSettingTab {
 		this.controller = new SettingsController(this.plugin);
 
 		this.unsubscribeLocale = onLocalChange(() => {
-			this.containerEl.setCssProps({ direction: getDirection() });
+			this.containerEl.style.direction = getDirection();
 		});
 
 		const { containerEl } = this;
 
-		containerEl.empty();
-		containerEl.addClass("persian-calendar");
-		containerEl.setCssProps({ direction: getDirection() });
+		containerEl.replaceChildren();
+		containerEl.classList.add("persian-calendar");
+		containerEl.style.direction = getDirection();
 
-		const contactUs = containerEl.createEl("div", {
-			cls: "persian-calendar__setting-banner",
-		});
+		const contactUs = document.createElement("div");
+		addClasses(contactUs, "persian-calendar__setting-banner");
+		containerEl.appendChild(contactUs);
 
 		const heading = new Setting(contactUs).setHeading();
 		this.controller.trackLocale(() => heading.setName(t("setting.banner.title")));

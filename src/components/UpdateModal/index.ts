@@ -18,45 +18,54 @@ export default class UpdateModal extends Modal {
 
 	onOpen() {
 		const { contentEl } = this;
-		contentEl.empty();
-		contentEl.addClass("persian-calendar");
-		contentEl.setAttr("dir", this.setting.language === "fa" ? "rtl" : "ltr");
+		contentEl.replaceChildren();
+		contentEl.classList.add("persian-calendar");
+		contentEl.setAttribute("dir", this.setting.language === "fa" ? "rtl" : "ltr");
 
-		const headerEl = contentEl.createEl("div", { cls: "persian-calendar__update-header" });
+		const headerEl = document.createElement("div");
+		headerEl.classList.add("persian-calendar__update-header");
+		contentEl.appendChild(headerEl);
 		setIcon(headerEl, "calendar-heart");
 
 		const pluginName = "Persian Calendar";
-		headerEl.createEl("p", { text: pluginName });
+		const nameEl = document.createElement("p");
+		nameEl.textContent = pluginName;
+		headerEl.appendChild(nameEl);
 
 		SocialLinks(contentEl);
 
 		this.notes.forEach((note) => {
-			const section = contentEl.createEl("div");
-			const header = section.createEl("div");
+			const section = document.createElement("div");
+			contentEl.appendChild(section);
+
+			const header = document.createElement("div");
+			section.appendChild(header);
+
 			const versionText =
 				this.setting.language === "fa" ? `نسخه ${note.version}` : `Version ${note.version}`;
-			header.createEl("h3", {
-				text: versionText,
-				cls: "persian-calendar__update-version",
-			});
+			const versionEl = document.createElement("h3");
+			versionEl.textContent = versionText;
+			versionEl.classList.add("persian-calendar__update-version");
+			header.appendChild(versionEl);
 
 			const changesArray = note.changes[this.setting.language];
 			if (changesArray.length > 0) {
-				const changesContainer = section.createEl("div", {
-					cls: "persian-calendar__update-body",
-				});
+				const changesContainer = document.createElement("div");
+				changesContainer.classList.add("persian-calendar__update-body");
+				section.appendChild(changesContainer);
+
 				changesArray.forEach((change) => {
-					changesContainer.createEl("p", {
-						text: change,
-						cls: "persian-calendar__update-change",
-					});
+					const changeEl = document.createElement("p");
+					changeEl.textContent = change;
+					changeEl.classList.add("persian-calendar__update-change");
+					changesContainer.appendChild(changeEl);
 				});
 			}
 		});
 	}
 
 	onClose() {
-		this.contentEl.empty();
+		this.contentEl.replaceChildren();
 		if (this.onCloseCallback) {
 			this.onCloseCallback();
 		}

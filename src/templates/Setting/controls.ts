@@ -112,7 +112,7 @@ export function addValidatedText<K extends StringKey>(
 ): Setting {
 	const applyFeedback = (inputEl: HTMLInputElement, value: string) => {
 		const result = validator(value);
-		inputEl.toggleClass("persian-calendar__setting-input--invalid", !result.valid);
+		inputEl.classList.toggle("persian-calendar__setting-input--invalid", !result.valid);
 		inputEl.title = result.message;
 	};
 

@@ -37,7 +37,7 @@ export class PathSuggest extends AbstractInputSuggest<string> {
 	}
 
 	renderSuggestion(path: string, el: HTMLElement): void {
-		el.setText(path);
+		el.textContent = path;
 	}
 
 	selectSuggestion(path: string): void {
